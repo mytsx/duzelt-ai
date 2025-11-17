@@ -6,15 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadStatus() {
-    chrome.storage.sync.get(['ai_corrector_enabled', 'openai_api_key'], (result) => {
-        const enabled = result.ai_corrector_enabled !== false;
-        const hasApiKey = result.openai_api_key && result.openai_api_key.length > 0;
+    // API key local storage'da, enabled sync storage'da
+    chrome.storage.local.get(['openai_api_key'], (localResult) => {
+        chrome.storage.sync.get(['ai_corrector_enabled'], (syncResult) => {
+            const enabled = syncResult.ai_corrector_enabled !== false;
+            const hasApiKey = localResult.openai_api_key && localResult.openai_api_key.length > 0;
 
-        document.getElementById('enabled-toggle').checked = enabled;
-        document.getElementById('status-text').textContent = enabled ? 'Etkin' : 'Devre Dışı';
-        document.getElementById('provider-info').textContent = hasApiKey
-            ? 'API Key: Ayarlanmış ✓'
-            : 'API Key: Ayarlanmamış ✗';
+            document.getElementById('enabled-toggle').checked = enabled;
+            document.getElementById('status-text').textContent = enabled ? 'Etkin' : 'Devre Dışı';
+            document.getElementById('provider-info').textContent = hasApiKey
+                ? 'API Key: Ayarlanmış ✓'
+                : 'API Key: Ayarlanmamış ✗';
+        });
     });
 }
 

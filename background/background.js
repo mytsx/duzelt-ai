@@ -25,7 +25,8 @@ async function handleCorrectText(text) {
 
 async function loadConfig() {
     return new Promise((resolve) => {
-        chrome.storage.sync.get([STORAGE_KEYS.OPENAI_KEY], (result) => {
+        // API key'i local storage'dan oku (güvenlik için)
+        chrome.storage.local.get([STORAGE_KEYS.OPENAI_KEY], (result) => {
             resolve({
                 openaiKey: result[STORAGE_KEYS.OPENAI_KEY] || null
             });

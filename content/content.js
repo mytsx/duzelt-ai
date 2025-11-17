@@ -9,6 +9,7 @@
 
     let isEnabled = true;
     let buttonCounter = 0;
+    let domObserver = null;
     const processedFields = new WeakSet();
 
     chrome.storage.sync.get([CONFIG.ENABLED_KEY], function(result) {
@@ -27,6 +28,9 @@
     }
 
     function addButtonsToExistingFields() {
+        // isEnabled kontrolü - devre dışıysa hiç buton ekleme
+        if (!isEnabled) return;
+
         // Normal alanlar
         const fields = document.querySelectorAll('textarea, input[type="text"], [contenteditable="true"]');
         fields.forEach(field => {
@@ -251,6 +255,18 @@
         event.preventDefault();
         const button = event.currentTarget;
 
+        // Rich text editör uyarısı
+        if (editorType) {
+            const confirmation = confirm(
+                'UYARI: Rich text editörlerde bold, italic, linkler gibi HTML formatları kaybolacaktır.\n\n' +
+                'Sadece düz metin düzeltme yapılacaktır.\n\n' +
+                'Devam etmek istiyor musunuz?'
+            );
+            if (!confirmation) {
+                return;
+            }
+        }
+
         const originalText = getEditorValue(fieldOrEditor, editorType);
         if (!originalText || originalText.trim().length < 10) {
             alert('Lütfen düzeltilecek metin girin (en az 10 karakter)');
@@ -425,7 +441,18 @@
     }
 
     function observeDOMChanges() {
-        const observer = new MutationObserver(mutations => {
+        // isEnabled kontrolü - devre dışıysa observer başlatma
+        if (!isEnabled) return;
+
+        // Eski observer varsa disconnect et
+        if (domObserver) {
+            domObserver.disconnect();
+        }
+
+        domObserver = new MutationObserver(mutations => {
+            // Her mutation'da isEnabled kontrolü
+            if (!isEnabled) return;
+
             let needsUpdate = false;
 
             mutations.forEach(mutation => {
@@ -440,12 +467,14 @@
                 // Debounce: 500ms sonra kontrol et
                 clearTimeout(observeDOMChanges.timer);
                 observeDOMChanges.timer = setTimeout(() => {
-                    addButtonsToExistingFields();
+                    if (isEnabled) {
+                        addButtonsToExistingFields();
+                    }
                 }, 500);
             }
         });
 
-        observer.observe(document.body, {
+        domObserver.observe(document.body, {
             childList: true,
             subtree: true
         });
@@ -458,6 +487,7 @@
                 init();
             } else {
                 removeAllButtons();
+                disconnectObserver();
             }
         }
     });
@@ -466,6 +496,13 @@
         const buttons = document.querySelectorAll(`.${CONFIG.BUTTON_CLASS}`);
         buttons.forEach(btn => btn.remove());
         processedFields.clear();
+    }
+
+    function disconnectObserver() {
+        if (domObserver) {
+            domObserver.disconnect();
+            domObserver = null;
+        }
     }
 
 })();

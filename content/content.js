@@ -105,6 +105,8 @@
                     const toolbar = container.previousElementSibling;
                     if (toolbar && toolbar.classList.contains('ql-toolbar')) {
                         addButtonToRichEditor(toolbar, 'quill', editableElement);
+                        // Container'ı processed olarak işaretle (toolbar'a buton ekledik ama container'ı kontrol ediyoruz)
+                        processedFields.add(container);
                     } else {
                         addButtonToRichEditor(container, 'quill', editableElement);
                     }

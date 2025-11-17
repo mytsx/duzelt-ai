@@ -1,6 +1,6 @@
 # AI Türkçe Metin Düzeltici - Chrome Extension
 
-Web sayfalarındaki tüm text input alanlarına AI destekli Türkçe metin düzeltme butonu ekleyen Chrome Extension.
+Web sayfalarındaki zengin metin düzenleyicilere (CKEditor, Summernote, TinyMCE, Quill) AI destekli Türkçe metin düzeltme butonu ekleyen Chrome Extension.
 
 **Version:** 3.1.0
 

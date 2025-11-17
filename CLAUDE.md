@@ -155,7 +155,7 @@ headers: {
 ## File Organization
 
 ```
-manifest.json          - Extension config (v3.0.1)
+manifest.json          - Extension config (v3.1.0)
 background/
   ├── background.js         - Message handler, loads config from storage
   └── openai-provider.js    - OpenAI API client with Headers fix (v3.0.1)

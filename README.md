@@ -1,18 +1,19 @@
 # AI Türkçe Metin Düzeltici - Chrome Extension
 
-Web sayfalarındaki tüm text input alanlarına AI destekli Türkçe metin düzeltme butonu ekleyen Chrome Extension.
+Web sayfalarındaki zengin metin düzenleyicilere (CKEditor, Summernote, TinyMCE, Quill) AI destekli Türkçe metin düzeltme butonu ekleyen Chrome Extension.
 
-**Version:** 2.0.0
+**Version:** 3.1.0
+
+**IMPORTANT:** v3.1.0'dan itibaren extension **SADECE** rich text editörlerde (CKEditor, Summernote, TinyMCE, Quill) çalışır. Normal textarea/input alanlarında buton GÖRÜNMEZ.
 
 ## Özellikler
 
 ### Akıllı Buton Enjeksiyonu
-- ✅ Normal textarea ve input alanları
-- ✅ **CKEditor** (4.x ve 5.x)
-- ✅ **Summernote**
-- ✅ **TinyMCE**
-- ✅ **Quill**
-- ✅ Tüm contenteditable alanlar
+- ✅ **CKEditor** (4.x ve 5.x) - Toolbar'a entegre
+- ✅ **Summernote** - Toolbar'a entegre
+- ✅ **TinyMCE** - Toolbar'a entegre
+- ✅ **Quill** - Toolbar'a entegre
+- ❌ Normal textarea/input alanları (v3.1.0'dan itibaren desteklenmiyor)
 - ✅ Dinamik içerik desteği (MutationObserver)
 
 ### AI Düzeltme
@@ -41,13 +42,7 @@ Web sayfalarındaki tüm text input alanlarına AI destekli Türkçe metin düze
 
 ## Kullanım
 
-### Normal Text Alanları (textarea, input)
-1. Herhangi bir web sitesindeki text alanına tıklayın
-2. Sağ üstte görünen "🤖 Düzelt" butonuna tıklayın
-3. Düzeltilmiş metni diff ile önizleyin
-4. "Kabul Et" veya "İptal" seçin
-
-### Rich Text Editörler (CKEditor, Summernote, vb.)
+### Rich Text Editörler (CKEditor, Summernote, TinyMCE, Quill)
 1. Editörün **toolbar**'ında "🤖 Düzelt" butonu otomatik olarak görünür
 2. Metninizi yazın
 3. Toolbar'daki "🤖 Düzelt" butonuna tıklayın
@@ -55,16 +50,14 @@ Web sayfalarındaki tüm text input alanlarına AI destekli Türkçe metin düze
 
 ## Desteklenen Platformlar
 
-Extension **tüm web sitelerinde** çalışır:
-- ✅ **Gmail** - Email yazma
-- ✅ **Notion** - Quill editör
-- ✅ **WordPress** - CKEditor/TinyMCE
-- ✅ **LinkedIn** - Post ve mesajlar
-- ✅ **Twitter/X** - Tweet yazma
-- ✅ **Google Docs** - Contenteditable
-- ✅ **MigemPortal** - HelpDesk ve formlar
-- ✅ **Drupal, Joomla** - CMS editörleri
-- ✅ Ve diğer tüm web siteleri
+Extension **SADECE rich text editör kullanan web sitelerinde** çalışır:
+- ✅ **WordPress** - CKEditor/TinyMCE toolbar
+- ✅ **Drupal, Joomla** - CMS editör toolbar'ları
+- ✅ **Notion** - Quill editör (eğer varsa)
+- ✅ **MigemPortal** - HelpDesk (eğer CKEditor/TinyMCE kullanıyorsa)
+- ❌ **Gmail** - Normal textarea (desteklenmiyor)
+- ❌ **LinkedIn, Twitter/X** - Normal text input (desteklenmiyor)
+- ❌ **Google Docs** - Özel editör (desteklenmiyor)
 
 ## Proje Yapısı
 

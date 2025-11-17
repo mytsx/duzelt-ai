@@ -4,31 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Chrome Extension (Manifest V3) that adds AI-powered Turkish text correction buttons to all text input fields across the web. It uses OpenAI's GPT-4o to correct text according to Turkish official writing rules (TDK standards and official correspondence guidelines).
+Chrome Extension (Manifest V3) that adds AI-powered Turkish text correction buttons **ONLY to rich text editors** (CKEditor, Summernote, TinyMCE, Quill). Uses OpenAI GPT-4o to correct text according to TDK (Turkish Language Association) standards and official correspondence regulations.
 
-**Current Version:** 2.0.0
+**Current Version:** 3.1.0
 
-## Development Setup
+## Build & Development Commands
 
-### Testing the Extension
+**No build step required** - this is vanilla JavaScript with no dependencies or build process.
 
-1. Load unpacked extension in Chrome:
-   ```
-   chrome://extensions/ → Enable "Developer mode" → "Load unpacked" → Select this directory
-   ```
+**Development workflow:**
+1. Make code changes
+2. Reload extension: `chrome://extensions/` → Click reload icon
+3. Refresh test webpage (F5)
 
-2. After making changes, reload the extension:
-   ```
-   chrome://extensions/ → Click reload icon next to the extension
-   ```
+**Package for distribution:**
+```bash
+zip -r dist.zip manifest.json background content popup options lib icons
+```
 
-3. Refresh the test webpage (F5)
-
-### Debugging
-
-- **Background script errors**: `chrome://extensions/` → Extension → "Inspect views: service worker"
-- **Content script errors**: Open DevTools on any webpage (F12) → Console tab
-- **Popup errors**: Right-click extension icon → "Inspect popup"
+**Debugging:**
+- Background script: `chrome://extensions/` → "Inspect views: service worker"
+- Content script: F12 on any webpage → Console tab
+- Popup: Right-click extension icon → "Inspect popup"
 
 ## Architecture
 
@@ -38,131 +35,227 @@ Content Script (content.js)
     ↓ chrome.runtime.sendMessage({ action: 'correctText', text })
 Background Script (background.js)
     ↓ OpenAIProvider.correctText(text, apiKey)
-OpenAI API (GPT-4o)
-    ↓ JSON response { corrected_text: "..." }
+OpenAI API (GPT-4o with JSON mode)
+    ↓ { "corrected_text": "..." }
 Background Script
     ↓ sendResponse({ correctedText })
-Content Script → Shows diff modal
+Content Script → Shows diff modal with accept/reject
 ```
 
-### Key Components
+### Storage Architecture (CRITICAL)
 
-**Content Script (content/content.js)**
-- Runs on all web pages (`<all_urls>`)
-- Detects and injects buttons into text fields
-- Rich text editor detection: CKEditor (4.x, 5.x), Summernote, TinyMCE, Quill
-- Uses `WeakSet` to track processed fields (prevents duplicate buttons)
-- MutationObserver with 500ms debounce for dynamic content
-- 1000ms initial delay to allow rich text editors to load
+**Security fix in v2.1.0+:** API keys MUST use `chrome.storage.local` (not sync)
 
-**Background Script (background/background.js)**
-- Service worker (Manifest V3)
-- Handles API communication with OpenAI
-- Loads API key from chrome.storage.sync
-- Returns corrected text or error messages
-
-**OpenAI Provider (background/openai-provider.js)**
-- GPT-4o model with response_format: json_object
-- Temperature: 0.3 (for consistency)
-- System prompt from prompts/turkish-official.txt (TDK rules)
-- Expects JSON response: `{ "corrected_text": "..." }`
-
-### Storage Keys
 ```javascript
-STORAGE_KEYS = {
-    OPENAI_KEY: 'openai_api_key',
-    ENABLED: 'ai_corrector_enabled'
-}
+// API key - chrome.storage.local (device-specific, NOT synced)
+STORAGE_KEYS.OPENAI_KEY = 'openai_api_key'
+
+// Settings - chrome.storage.sync (synced across devices)
+STORAGE_KEYS.ENABLED = 'ai_corrector_enabled'
 ```
 
-## Critical Implementation Details
+**Rationale:** API keys in `chrome.storage.sync` would sync across all user devices via Google account, creating security risk. Always use `local` for secrets.
 
-### Rich Text Editor Button Placement
+### Rich Text Editor Support (v3.1.0: ONLY Rich Editors)
 
-**Problem:** Rich text editors use contenteditable divs, which would trigger both toolbar buttons AND floating buttons.
+**Important:** As of v3.1.0, buttons appear **ONLY** in rich text editors (CKEditor, Summernote, TinyMCE, Quill). Normal textarea/input fields are **NOT** supported.
 
-**Solution:** The `isFieldEligible()` function filters out contenteditable elements inside rich text editors:
-- Checks for `.ck-content`, `.note-editable`, `.ql-editor` classes
-- Checks for parent containers: `.ck-editor`, `.note-editor`, `.ql-container`, `.tox-tinymce`
-- Only toolbar buttons appear for rich editors; floating buttons appear for plain textareas/inputs
+**Rationale:** Users requested to limit the extension to professional rich text editors only, not all text fields.
 
-### Field Filtering Logic
-Fields are skipped if they are:
-- Inside rich text editor containers (see above)
-- Too small (< 100px width or < 30px height) → prevents search boxes
-- Password, email, number, tel, url, or search input types
-- Read-only or disabled
-- Hidden (display: none or no offsetParent)
-
-### Detection Functions
-Each rich text editor has its own detection function:
-- `detectCKEditor()`: Checks `window.CKEDITOR.instances` + `.ck-editor` class
+**Detection functions** (each runs on init and via MutationObserver):
+- `detectCKEditor()`: Checks `window.CKEDITOR.instances` + `.ck-editor` class for CKEditor 4.x/5.x
 - `detectSummernote()`: Checks `.note-editor` container
 - `detectTinyMCE()`: Checks `window.tinymce.editors`
 - `detectQuill()`: Checks `.ql-container`
 
-## Turkish Correction Prompt
+**Button placement:**
+- **Rich editors:** Button added to toolbar (integrated into editor UI)
+- **Plain textarea/input:** NOT supported (removed in v3.1.0)
 
-The system prompt in `prompts/turkish-official.txt` follows:
-1. TDK (Türk Dil Kurumu) spelling and grammar rules
-2. Official correspondence regulations ("Resmî Yazışmalarda Uygulanacak Usul ve Esaslar")
-3. Must return ONLY valid JSON: `{"corrected_text":"..."}`
-4. Preserves meaning, only corrects grammar/spelling/formality
+### HTML Format Preservation (v3.0.0+)
 
-## Common Issues
+**Critical feature:** When correcting rich text, preserve HTML formatting (bold, italic, links, lists).
 
-### "Buttons appearing twice"
-- Rich text editor contenteditable elements must be filtered in `isFieldEligible()`
-- Check if new editor type needs to be added to detection functions
+**Implementation:**
+```javascript
+// getEditorValue returns object with both text and HTML
+{ text: "plain text", html: "<b>formatted</b> text", isPlainText: false }
 
-### "Buttons not appearing"
-- Extension enabled? Check popup toggle
-- Check console for errors
-- Rich text editors need 1000ms to initialize (see `init()` timeout)
-- MutationObserver debounces 500ms - wait before expecting buttons
+// mapTextToHTML does word-based replacement preserving tags
+correctedHTML = mapTextToHTML(originalHTML, originalText, correctedText)
 
-### "API errors"
-- Check if API key is set in options page
-- OpenAI API key format: starts with `sk-proj-` or `sk-`
-- Background script logs visible in service worker inspector
+// setEditorValue uses correctedHTML for rich editors
+editor.setData(correctedHTML)  // CKEditor
+editor.innerHTML = correctedHTML  // Others
+```
+
+**Algorithm:** Word-by-word diff between original and corrected text, replacing words inside HTML without touching tags. Falls back to plain text if word count differs by >50%.
+
+### Enable/Disable Mechanism (v2.1.0+)
+
+**Problem:** MutationObserver continued running after disable, causing buttons to reappear.
+
+**Solution:** Robust enable/disable mechanism using three guards and observer disconnect:
+```javascript
+// Guard 1: Check before adding buttons (line 33)
+function addButtonsToExistingFields() {
+    if (!isEnabled) return;
+}
+
+// Guard 2: Check before starting observer (line 458)
+function observeDOMChanges() {
+    if (!isEnabled) return;
+}
+
+// Guard 3: Check inside observer callback (line 467)
+domObserver = new MutationObserver(mutations => {
+    if (!isEnabled) return;
+});
+
+// Guard 4: Disconnect observer when disabled (line 514)
+function disconnectObserver() {
+    if (domObserver) {
+        domObserver.disconnect();
+        domObserver = null;
+    }
+}
+```
+
+### Processed Fields Tracking (v2.1.1+)
+
+**Critical fix:** Changed from `WeakSet` to `Set` because WeakSet doesn't have `.clear()` method.
+
+```javascript
+const processedFields = new Set();  // line 14
+
+// Clear when disabled
+function removeAllButtons() {
+    processedFields.clear();  // Works with Set, not WeakSet
+}
+```
+
+### Chrome Service Worker Fetch Quirk (v3.0.1)
+
+**Problem:** Manifest V3 service workers throw "non ISO-8859-1 code point" error when headers contain Turkish characters or are improperly constructed.
+
+**Solution:** Use `Headers` constructor instead of object literal:
+```javascript
+// CORRECT (v3.0.1+):
+const headers = new Headers();
+headers.append('Content-Type', 'application/json; charset=utf-8');
+headers.append('Authorization', 'Bearer ' + apiKey);
+
+// INCORRECT (causes errors):
+headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`
+}
+```
 
 ## File Organization
 
 ```
-manifest.json          → Extension config, permissions, content_scripts
+manifest.json          - Extension config (v3.1.0)
 background/
-  ├── background.js         → Message handling, API orchestration
-  └── openai-provider.js    → OpenAI API client (GPT-4o)
+  ├── background.js         - Message handler, loads config from storage
+  └── openai-provider.js    - OpenAI API client with Headers fix (v3.0.1)
 content/
-  ├── content.js            → Button injection, rich editor detection
-  └── content.css           → Button styles, modal styles
+  ├── content.js            - Button injection, rich editor detection, HTML preservation
+  └── content.css           - Button styles, modal styles
 options/
-  ├── options.html/js/css   → Settings page (API key management)
+  ├── options.html/js/css   - Settings page with 4-layer error handling
 popup/
-  ├── popup.html/js/css     → Quick toggle UI
+  ├── popup.html/js/css     - Quick enable/disable toggle
 lib/
-  └── diff.min.js           → Text diffing for preview modal
+  └── diff.min.js           - jsdiff library for preview modal
 prompts/
-  └── turkish-official.txt  → System prompt for corrections
+  └── turkish-official.txt  - TDK + official correspondence rules (embedded in code)
 ```
 
-## Testing Workflow
+## Coding Conventions
 
-1. Make code changes
-2. Reload extension at `chrome://extensions/`
-3. Refresh test webpage
-4. Test on pages with different editor types:
-   - Plain textarea (Gmail compose)
-   - Summernote (various CMSs)
-   - CKEditor (WordPress, Drupal)
-   - Quill (Notion-like editors)
+**Style:**
+- Vanilla JavaScript ES2020, no modules or transpilation
+- 4 spaces indentation, single quotes
+- Variables: `camelCase`, Constants: `UPPER_SNAKE_CASE`
+- Files: lowercase with hyphens (`openai-provider.js`, `popup.html`)
 
-## Storage Format
-
-API key stored in `chrome.storage.sync`:
-```javascript
-{
-  'openai_api_key': 'sk-proj-...',
-  'ai_corrector_enabled': true
-}
+**Commit messages:** Follow conventional commits pattern:
 ```
+type: summary (version)
+
+Examples:
+feat: HTML format preservation in rich text editors (v3.0.0)
+fix: Chrome Service Worker fetch header encoding issue (v3.0.1)
+chore: Bump version to 2.1.1
+```
+
+## Testing Checklist
+
+Before committing changes, manually test:
+
+1. **Popup toggle:** Enable/disable in popup → verify buttons appear/disappear
+2. **Settings page:** Save API key → test connection → verify success message
+3. **CKEditor:** WordPress admin, Drupal → verify button appears in toolbar
+4. **Summernote:** CMS editors → verify button appears in toolbar
+5. **TinyMCE:** Various CMSs → verify button appears in toolbar
+6. **Quill:** Notion-like editors → verify button appears in toolbar
+7. **Plain textarea/input:** Gmail compose, basic forms → verify NO buttons appear (v3.1.0+)
+8. **HTML preservation:** Bold/italic text → correct → verify formatting preserved
+9. **Disable flow:** Disable in popup → verify observer stops → no buttons reappear on DOM changes
+
+**Check service worker logs** for any runtime errors after each test.
+
+## Common Issues & Fixes
+
+### "Duplicate buttons in Quill editor toolbar"
+- **Cause:** detectQuill() checks container but adds toolbar to processedFields
+- **Fix:** Explicitly mark container as processed when adding button to toolbar (fixed in v3.1.0, line 109)
+
+### "Format loss when accepting corrections"
+- **Cause:** Using `innerText` instead of HTML preservation
+- **Fix:** Ensure `mapTextToHTML()` is called for rich editors (implemented in v3.0.0)
+
+### "WeakSet.clear() TypeError"
+- **Cause:** WeakSet doesn't have clear() method
+- **Fix:** Use `Set` instead (fixed in v2.1.1, line 14)
+
+### "Buttons reappear after disabling"
+- **Cause:** MutationObserver not disconnected
+- **Fix:** Call `disconnectObserver()` when disabled (line 514)
+
+### "Failed to read headers property" fetch error
+- **Cause:** Object literal headers in Service Worker with non-ASCII chars
+- **Fix:** Use `Headers` constructor (fixed in v3.0.1, openai-provider.js lines 60-62)
+
+### "API key not saved" or "syncing to wrong devices"
+- **Cause:** Using sync storage for API keys
+- **Fix:** MUST use `chrome.storage.local` for API keys (security requirement)
+
+## Turkish Correction Prompt
+
+System prompt follows:
+1. **TDK** (Türk Dil Kurumu) spelling and grammar rules
+2. **Official correspondence regulations** (Resmî Yazışmalarda Uygulanacak Usul ve Esaslar)
+3. **JSON-only output:** `{"corrected_text":"..."}`
+4. **Temperature:** 0.3 for consistency
+5. **Model:** gpt-4o with `response_format: { type: 'json_object' }`
+
+Priority order: Official correspondence rules > TDK general rules
+
+## Version History (Key Changes)
+
+- **v3.1.0:** BREAKING: Removed support for plain textarea/input - ONLY rich text editors supported
+- **v3.0.1:** Fix Chrome Service Worker fetch header encoding (Headers constructor)
+- **v3.0.0:** HTML format preservation in rich text editors
+- **v2.1.1:** Fix WeakSet.clear() crash (changed to Set)
+- **v2.1.0:** Security fix (API keys to local storage), enable/disable guards, error handling
+- **v2.0.0:** Rich text editor support, duplicate button prevention
+- **v1.0.0:** Initial release
+
+## Critical Security Rules
+
+1. **API keys:** ALWAYS use `chrome.storage.local`, NEVER sync
+2. **New external APIs:** Add to `host_permissions` in manifest.json
+3. **User input:** All text goes through background script (no direct API calls from content script)
+4. **Storage keys:** Document in STORAGE_KEYS constant, maintain consistency across files

@@ -32,15 +32,8 @@
         // isEnabled kontrolü - devre dışıysa hiç buton ekleme
         if (!isEnabled) return;
 
-        // Normal alanlar
-        const fields = document.querySelectorAll('textarea, input[type="text"], [contenteditable="true"]');
-        fields.forEach(field => {
-            if (!processedFields.has(field) && isFieldEligible(field)) {
-                addButtonToField(field);
-            }
-        });
-
-        // Rich text editörleri tespit et
+        // SADECE Rich text editörleri tespit et
+        // Normal textarea/input alanlarına buton ekleme - sadece rich editörlere
         detectRichTextEditors();
     }
 
@@ -112,6 +105,8 @@
                     const toolbar = container.previousElementSibling;
                     if (toolbar && toolbar.classList.contains('ql-toolbar')) {
                         addButtonToRichEditor(toolbar, 'quill', editableElement);
+                        // Container'ı processed olarak işaretle (toolbar'a buton ekledik ama container'ı kontrol ediyoruz)
+                        processedFields.add(container);
                     } else {
                         addButtonToRichEditor(container, 'quill', editableElement);
                     }
@@ -120,56 +115,8 @@
         });
     }
 
-    function isFieldEligible(field) {
-        // Zaten işlenmiş mi?
-        if (processedFields.has(field)) return false;
-
-        // Temel kontroller
-        if (field.readOnly || field.disabled) return false;
-        if (field.style.display === 'none' || field.offsetParent === null) return false;
-        if (field.closest('[data-ai-corrector-ignore]')) return false;
-
-        // Rich text editör içindeki contenteditable alanları atla (onlar için toolbar'a buton ekliyoruz)
-        if (field.contentEditable === 'true' || field.getAttribute('contenteditable') === 'true') {
-            // CKEditor editable alanı mı?
-            if (field.classList.contains('ck-content') || field.classList.contains('ck-editor__editable')) {
-                return false;
-            }
-            // Summernote editable alanı mı?
-            if (field.classList.contains('note-editable')) {
-                return false;
-            }
-            // Quill editable alanı mı?
-            if (field.classList.contains('ql-editor')) {
-                return false;
-            }
-            // TinyMCE editable alanı mı?
-            if (field.id && field.id.includes('tinymce')) {
-                return false;
-            }
-            // Genel kontrol: rich text editör container içinde mi?
-            if (field.closest('.ck-editor, .note-editor, .ql-container, .tox-tinymce')) {
-                return false;
-            }
-        }
-
-        // Çok küçük alanları atla (search box vb.)
-        if (field.offsetWidth < 100 || field.offsetHeight < 30) return false;
-
-        // Password, email vb. atla
-        if (field.type && ['password', 'email', 'number', 'tel', 'url', 'search'].includes(field.type)) return false;
-
-        return true;
-    }
-
-    function addButtonToField(field) {
-        const fieldId = field.id || `ai-field-${buttonCounter++}`;
-        if (!field.id) field.id = fieldId;
-
-        const button = createButton(fieldId, field);
-        insertButtonNearField(field, button);
-        processedFields.add(field);
-    }
+    // isFieldEligible ve addButtonToField fonksiyonları kaldırıldı
+    // v3.1.0: Sadece rich text editörlere buton ekleniyor, normal input/textarea'lara eklenmiyor
 
     function addButtonToRichEditor(containerElement, editorType, editorInstance) {
         const fieldId = `ai-richeditor-${buttonCounter++}`;
@@ -197,17 +144,8 @@
         return button;
     }
 
-    function insertButtonNearField(field, button) {
-        // Parent'ın position'ını kontrol et
-        const parent = field.parentNode;
-        const parentPosition = window.getComputedStyle(parent).position;
-
-        if (parentPosition === 'static') {
-            parent.style.position = 'relative';
-        }
-
-        parent.appendChild(button);
-    }
+    // insertButtonNearField fonksiyonu kaldırıldı
+    // v3.1.0: Sadece rich text editörlere buton ekleniyor
 
     function insertButtonForRichEditor(editorElement, button, editorType) {
         // Rich editörler için toolbar'a veya container'a ekle

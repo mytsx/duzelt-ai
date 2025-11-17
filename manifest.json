@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AI Türkçe Metin Düzeltici",
-  "version": "3.0.1",
-  "description": "Türkçe resmi yazışmaları AI ile düzelten Chrome extension. CKEditor, Summernote, TinyMCE ve tüm text editörlerde çalışır.",
+  "version": "3.1.0",
+  "description": "Türkçe resmi yazışmaları AI ile düzelten Chrome extension. SADECE rich text editörlerde (CKEditor, Summernote, TinyMCE, Quill) çalışır.",
 
   "permissions": [
     "storage",

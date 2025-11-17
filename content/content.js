@@ -10,7 +10,8 @@
     let isEnabled = true;
     let buttonCounter = 0;
     let domObserver = null;
-    const processedFields = new WeakSet();
+    // WeakSet yerine Set kullan - clear() metodu var
+    const processedFields = new Set();
 
     chrome.storage.sync.get([CONFIG.ENABLED_KEY], function(result) {
         isEnabled = result[CONFIG.ENABLED_KEY] !== false;

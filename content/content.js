@@ -256,19 +256,9 @@
         event.preventDefault();
         const button = event.currentTarget;
 
-        // Rich text editör uyarısı
-        if (editorType) {
-            const confirmation = confirm(
-                'UYARI: Rich text editörlerde bold, italic, linkler gibi HTML formatları kaybolacaktır.\n\n' +
-                'Sadece düz metin düzeltme yapılacaktır.\n\n' +
-                'Devam etmek istiyor musunuz?'
-            );
-            if (!confirmation) {
-                return;
-            }
-        }
+        const editorData = getEditorValue(fieldOrEditor, editorType);
+        const originalText = editorData.text;
 
-        const originalText = getEditorValue(fieldOrEditor, editorType);
         if (!originalText || originalText.trim().length < 10) {
             alert('Lütfen düzeltilecek metin girin (en az 10 karakter)');
             return;
@@ -279,7 +269,7 @@
 
         try {
             const correctedText = await requestCorrection(originalText);
-            showDiffModal(originalText, correctedText, fieldOrEditor, button, editorType);
+            showDiffModal(originalText, correctedText, fieldOrEditor, button, editorType, editorData);
         } catch (error) {
             alert('Hata: ' + error.message);
             button.disabled = false;
@@ -289,73 +279,157 @@
 
     function getEditorValue(fieldOrEditor, editorType) {
         if (!editorType) {
-            // Normal field
+            // Normal field - düz metin
             if (fieldOrEditor.isContentEditable) {
-                return fieldOrEditor.innerText || fieldOrEditor.textContent;
+                return {
+                    text: fieldOrEditor.innerText || fieldOrEditor.textContent,
+                    html: null,
+                    isPlainText: true
+                };
             }
-            return fieldOrEditor.value;
+            return {
+                text: fieldOrEditor.value,
+                html: null,
+                isPlainText: true
+            };
         }
 
-        // Rich text editörler
+        // Rich text editörler - HTML ile birlikte
+        let html = '';
+        let text = '';
+
         switch (editorType) {
             case 'ckeditor4':
-                return fieldOrEditor.getData().replace(/<[^>]*>/g, '');
+                html = fieldOrEditor.getData();
+                text = extractTextFromHTML(html);
+                break;
 
             case 'ckeditor5':
-                return fieldOrEditor.innerText || fieldOrEditor.textContent;
+                html = fieldOrEditor.innerHTML;
+                text = fieldOrEditor.innerText || fieldOrEditor.textContent;
+                break;
 
             case 'summernote':
-                return fieldOrEditor.innerText || fieldOrEditor.textContent;
+                html = fieldOrEditor.innerHTML;
+                text = fieldOrEditor.innerText || fieldOrEditor.textContent;
+                break;
 
             case 'tinymce':
-                return fieldOrEditor.getContent({ format: 'text' });
+                html = fieldOrEditor.getContent();
+                text = fieldOrEditor.getContent({ format: 'text' });
+                break;
 
             case 'quill':
-                return fieldOrEditor.innerText || fieldOrEditor.textContent;
+                html = fieldOrEditor.innerHTML;
+                text = fieldOrEditor.innerText || fieldOrEditor.textContent;
+                break;
 
             default:
-                return fieldOrEditor.innerText || fieldOrEditor.textContent || fieldOrEditor.value || '';
+                html = fieldOrEditor.innerHTML || '';
+                text = fieldOrEditor.innerText || fieldOrEditor.textContent || '';
         }
+
+        return {
+            text: text,
+            html: html,
+            isPlainText: false,
+            editorInstance: fieldOrEditor
+        };
     }
 
-    function setEditorValue(fieldOrEditor, value, editorType) {
+    function extractTextFromHTML(html) {
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        return temp.innerText || temp.textContent || '';
+    }
+
+    function setEditorValue(fieldOrEditor, correctedText, editorType, originalData) {
         if (!editorType) {
-            // Normal field
+            // Normal field - düz metin
             if (fieldOrEditor.isContentEditable) {
-                fieldOrEditor.innerText = value;
+                fieldOrEditor.innerText = correctedText;
             } else {
-                fieldOrEditor.value = value;
+                fieldOrEditor.value = correctedText;
             }
             fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
             fieldOrEditor.dispatchEvent(new Event('change', { bubbles: true }));
             return;
         }
 
-        // Rich text editörler
+        // Rich text editörler - HTML formatını koru
+        const correctedHTML = mapTextToHTML(originalData.html, originalData.text, correctedText);
+
         switch (editorType) {
             case 'ckeditor4':
-                fieldOrEditor.setData(value);
+                fieldOrEditor.setData(correctedHTML);
                 break;
 
             case 'ckeditor5':
-                fieldOrEditor.innerText = value;
+                fieldOrEditor.innerHTML = correctedHTML;
                 fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
                 break;
 
             case 'summernote':
-                fieldOrEditor.innerText = value;
+                fieldOrEditor.innerHTML = correctedHTML;
                 fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
                 break;
 
             case 'tinymce':
-                fieldOrEditor.setContent(value);
+                fieldOrEditor.setContent(correctedHTML);
                 break;
 
             case 'quill':
-                fieldOrEditor.innerText = value;
+                fieldOrEditor.innerHTML = correctedHTML;
                 fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
                 break;
         }
+    }
+
+    function mapTextToHTML(originalHTML, originalText, correctedText) {
+        // Basit strateji: kelime bazlı değiştirme
+        // HTML tag'lerini koru, sadece text node'ları değiştir
+
+        const originalWords = originalText.split(/\s+/).filter(w => w.length > 0);
+        const correctedWords = correctedText.split(/\s+/).filter(w => w.length > 0);
+
+        // Eğer kelime sayısı çok farklıysa, direkt düz metin dön (güvenli mod)
+        if (Math.abs(originalWords.length - correctedWords.length) > originalWords.length * 0.5) {
+            return escapeHtmlPreserveBasicTags(correctedText);
+        }
+
+        // HTML'i parse et ve kelime bazlı değiştir
+        let result = originalHTML;
+        let wordIndex = 0;
+
+        // Her orijinal kelimeyi düzeltilmiş kelime ile değiştir
+        for (let i = 0; i < originalWords.length && i < correctedWords.length; i++) {
+            if (originalWords[i] !== correctedWords[i]) {
+                // Kelimeyi HTML içinde bul ve değiştir (tag dışında)
+                result = replaceWordInHTML(result, originalWords[i], correctedWords[i]);
+            }
+        }
+
+        return result;
+    }
+
+    function replaceWordInHTML(html, oldWord, newWord) {
+        // Basit regex ile tag dışındaki metni değiştir
+        // NOT: Bu basit bir yaklaşım, %100 mükemmel değil ama çoğu durumda çalışır
+        const escapedOld = oldWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(>|^)([^<]*?)\\b${escapedOld}\\b([^<]*?)(<|$)`, 'gi');
+
+        return html.replace(regex, (match, before, prefix, suffix, after) => {
+            return before + prefix + newWord + suffix + after;
+        });
+    }
+
+    function escapeHtmlPreserveBasicTags(text) {
+        // Güvenli mod: sadece temel formatlamayı koru
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
     }
 
     function requestCorrection(text) {
@@ -375,7 +449,7 @@
         });
     }
 
-    function showDiffModal(original, corrected, fieldOrEditor, button, editorType) {
+    function showDiffModal(original, corrected, fieldOrEditor, button, editorType, originalData) {
         const existingModal = document.getElementById(CONFIG.MODAL_ID);
         if (existingModal) existingModal.remove();
 
@@ -386,7 +460,7 @@
         const rejectBtn = modal.querySelector('[data-action="reject"]');
 
         acceptBtn.addEventListener('click', () => {
-            setEditorValue(fieldOrEditor, corrected, editorType);
+            setEditorValue(fieldOrEditor, corrected, editorType, originalData);
             modal.remove();
             button.disabled = false;
             button.innerHTML = '🤖 Düzelt';

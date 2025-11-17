@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Metin Düzeltici - Ayarlar</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AI Türkçe Metin Düzeltici</h1>
+            <p>Ayarlarınızı yapılandırın</p>
+        </header>
+
+        <main>
+            <section class="settings-section">
+                <h2>OpenAI API Ayarları</h2>
+                <div class="form-group">
+                    <label for="openai-key">API Key</label>
+                    <input type="password" id="openai-key" placeholder="sk-proj-...">
+                    <small>OpenAI API key'iniz güvenli olarak saklanır</small>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>Genel Ayarlar</h2>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enabled" checked>
+                        Extension'ı etkinleştir
+                    </label>
+                </div>
+            </section>
+
+            <div class="actions">
+                <button id="save-btn" class="btn-primary">Kaydet</button>
+                <button id="test-btn" class="btn-secondary">API Bağlantısını Test Et</button>
+            </div>
+
+            <div id="status" class="status"></div>
+        </main>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>

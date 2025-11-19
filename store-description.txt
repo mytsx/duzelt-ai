@@ -19,6 +19,7 @@ OpenAI'nin GPT-4o modelini kullanarak Türkçe metinlerinizi:
 ✅ **Profesyonel İçerik:** WordPress, Drupal gibi CMS platformlarında resmi yazışmalarınızı hatasız yazın
 ✅ **Zaman Kazanın:** Metninizi manuel olarak kontrol etmek yerine tek tıkla düzeltin
 ✅ **TDK Standartları:** Türk Dil Kurumu ve resmi yazışma yönetmeliğine tam uyum
+✅ **Özelleştirilebilir (YENİ v3.3.0):** Kendi düzeltme kurallarınızı tanımlayın
 ✅ **Güvenli:** API anahtarınız cihazınızda güvenle saklanır, Chrome'un sync özelliği ile paylaşılmaz
 ✅ **Diff Önizleme:** Değişiklikleri kabul etmeden önce görebilirsiniz
 ✅ **HTML Koruma:** Bold, italic, linkler gibi formatlamalar korunur
@@ -27,10 +28,11 @@ OpenAI'nin GPT-4o modelini kullanarak Türkçe metinlerinizi:
 
 1. Eklentiyi yükleyin
 2. Ayarlar sayfasından OpenAI API anahtarınızı girin
-3. WordPress, Drupal veya herhangi bir CMS'te editör açın
-4. Editör toolbar'ında görünen "🤖 Düzelt" butonuna tıklayın
-5. Değişiklikleri diff görünümünde inceleyin
-6. "Kabul Et" veya "İptal" seçin
+3. (İsteğe Bağlı) Sistem promptunu özelleştirin - kendi düzeltme kurallarınızı tanımlayın
+4. WordPress, Drupal veya herhangi bir CMS'te editör açın
+5. Editör toolbar'ında görünen "🤖 Düzelt" butonuna tıklayın
+6. Değişiklikleri diff görünümünde inceleyin
+7. "Kabul Et" veya "İptal" seçin
 
 ## Desteklenen Editörler
 
@@ -58,7 +60,7 @@ Bu eklenti SADECE yukarıdaki zengin metin editörlerinde çalışır. Gmail, Li
 
 ---
 
-Versiyon: 3.1.0
+Versiyon: 3.3.0
 Geliştirici: Mehmet Yerli
 GitHub: https://github.com/mytsx/duzelt-ai
 Destek: https://github.com/mytsx/duzelt-ai/issues

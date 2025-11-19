@@ -2,7 +2,7 @@
 
 Web sayfalarındaki zengin metin düzenleyicilere (CKEditor, Summernote, TinyMCE, Quill) AI destekli Türkçe metin düzeltme butonu ekleyen Chrome Extension.
 
-**Version:** 3.1.0
+**Version:** 3.3.0
 
 **IMPORTANT:** v3.1.0'dan itibaren extension **SADECE** rich text editörlerde (CKEditor, Summernote, TinyMCE, Quill) çalışır. Normal textarea/input alanlarında buton GÖRÜNMEZ.
 
@@ -20,8 +20,10 @@ Web sayfalarındaki zengin metin düzenleyicilere (CKEditor, Summernote, TinyMCE
 - OpenAI GPT-4o ile güçlendirilmiş
 - TDK (Türk Dil Kurumu) kurallarına uygun
 - Resmi yazışma standartlarına uygun
+- **Özelleştirilebilir Sistem Promptu** (v3.3.0) - Kendi düzeltme kurallarınızı tanımlayın
 - Diff gösterimi ile değişiklikleri önizleme
 - JSON response format ile tutarlı sonuçlar
+- HTML format koruması (bold, italic, linkler korunur)
 
 ## Kurulum
 
@@ -36,9 +38,13 @@ Web sayfalarındaki zengin metin düzenleyicilere (CKEditor, Summernote, TinyMCE
 
 1. Extension ikonuna tıklayın
 2. "⚙️ Ayarlar" butonuna tıklayın
-3. OpenAI API key'inizi girin (sk-proj-... formatında)
-4. "Kaydet" butonuna tıklayın
-5. "API Bağlantısını Test Et" ile test edin
+3. **OpenAI API key'inizi girin** (sk-proj-... formatında)
+4. **(İsteğe Bağlı)** Sistem promptunu özelleştirin:
+   - Varsayılan: TDK + Resmi yazışma kuralları
+   - Özel: Kendi düzeltme kurallarınızı tanımlayabilirsiniz
+   - Boş bırakırsanız varsayılan kullanılır
+5. "Kaydet" butonuna tıklayın
+6. "API Bağlantısını Test Et" ile test edin
 
 ## Kullanım
 
@@ -88,6 +94,10 @@ Extension **SADECE rich text editör kullanan web sitelerinde** çalışır:
 - **Model**: OpenAI GPT-4o (gpt-4o)
 - **Temperature**: 0.3 (tutarlı sonuçlar için)
 - **Response Format**: JSON object
+- **Storage**:
+  - API Key: `chrome.storage.local` (güvenlik)
+  - Custom Prompt: `chrome.storage.local` (8KB sync limiti aşımı)
+  - Enable/Disable: `chrome.storage.sync` (cihazlar arası senkronizasyon)
 - **Permissions**: storage, activeTab
 - **Host Permissions**: https://api.openai.com/*
 - **Content Security Policy**: XSS korumalı
@@ -122,10 +132,12 @@ Detaylı bilgi için `CLAUDE.md` dosyasına bakın.
 
 ## Güvenlik
 
-- API key'ler Chrome'un güvenli storage'ında saklanır
+- **API key'ler** ve **özel promptlar** cihazınızda (`chrome.storage.local`) güvenle saklanır
+- Chrome sync ile paylaşılmaz (gizlilik koruması)
 - Manifest V3 güvenlik standartları
 - Content Security Policy koruması
-- XSS koruması
+- XSS koruması (DOMParser kullanımı)
+- Input sanitization
 
 ## Lisans
 

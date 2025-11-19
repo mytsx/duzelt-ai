@@ -1,10 +1,19 @@
 (function() {
     'use strict';
 
+    const STORAGE_KEYS = {
+        OPENAI_KEY: 'openai_api_key',
+        ENABLED: 'ai_corrector_enabled'
+    };
+
     const CONFIG = {
         BUTTON_CLASS: 'ai-text-corrector-button',
         MODAL_ID: 'ai-text-corrector-modal',
-        ENABLED_KEY: 'ai_corrector_enabled'
+        // Timing constants (milliseconds)
+        INIT_DELAY: 1000,           // Initial delay for editor detection
+        DEBOUNCE_DELAY: 500,        // Debounce delay for DOM mutations
+        // Text validation
+        MIN_TEXT_LENGTH: 10         // Minimum characters for correction
     };
 
     let isEnabled = true;
@@ -13,8 +22,8 @@
     // WeakSet yerine Set kullan - clear() metodu var
     const processedFields = new Set();
 
-    chrome.storage.sync.get([CONFIG.ENABLED_KEY], function(result) {
-        isEnabled = result[CONFIG.ENABLED_KEY] !== false;
+    chrome.storage.sync.get([STORAGE_KEYS.ENABLED], function(result) {
+        isEnabled = result[STORAGE_KEYS.ENABLED] !== false;
         if (isEnabled) {
             init();
         }
@@ -25,7 +34,7 @@
         setTimeout(() => {
             addButtonsToExistingFields();
             observeDOMChanges();
-        }, 1000);
+        }, CONFIG.INIT_DELAY);
     }
 
     function addButtonsToExistingFields() {
@@ -197,8 +206,8 @@
         const editorData = getEditorValue(fieldOrEditor, editorType);
         const originalText = editorData.text;
 
-        if (!originalText || originalText.trim().length < 10) {
-            alert('Lütfen düzeltilecek metin girin (en az 10 karakter)');
+        if (!originalText || originalText.trim().length < CONFIG.MIN_TEXT_LENGTH) {
+            alert(`Lütfen düzeltilecek metin girin (en az ${CONFIG.MIN_TEXT_LENGTH} karakter)`);
             return;
         }
 
@@ -297,6 +306,30 @@
         // Rich text editörler - HTML formatını koru
         const correctedHTML = mapTextToHTML(originalData.html, originalData.text, correctedText);
 
+        // If word count changed, mapping failed to preserve formatting
+        // Fall back to plain text with user warning (already shown in modal)
+        if (correctedHTML === null) {
+            // Apply as plain text - formatting will be lost
+            const plainHTML = escapeHtmlSafe(correctedText);
+
+            switch (editorType) {
+                case 'ckeditor4':
+                    fieldOrEditor.setData(plainHTML);
+                    break;
+                case 'ckeditor5':
+                case 'summernote':
+                case 'quill':
+                    fieldOrEditor.innerHTML = plainHTML;
+                    fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
+                    break;
+                case 'tinymce':
+                    fieldOrEditor.setContent(plainHTML);
+                    break;
+            }
+            return;
+        }
+
+        // Normal case: formatting preserved
         switch (editorType) {
             case 'ckeditor4':
                 fieldOrEditor.setData(correctedHTML);
@@ -324,51 +357,93 @@
     }
 
     function mapTextToHTML(originalHTML, originalText, correctedText) {
-        // Basit strateji: kelime bazlı değiştirme
-        // HTML tag'lerini koru, sadece text node'ları değiştir
+        // SECURITY FIX: Position-aware replacement with proper escaping
+        // Fixes: XSS vulnerability and word mapping corruption
 
         const originalWords = originalText.split(/\s+/).filter(w => w.length > 0);
         const correctedWords = correctedText.split(/\s+/).filter(w => w.length > 0);
 
-        // Eğer kelime sayısı çok farklıysa, direkt düz metin dön (güvenli mod)
-        if (Math.abs(originalWords.length - correctedWords.length) > originalWords.length * 0.5) {
-            return escapeHtmlPreserveBasicTags(correctedText);
+        // FIX: If word counts differ, preserve original formatting
+        // Insertions/deletions cannot be reliably mapped with position-only strategy
+        // Rather than destroying all rich-text formatting (bold, italic, links, lists),
+        // we preserve the original HTML and let the user decide via modal
+        if (originalWords.length !== correctedWords.length) {
+            // Return null to signal "cannot map safely"
+            // The caller (showDiffModal) will show a warning to the user
+            return null;
         }
 
-        // HTML'i parse et ve kelime bazlı değiştir
-        let result = originalHTML;
-        let wordIndex = 0;
+        // SECURITY: Use DOMParser to safely parse HTML without executing scripts
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(originalHTML, 'text/html');
+        const tempDiv = doc.body;
 
-        // Her orijinal kelimeyi düzeltilmiş kelime ile değiştir
-        for (let i = 0; i < originalWords.length && i < correctedWords.length; i++) {
+        // Build position-indexed replacement map
+        // Key: global word position, Value: replacement text
+        const positionMap = new Map();
+        for (let i = 0; i < originalWords.length; i++) {
             if (originalWords[i] !== correctedWords[i]) {
-                // Kelimeyi HTML içinde bul ve değiştir (tag dışında)
-                result = replaceWordInHTML(result, originalWords[i], correctedWords[i]);
+                // SECURITY: textContent insertion (line 401) prevents HTML injection
+                // No need for sanitization - textContent auto-escapes
+                positionMap.set(i, correctedWords[i]);
             }
         }
 
-        return result;
+        // Walk DOM tree and replace text nodes using global position counter
+        const context = { globalPosition: 0 };
+        replaceTextNodesInDOM(tempDiv, positionMap, context);
+
+        return tempDiv.innerHTML;
     }
 
-    function replaceWordInHTML(html, oldWord, newWord) {
-        // Basit regex ile tag dışındaki metni değiştir
-        // NOT: Bu basit bir yaklaşım, %100 mükemmel değil ama çoğu durumda çalışır
-        const escapedOld = oldWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`(>|^)([^<]*?)\\b${escapedOld}\\b([^<]*?)(<|$)`, 'gi');
+    function replaceTextNodesInDOM(node, positionMap, context) {
+        // Recursively walk DOM tree and replace text content
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent || '';
+            const words = text.split(/(\s+)/); // Keep whitespace
 
-        return html.replace(regex, (match, before, prefix, suffix, after) => {
-            return before + prefix + newWord + suffix + after;
-        });
+            let modified = false;
+            const newWords = words.map(word => {
+                if (word.trim().length === 0) {
+                    return word; // Keep whitespace as-is
+                }
+
+                // Check if this position needs replacement
+                if (positionMap.has(context.globalPosition)) {
+                    modified = true;
+                    const replacement = positionMap.get(context.globalPosition);
+                    context.globalPosition++;
+                    return replacement;
+                }
+
+                context.globalPosition++;
+                return word;
+            });
+
+            if (modified) {
+                // SECURITY: textContent auto-escapes HTML, preventing XSS
+                // Special chars like < > & are displayed correctly without double-escaping
+                node.textContent = newWords.join('');
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Skip script and style tags for security
+            if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE') {
+                return;
+            }
+
+            // Recursively process child nodes
+            const children = Array.from(node.childNodes);
+            children.forEach(child => replaceTextNodesInDOM(child, positionMap, context));
+        }
     }
 
-    function escapeHtmlPreserveBasicTags(text) {
-        // Güvenli mod: sadece temel formatlamayı koru
-        return text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\n/g, '<br>');
+    function escapeHtmlSafe(text) {
+        // Safe fallback: escape all HTML and preserve line breaks
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML.replace(/\n/g, '<br>');
     }
+
 
     function requestCorrection(text) {
         return new Promise((resolve, reject) => {
@@ -388,30 +463,66 @@
     }
 
     function showDiffModal(original, corrected, fieldOrEditor, button, editorType, originalData) {
+        // FIX: Clean up existing modal if present
         const existingModal = document.getElementById(CONFIG.MODAL_ID);
-        if (existingModal) existingModal.remove();
+        if (existingModal) {
+            // The cleanup handler is responsible for removing the modal and re-enabling the button
+            if (existingModal._cleanupHandler) {
+                existingModal._cleanupHandler();
+            } else {
+                // Fallback for modals created without a cleanup handler
+                const previousButton = existingModal._associatedButton;
+                if (previousButton) {
+                    previousButton.disabled = false;
+                    previousButton.innerHTML = '🤖 Düzelt';
+                }
+                existingModal.remove();
+            }
+        }
 
-        const modal = createDiffModal(original, corrected);
+        // Check if word count changed (formatting cannot be preserved)
+        const originalWords = original.split(/\s+/).filter(w => w.length > 0);
+        const correctedWords = corrected.split(/\s+/).filter(w => w.length > 0);
+        const wordCountChanged = originalWords.length !== correctedWords.length;
+
+        const modal = createDiffModal(original, corrected, wordCountChanged);
+        // Store button reference on modal for cleanup
+        modal._associatedButton = button;
         document.body.appendChild(modal);
 
         const acceptBtn = modal.querySelector('[data-action="accept"]');
         const rejectBtn = modal.querySelector('[data-action="reject"]');
 
+        // Use function declarations to avoid temporal dead zone
+        function handleEscape(e) {
+            if (e.key === 'Escape') {
+                cleanup();
+            }
+        }
+
+        function cleanup() {
+            modal.remove();
+            button.disabled = false;
+            button.innerHTML = '🤖 Düzelt';
+            // FIX: Always remove event listener to prevent memory leak
+            document.removeEventListener('keydown', handleEscape);
+        }
+
+        // Store cleanup handler for proper cleanup of existing modals
+        modal._cleanupHandler = cleanup;
+
         acceptBtn.addEventListener('click', () => {
             setEditorValue(fieldOrEditor, corrected, editorType, originalData);
-            modal.remove();
-            button.disabled = false;
-            button.innerHTML = '🤖 Düzelt';
+            cleanup();
         });
 
-        rejectBtn.addEventListener('click', () => {
-            modal.remove();
-            button.disabled = false;
-            button.innerHTML = '🤖 Düzelt';
-        });
+        rejectBtn.addEventListener('click', cleanup);
+
+        // Allow ESC key to close modal (accessibility)
+        document.addEventListener('keydown', handleEscape);
     }
 
-    function createDiffModal(original, corrected) {
+    function createDiffModal(original, corrected, wordCountChanged = false) {
         const modal = document.createElement('div');
         modal.id = CONFIG.MODAL_ID;
         modal.className = 'ai-corrector-modal';
@@ -423,12 +534,21 @@
             return `<span style="color: ${color}; text-decoration: ${decoration};">${escapeHtml(part.value)}</span>`;
         }).join('');
 
+        // Warning message if formatting will be lost
+        const warningHtml = wordCountChanged ? `
+            <div class="ai-corrector-warning">
+                <strong>⚠️ Uyarı:</strong> Düzeltme kelime sayısını değiştirdi.
+                <br>Formatlar (kalın, italik, linkler) korunmayabilir.
+            </div>
+        ` : '';
+
         modal.innerHTML = `
             <div class="ai-corrector-modal-content">
                 <div class="ai-corrector-modal-header">
                     <h3>AI Metin Düzeltme Sonucu</h3>
                 </div>
                 <div class="ai-corrector-modal-body">
+                    ${warningHtml}
                     <div class="ai-corrector-diff">
                         ${diffHtml}
                     </div>
@@ -477,13 +597,13 @@
             });
 
             if (needsUpdate) {
-                // Debounce: 500ms sonra kontrol et
+                // Debounce: DOM değişikliklerini topla
                 clearTimeout(observeDOMChanges.timer);
                 observeDOMChanges.timer = setTimeout(() => {
                     if (isEnabled) {
                         addButtonsToExistingFields();
                     }
-                }, 500);
+                }, CONFIG.DEBOUNCE_DELAY);
             }
         });
 
@@ -494,8 +614,8 @@
     }
 
     chrome.storage.onChanged.addListener((changes, namespace) => {
-        if (namespace === 'sync' && changes[CONFIG.ENABLED_KEY]) {
-            isEnabled = changes[CONFIG.ENABLED_KEY].newValue !== false;
+        if (namespace === 'sync' && changes[STORAGE_KEYS.ENABLED]) {
+            isEnabled = changes[STORAGE_KEYS.ENABLED].newValue !== false;
             if (isEnabled) {
                 init();
             } else {

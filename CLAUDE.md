@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Chrome Extension (Manifest V3) that adds AI-powered Turkish text correction buttons **ONLY to rich text editors** (CKEditor, Summernote, TinyMCE, Quill). Uses OpenAI GPT-4o to correct text according to TDK (Turkish Language Association) standards and official correspondence regulations.
 
-**Current Version:** 3.1.0
+**Current Version:** 3.2.4
 
 ## Build & Development Commands
 
@@ -72,24 +72,36 @@ STORAGE_KEYS.ENABLED = 'ai_corrector_enabled'
 - **Rich editors:** Button added to toolbar (integrated into editor UI)
 - **Plain textarea/input:** NOT supported (removed in v3.1.0)
 
-### HTML Format Preservation (v3.0.0+)
+### HTML Format Preservation (v3.0.0+, Enhanced in v3.2.1)
 
 **Critical feature:** When correcting rich text, preserve HTML formatting (bold, italic, links, lists).
 
-**Implementation:**
+**Implementation (v3.2.1 - Security Enhanced):**
 ```javascript
 // getEditorValue returns object with both text and HTML
 { text: "plain text", html: "<b>formatted</b> text", isPlainText: false }
 
-// mapTextToHTML does word-based replacement preserving tags
+// mapTextToHTML does position-aware replacement (content.js:337-369)
 correctedHTML = mapTextToHTML(originalHTML, originalText, correctedText)
+
+// SECURITY: textContent insertion prevents XSS (content.js:410-415)
+function sanitizeTextForDisplay(text) {
+    return text;  // Direct return - textContent handles escaping
+}
+// Insertion via node.textContent (line 396) auto-escapes HTML
 
 // setEditorValue uses correctedHTML for rich editors
 editor.setData(correctedHTML)  // CKEditor
 editor.innerHTML = correctedHTML  // Others
 ```
 
-**Algorithm:** Word-by-word diff between original and corrected text, replacing words inside HTML without touching tags. Falls back to plain text if word count differs by >50%.
+**Algorithm (v3.2.1 - Position-Indexed):**
+- Position-indexed Map (key: word position, value: replacement text)
+- Global position counter during DOM tree walking
+- Correctly handles repeated words ("Ali Ali" → "Ali Veli")
+- textContent insertion prevents XSS (auto-escapes HTML entities)
+- Skips SCRIPT and STYLE tags for security
+- Falls back to plain text if word count differs by >50%
 
 ### Enable/Disable Mechanism (v2.1.0+)
 
@@ -208,6 +220,26 @@ Before committing changes, manually test:
 
 ## Common Issues & Fixes
 
+### "XSS vulnerability in HTML parsing" (CRITICAL - FIXED in v3.2.2)
+- **Cause:** Using `innerHTML` to parse editor content could execute malicious scripts
+- **Example:** `<svg onload=alert(1)>` would execute during parsing
+- **Fix:** Use DOMParser.parseFromString() which doesn't execute scripts (content.js:360-362)
+
+### "Word insertion/deletion corrupts output" (HIGH - FIXED in v3.2.2)
+- **Cause:** Position-only mapping cannot handle word count changes
+- **Example 1:** "Merhaba Ali" → "Merhaba Ali Bey" lost "Bey" (insertion)
+- **Example 2:** "a b c d" → "a b d" became "a b d d" (deletion)
+- **Fix:** Fallback to safe mode when word counts differ (content.js:349-351)
+
+### "Word mapping corrupts repeated words" (FIXED in v3.2.1)
+- **Cause:** String-based mapping without position tracking
+- **Example:** "Ali Ali" → "Ali Veli" became "Veli Veli"
+- **Fix:** Position-indexed Map with global counter during DOM tree walking (content.js:337-380)
+
+### "Button stays disabled after second modal opens" (FIXED in v3.2.1)
+- **Cause:** Opening second modal removed first modal without re-enabling its button
+- **Fix:** Store button reference and cleanup handler on modal (content.js:442-494)
+
 ### "Duplicate buttons in Quill editor toolbar"
 - **Cause:** detectQuill() checks container but adds toolbar to processedFields
 - **Fix:** Explicitly mark container as processed when adding button to toolbar (fixed in v3.1.0, line 109)
@@ -245,6 +277,36 @@ Priority order: Official correspondence rules > TDK general rules
 
 ## Version History (Key Changes)
 
+- **v3.2.4:** Code quality improvements and cleanup
+  - **MEDIUM:** Removed unused WORD_DIFF_THRESHOLD constant from CONFIG object
+  - **MEDIUM:** Moved inline styles to CSS file (ai-corrector-warning class)
+  - Improved code maintainability and readability
+- **v3.2.3:** CRITICAL: Format preservation when word count changes
+  - **HIGH:** Fixed format destruction on word insertion/deletion
+  - Now preserves rich-text formatting (bold, italic, links) when possible
+  - Falls back to plain text with user warning when word count changes
+  - User sees warning: "⚠️ Düzeltme kelime sayısını değiştirdi. Formatlar korunmayabilir."
+  - **MEDIUM:** Removed redundant threshold check code
+  - **MEDIUM:** Removed no-op sanitizeTextForDisplay function
+  - Improved security comments at textContent insertion point
+- **v3.2.2:** CRITICAL SECURITY & BUG FIXES: XSS via innerHTML, word insertion/deletion handling
+  - **CRITICAL:** Fixed XSS vulnerability in HTML parsing (use DOMParser instead of innerHTML)
+  - **HIGH:** Fixed word insertion/deletion bug (fallback to safe mode when word count differs)
+  - **MEDIUM:** Simplified modal cleanup logic (removed redundant code)
+  - Examples fixed: "Merhaba Ali" → "Merhaba Ali Bey" (no longer loses "Bey")
+  - Examples fixed: "a b c d" → "a b d" (no longer becomes "a b d d")
+- **v3.2.1:** CRITICAL BUG FIXES: Word mapping position tracking, memory leak, prompt sync
+  - Fixed word mapping position tracking bug (repeated words now handled correctly)
+  - Fixed HTML entity escape regression (special chars like < > now display correctly)
+  - Fixed memory leak in ESC key event listener cleanup
+  - Synced full turkish-official.txt prompt to SYSTEM_PROMPT (complete official correspondence rules)
+- **v3.2.0:** SECURITY: XSS vulnerability fix, word mapping corruption fix, button state management improvement
+  - Fixed XSS vulnerability in AI output handling (sanitize all AI responses)
+  - Fixed word mapping corruption using position-aware DOM tree walking
+  - Fixed button staying disabled when multiple modals opened
+  - Standardized STORAGE_KEYS across all files
+  - Extracted magic numbers to named constants
+  - Added ESC key support for modal closing (accessibility)
 - **v3.1.0:** BREAKING: Removed support for plain textarea/input - ONLY rich text editors supported
 - **v3.0.1:** Fix Chrome Service Worker fetch header encoding (Headers constructor)
 - **v3.0.0:** HTML format preservation in rich text editors

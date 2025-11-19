@@ -9,12 +9,11 @@ Web sayfalarındaki zengin metin düzenleyicilere (CKEditor, Summernote, TinyMCE
 ## Özellikler
 
 ### Akıllı Buton Enjeksiyonu
-- ✅ **CKEditor** (4.x ve 5.x) - Toolbar'a entegre
-- ✅ **Summernote** - Toolbar'a entegre
-- ✅ **TinyMCE** - Toolbar'a entegre
-- ✅ **Quill** - Toolbar'a entegre
-- ❌ Normal textarea/input alanları (v3.1.0'dan itibaren desteklenmiyor)
-- ✅ Dinamik içerik desteği (MutationObserver)
+- **CKEditor** (4.x ve 5.x) - Toolbar'a entegre
+- **Summernote** - Toolbar'a entegre
+- **TinyMCE** - Toolbar'a entegre
+- **Quill** - Toolbar'a entegre
+- Dinamik içerik desteği (MutationObserver)
 
 ### AI Düzeltme
 - OpenAI GPT-4o ile güçlendirilmiş

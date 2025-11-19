@@ -341,19 +341,30 @@
         const originalWords = originalText.split(/\s+/).filter(w => w.length > 0);
         const correctedWords = correctedText.split(/\s+/).filter(w => w.length > 0);
 
+        // FIX: If word counts differ, fall back to safe mode
+        // Insertions/deletions cannot be reliably mapped with position-only strategy
+        // Examples that would fail:
+        // - "Merhaba Ali" → "Merhaba Ali Bey" (insertion: "Bey" lost)
+        // - "a b c d" → "a b d" (deletion: becomes "a b d d")
+        if (originalWords.length !== correctedWords.length) {
+            return escapeHtmlSafe(correctedText);
+        }
+
         // Eğer kelime sayısı çok farklıysa, direkt düz metin dön (güvenli mod)
+        // This threshold is now redundant but kept for extreme cases
         if (Math.abs(originalWords.length - correctedWords.length) > originalWords.length * CONFIG.WORD_DIFF_THRESHOLD) {
             return escapeHtmlSafe(correctedText);
         }
 
-        // DOM-based position-aware replacement
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = originalHTML;
+        // SECURITY: Use DOMParser to safely parse HTML without executing scripts
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(originalHTML, 'text/html');
+        const tempDiv = doc.body;
 
         // Build position-indexed replacement map
         // Key: global word position, Value: replacement text
         const positionMap = new Map();
-        for (let i = 0; i < Math.min(originalWords.length, correctedWords.length); i++) {
+        for (let i = 0; i < originalWords.length; i++) {
             if (originalWords[i] !== correctedWords[i]) {
                 // SECURITY: Sanitize AI output but preserve actual characters
                 // Use textContent to prevent HTML injection while keeping readability
@@ -440,20 +451,21 @@
     }
 
     function showDiffModal(original, corrected, fieldOrEditor, button, editorType, originalData) {
-        // FIX: Re-enable previous button if modal already exists
+        // FIX: Clean up existing modal if present
         const existingModal = document.getElementById(CONFIG.MODAL_ID);
         if (existingModal) {
-            // Restore previous button state before removing modal
-            const previousButton = existingModal._associatedButton;
-            if (previousButton) {
-                previousButton.disabled = false;
-                previousButton.innerHTML = '🤖 Düzelt';
-            }
-            // Cleanup existing modal's event listener
+            // The cleanup handler is responsible for removing the modal and re-enabling the button
             if (existingModal._cleanupHandler) {
                 existingModal._cleanupHandler();
+            } else {
+                // Fallback for modals created without a cleanup handler
+                const previousButton = existingModal._associatedButton;
+                if (previousButton) {
+                    previousButton.disabled = false;
+                    previousButton.innerHTML = '🤖 Düzelt';
+                }
+                existingModal.remove();
             }
-            existingModal.remove();
         }
 
         const modal = createDiffModal(original, corrected);

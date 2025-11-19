@@ -1,6 +1,7 @@
 const OpenAIProvider = {
     API_BASE_URL: 'https://api.openai.com/v1',
     MODEL: 'gpt-4o',
+    TEMPERATURE: 0.3,  // Low temperature for consistency in corrections
 
     SYSTEM_PROMPT: `Sen, Türkçe RESMİ YAZIŞMALAR için özelleştirilmiş bir metin düzeltme asistanısın.
 
@@ -53,7 +54,7 @@ Aşağıdaki kaynaklara göre düzeltme yap:
                 }
             ],
             response_format: { type: 'json_object' },
-            temperature: 0.3
+            temperature: this.TEMPERATURE
         });
 
         // Headers'ı ayrı oluştur (Chrome Service Worker uyumluluğu için)

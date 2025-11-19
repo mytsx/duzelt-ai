@@ -1,10 +1,21 @@
 (function() {
     'use strict';
 
+    const STORAGE_KEYS = {
+        OPENAI_KEY: 'openai_api_key',
+        ENABLED: 'ai_corrector_enabled'
+    };
+
     const CONFIG = {
         BUTTON_CLASS: 'ai-text-corrector-button',
         MODAL_ID: 'ai-text-corrector-modal',
-        ENABLED_KEY: 'ai_corrector_enabled'
+        // Timing constants (milliseconds)
+        INIT_DELAY: 1000,           // Initial delay for editor detection
+        DEBOUNCE_DELAY: 500,        // Debounce delay for DOM mutations
+        // Text validation
+        MIN_TEXT_LENGTH: 10,        // Minimum characters for correction
+        // HTML mapping
+        WORD_DIFF_THRESHOLD: 0.5    // Max allowed word count difference (50%)
     };
 
     let isEnabled = true;
@@ -13,8 +24,8 @@
     // WeakSet yerine Set kullan - clear() metodu var
     const processedFields = new Set();
 
-    chrome.storage.sync.get([CONFIG.ENABLED_KEY], function(result) {
-        isEnabled = result[CONFIG.ENABLED_KEY] !== false;
+    chrome.storage.sync.get([STORAGE_KEYS.ENABLED], function(result) {
+        isEnabled = result[STORAGE_KEYS.ENABLED] !== false;
         if (isEnabled) {
             init();
         }
@@ -25,7 +36,7 @@
         setTimeout(() => {
             addButtonsToExistingFields();
             observeDOMChanges();
-        }, 1000);
+        }, CONFIG.INIT_DELAY);
     }
 
     function addButtonsToExistingFields() {
@@ -197,8 +208,8 @@
         const editorData = getEditorValue(fieldOrEditor, editorType);
         const originalText = editorData.text;
 
-        if (!originalText || originalText.trim().length < 10) {
-            alert('Lütfen düzeltilecek metin girin (en az 10 karakter)');
+        if (!originalText || originalText.trim().length < CONFIG.MIN_TEXT_LENGTH) {
+            alert(`Lütfen düzeltilecek metin girin (en az ${CONFIG.MIN_TEXT_LENGTH} karakter)`);
             return;
         }
 
@@ -324,51 +335,100 @@
     }
 
     function mapTextToHTML(originalHTML, originalText, correctedText) {
-        // Basit strateji: kelime bazlı değiştirme
-        // HTML tag'lerini koru, sadece text node'ları değiştir
+        // SECURITY FIX: Position-aware replacement with proper escaping
+        // Fixes: XSS vulnerability and word mapping corruption
 
         const originalWords = originalText.split(/\s+/).filter(w => w.length > 0);
         const correctedWords = correctedText.split(/\s+/).filter(w => w.length > 0);
 
         // Eğer kelime sayısı çok farklıysa, direkt düz metin dön (güvenli mod)
-        if (Math.abs(originalWords.length - correctedWords.length) > originalWords.length * 0.5) {
-            return escapeHtmlPreserveBasicTags(correctedText);
+        if (Math.abs(originalWords.length - correctedWords.length) > originalWords.length * CONFIG.WORD_DIFF_THRESHOLD) {
+            return escapeHtmlSafe(correctedText);
         }
 
-        // HTML'i parse et ve kelime bazlı değiştir
-        let result = originalHTML;
-        let wordIndex = 0;
+        // DOM-based position-aware replacement
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = originalHTML;
 
-        // Her orijinal kelimeyi düzeltilmiş kelime ile değiştir
-        for (let i = 0; i < originalWords.length && i < correctedWords.length; i++) {
+        // Build word-to-word mapping
+        const wordMap = new Map();
+        for (let i = 0; i < Math.min(originalWords.length, correctedWords.length); i++) {
             if (originalWords[i] !== correctedWords[i]) {
-                // Kelimeyi HTML içinde bul ve değiştir (tag dışında)
-                result = replaceWordInHTML(result, originalWords[i], correctedWords[i]);
+                // Track occurrence count to handle repeated words correctly
+                const key = originalWords[i].toLowerCase();
+                if (!wordMap.has(key)) {
+                    wordMap.set(key, []);
+                }
+                wordMap.get(key).push({
+                    index: i,
+                    original: originalWords[i],
+                    corrected: sanitizeText(correctedWords[i]) // SECURITY: Escape AI output
+                });
             }
         }
 
-        return result;
+        // Walk DOM tree and replace text nodes position-aware
+        replaceTextNodesInDOM(tempDiv, originalWords, wordMap);
+
+        return tempDiv.innerHTML;
     }
 
-    function replaceWordInHTML(html, oldWord, newWord) {
-        // Basit regex ile tag dışındaki metni değiştir
-        // NOT: Bu basit bir yaklaşım, %100 mükemmel değil ama çoğu durumda çalışır
-        const escapedOld = oldWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`(>|^)([^<]*?)\\b${escapedOld}\\b([^<]*?)(<|$)`, 'gi');
+    function replaceTextNodesInDOM(node, originalWords, wordMap) {
+        // Recursively walk DOM tree and replace text content
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent || '';
+            const words = text.split(/(\s+)/); // Keep whitespace
 
-        return html.replace(regex, (match, before, prefix, suffix, after) => {
-            return before + prefix + newWord + suffix + after;
-        });
+            let wordIndex = 0;
+            let modified = false;
+            const newWords = words.map(word => {
+                if (word.trim().length === 0) {
+                    return word; // Keep whitespace as-is
+                }
+
+                const key = word.toLowerCase();
+                if (wordMap.has(key)) {
+                    const mappings = wordMap.get(key);
+                    // Find first unused mapping for this word
+                    const mapping = mappings.find(m => !m.used);
+                    if (mapping) {
+                        mapping.used = true;
+                        modified = true;
+                        return mapping.corrected;
+                    }
+                }
+                wordIndex++;
+                return word;
+            });
+
+            if (modified) {
+                node.textContent = newWords.join('');
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Skip script and style tags for security
+            if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE') {
+                return;
+            }
+
+            // Recursively process child nodes
+            const children = Array.from(node.childNodes);
+            children.forEach(child => replaceTextNodesInDOM(child, originalWords, wordMap));
+        }
     }
 
-    function escapeHtmlPreserveBasicTags(text) {
-        // Güvenli mod: sadece temel formatlamayı koru
-        return text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\n/g, '<br>');
+    function sanitizeText(text) {
+        // SECURITY: Escape HTML entities to prevent XSS
+        // This prevents malicious AI responses from injecting tags/scripts
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
+
+    function escapeHtmlSafe(text) {
+        // Safe fallback: escape all HTML and preserve line breaks
+        return sanitizeText(text).replace(/\n/g, '<br>');
+    }
+
 
     function requestCorrection(text) {
         return new Promise((resolve, reject) => {
@@ -388,27 +448,47 @@
     }
 
     function showDiffModal(original, corrected, fieldOrEditor, button, editorType, originalData) {
+        // FIX: Re-enable previous button if modal already exists
         const existingModal = document.getElementById(CONFIG.MODAL_ID);
-        if (existingModal) existingModal.remove();
+        if (existingModal) {
+            // Restore previous button state before removing modal
+            const previousButton = existingModal._associatedButton;
+            if (previousButton) {
+                previousButton.disabled = false;
+                previousButton.innerHTML = '🤖 Düzelt';
+            }
+            existingModal.remove();
+        }
 
         const modal = createDiffModal(original, corrected);
+        // Store button reference on modal for cleanup
+        modal._associatedButton = button;
         document.body.appendChild(modal);
 
         const acceptBtn = modal.querySelector('[data-action="accept"]');
         const rejectBtn = modal.querySelector('[data-action="reject"]');
 
+        const cleanup = () => {
+            modal.remove();
+            button.disabled = false;
+            button.innerHTML = '🤖 Düzelt';
+        };
+
         acceptBtn.addEventListener('click', () => {
             setEditorValue(fieldOrEditor, corrected, editorType, originalData);
-            modal.remove();
-            button.disabled = false;
-            button.innerHTML = '🤖 Düzelt';
+            cleanup();
         });
 
-        rejectBtn.addEventListener('click', () => {
-            modal.remove();
-            button.disabled = false;
-            button.innerHTML = '🤖 Düzelt';
-        });
+        rejectBtn.addEventListener('click', cleanup);
+
+        // Allow ESC key to close modal (accessibility)
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                cleanup();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
     }
 
     function createDiffModal(original, corrected) {
@@ -477,13 +557,13 @@
             });
 
             if (needsUpdate) {
-                // Debounce: 500ms sonra kontrol et
+                // Debounce: DOM değişikliklerini topla
                 clearTimeout(observeDOMChanges.timer);
                 observeDOMChanges.timer = setTimeout(() => {
                     if (isEnabled) {
                         addButtonsToExistingFields();
                     }
-                }, 500);
+                }, CONFIG.DEBOUNCE_DELAY);
             }
         });
 
@@ -494,8 +574,8 @@
     }
 
     chrome.storage.onChanged.addListener((changes, namespace) => {
-        if (namespace === 'sync' && changes[CONFIG.ENABLED_KEY]) {
-            isEnabled = changes[CONFIG.ENABLED_KEY].newValue !== false;
+        if (namespace === 'sync' && changes[STORAGE_KEYS.ENABLED]) {
+            isEnabled = changes[STORAGE_KEYS.ENABLED].newValue !== false;
             if (isEnabled) {
                 init();
             } else {

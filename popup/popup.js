@@ -1,3 +1,8 @@
+const STORAGE_KEYS = {
+    OPENAI_KEY: 'openai_api_key',
+    ENABLED: 'ai_corrector_enabled'
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     loadStatus();
 
@@ -7,10 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadStatus() {
     // API key local storage'da, enabled sync storage'da
-    chrome.storage.local.get(['openai_api_key'], (localResult) => {
-        chrome.storage.sync.get(['ai_corrector_enabled'], (syncResult) => {
-            const enabled = syncResult.ai_corrector_enabled !== false;
-            const hasApiKey = localResult.openai_api_key && localResult.openai_api_key.length > 0;
+    chrome.storage.local.get([STORAGE_KEYS.OPENAI_KEY], (localResult) => {
+        chrome.storage.sync.get([STORAGE_KEYS.ENABLED], (syncResult) => {
+            const enabled = syncResult[STORAGE_KEYS.ENABLED] !== false;
+            const hasApiKey = localResult[STORAGE_KEYS.OPENAI_KEY] && localResult[STORAGE_KEYS.OPENAI_KEY].length > 0;
 
             document.getElementById('enabled-toggle').checked = enabled;
             document.getElementById('status-text').textContent = enabled ? 'Etkin' : 'Devre Dışı';
@@ -23,7 +28,7 @@ function loadStatus() {
 
 function toggleEnabled(event) {
     const enabled = event.target.checked;
-    chrome.storage.sync.set({ ai_corrector_enabled: enabled }, () => {
+    chrome.storage.sync.set({ [STORAGE_KEYS.ENABLED]: enabled }, () => {
         document.getElementById('status-text').textContent = enabled ? 'Etkin' : 'Devre Dışı';
     });
 }

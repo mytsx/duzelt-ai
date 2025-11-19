@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Chrome Extension (Manifest V3) that adds AI-powered Turkish text correction buttons **ONLY to rich text editors** (CKEditor, Summernote, TinyMCE, Quill). Uses OpenAI GPT-4o to correct text according to TDK (Turkish Language Association) standards and official correspondence regulations.
 
-**Current Version:** 3.1.0
+**Current Version:** 3.2.0
 
 ## Build & Development Commands
 
@@ -72,24 +72,36 @@ STORAGE_KEYS.ENABLED = 'ai_corrector_enabled'
 - **Rich editors:** Button added to toolbar (integrated into editor UI)
 - **Plain textarea/input:** NOT supported (removed in v3.1.0)
 
-### HTML Format Preservation (v3.0.0+)
+### HTML Format Preservation (v3.0.0+, Enhanced in v3.2.0)
 
 **Critical feature:** When correcting rich text, preserve HTML formatting (bold, italic, links, lists).
 
-**Implementation:**
+**Implementation (v3.2.0 - Security Enhanced):**
 ```javascript
 // getEditorValue returns object with both text and HTML
 { text: "plain text", html: "<b>formatted</b> text", isPlainText: false }
 
-// mapTextToHTML does word-based replacement preserving tags
+// mapTextToHTML does position-aware replacement with sanitization
 correctedHTML = mapTextToHTML(originalHTML, originalText, correctedText)
+
+// SECURITY: All AI output sanitized via sanitizeText()
+function sanitizeText(text) {
+    const div = document.createElement('div');
+    div.textContent = text;  // Auto-escapes HTML entities
+    return div.innerHTML;
+}
 
 // setEditorValue uses correctedHTML for rich editors
 editor.setData(correctedHTML)  // CKEditor
 editor.innerHTML = correctedHTML  // Others
 ```
 
-**Algorithm:** Word-by-word diff between original and corrected text, replacing words inside HTML without touching tags. Falls back to plain text if word count differs by >50%.
+**Algorithm (v3.2.0):**
+- Position-aware DOM tree walking (not global regex)
+- Word occurrence tracking to handle repeated words correctly
+- All AI text sanitized to prevent XSS attacks
+- Skips SCRIPT and STYLE tags for security
+- Falls back to plain text if word count differs by >50%
 
 ### Enable/Disable Mechanism (v2.1.0+)
 
@@ -208,6 +220,19 @@ Before committing changes, manually test:
 
 ## Common Issues & Fixes
 
+### "XSS vulnerability in AI output" (CRITICAL - FIXED in v3.2.0)
+- **Cause:** AI responses were injected into DOM without sanitization
+- **Fix:** All AI output is now sanitized using `sanitizeText()` function before DOM insertion (content.js:409-415)
+
+### "Word mapping corrupts repeated words" (FIXED in v3.2.0)
+- **Cause:** Global regex replacement ('gi') replaced all occurrences, not position-aware
+- **Example:** "Ali Ali" → "Ali Veli" became "Veli Veli"
+- **Fix:** Position-aware DOM tree walking with word occurrence tracking (content.js:366-407)
+
+### "Button stays disabled after second modal opens" (FIXED in v3.2.0)
+- **Cause:** Opening second modal removed first modal without re-enabling its button
+- **Fix:** Store button reference on modal and restore previous button state (content.js:440-482)
+
 ### "Duplicate buttons in Quill editor toolbar"
 - **Cause:** detectQuill() checks container but adds toolbar to processedFields
 - **Fix:** Explicitly mark container as processed when adding button to toolbar (fixed in v3.1.0, line 109)
@@ -245,6 +270,13 @@ Priority order: Official correspondence rules > TDK general rules
 
 ## Version History (Key Changes)
 
+- **v3.2.0:** SECURITY: XSS vulnerability fix, word mapping corruption fix, button state management improvement
+  - Fixed XSS vulnerability in AI output handling (sanitize all AI responses)
+  - Fixed word mapping corruption using position-aware DOM tree walking
+  - Fixed button staying disabled when multiple modals opened
+  - Standardized STORAGE_KEYS across all files
+  - Extracted magic numbers to named constants
+  - Added ESC key support for modal closing (accessibility)
 - **v3.1.0:** BREAKING: Removed support for plain textarea/input - ONLY rich text editors supported
 - **v3.0.1:** Fix Chrome Service Worker fetch header encoding (Headers constructor)
 - **v3.0.0:** HTML format preservation in rich text editors

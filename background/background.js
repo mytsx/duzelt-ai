@@ -1,7 +1,8 @@
 importScripts('openai-provider.js');
 
 const STORAGE_KEYS = {
-    OPENAI_KEY: 'openai_api_key'
+    OPENAI_KEY: 'openai_api_key',
+    ENABLED: 'ai_corrector_enabled'
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

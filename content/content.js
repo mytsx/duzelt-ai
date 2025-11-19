@@ -350,54 +350,45 @@
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = originalHTML;
 
-        // Build word-to-word mapping
-        const wordMap = new Map();
+        // Build position-indexed replacement map
+        // Key: global word position, Value: replacement text
+        const positionMap = new Map();
         for (let i = 0; i < Math.min(originalWords.length, correctedWords.length); i++) {
             if (originalWords[i] !== correctedWords[i]) {
-                // Track occurrence count to handle repeated words correctly
-                const key = originalWords[i].toLowerCase();
-                if (!wordMap.has(key)) {
-                    wordMap.set(key, []);
-                }
-                wordMap.get(key).push({
-                    index: i,
-                    original: originalWords[i],
-                    corrected: sanitizeText(correctedWords[i]) // SECURITY: Escape AI output
-                });
+                // SECURITY: Sanitize AI output but preserve actual characters
+                // Use textContent to prevent HTML injection while keeping readability
+                positionMap.set(i, sanitizeTextForDisplay(correctedWords[i]));
             }
         }
 
-        // Walk DOM tree and replace text nodes position-aware
-        replaceTextNodesInDOM(tempDiv, originalWords, wordMap);
+        // Walk DOM tree and replace text nodes using global position counter
+        const context = { globalPosition: 0 };
+        replaceTextNodesInDOM(tempDiv, positionMap, context);
 
         return tempDiv.innerHTML;
     }
 
-    function replaceTextNodesInDOM(node, originalWords, wordMap) {
+    function replaceTextNodesInDOM(node, positionMap, context) {
         // Recursively walk DOM tree and replace text content
         if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent || '';
             const words = text.split(/(\s+)/); // Keep whitespace
 
-            let wordIndex = 0;
             let modified = false;
             const newWords = words.map(word => {
                 if (word.trim().length === 0) {
                     return word; // Keep whitespace as-is
                 }
 
-                const key = word.toLowerCase();
-                if (wordMap.has(key)) {
-                    const mappings = wordMap.get(key);
-                    // Find first unused mapping for this word
-                    const mapping = mappings.find(m => !m.used);
-                    if (mapping) {
-                        mapping.used = true;
-                        modified = true;
-                        return mapping.corrected;
-                    }
+                // Check if this position needs replacement
+                if (positionMap.has(context.globalPosition)) {
+                    modified = true;
+                    const replacement = positionMap.get(context.globalPosition);
+                    context.globalPosition++;
+                    return replacement;
                 }
-                wordIndex++;
+
+                context.globalPosition++;
                 return word;
             });
 
@@ -412,21 +403,22 @@
 
             // Recursively process child nodes
             const children = Array.from(node.childNodes);
-            children.forEach(child => replaceTextNodesInDOM(child, originalWords, wordMap));
+            children.forEach(child => replaceTextNodesInDOM(child, positionMap, context));
         }
     }
 
-    function sanitizeText(text) {
-        // SECURITY: Escape HTML entities to prevent XSS
-        // This prevents malicious AI responses from injecting tags/scripts
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    function sanitizeTextForDisplay(text) {
+        // SECURITY: Use textContent for safe insertion (auto-escapes HTML)
+        // This prevents XSS while keeping special chars readable (< stays as <, not &lt;)
+        // textContent already prevents HTML injection, no need for double-escaping
+        return text;
     }
 
     function escapeHtmlSafe(text) {
         // Safe fallback: escape all HTML and preserve line breaks
-        return sanitizeText(text).replace(/\n/g, '<br>');
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML.replace(/\n/g, '<br>');
     }
 
 
@@ -457,6 +449,10 @@
                 previousButton.disabled = false;
                 previousButton.innerHTML = '🤖 Düzelt';
             }
+            // Cleanup existing modal's event listener
+            if (existingModal._cleanupHandler) {
+                existingModal._cleanupHandler();
+            }
             existingModal.remove();
         }
 
@@ -468,11 +464,23 @@
         const acceptBtn = modal.querySelector('[data-action="accept"]');
         const rejectBtn = modal.querySelector('[data-action="reject"]');
 
-        const cleanup = () => {
+        // Use function declarations to avoid temporal dead zone
+        function handleEscape(e) {
+            if (e.key === 'Escape') {
+                cleanup();
+            }
+        }
+
+        function cleanup() {
             modal.remove();
             button.disabled = false;
             button.innerHTML = '🤖 Düzelt';
-        };
+            // FIX: Always remove event listener to prevent memory leak
+            document.removeEventListener('keydown', handleEscape);
+        }
+
+        // Store cleanup handler for proper cleanup of existing modals
+        modal._cleanupHandler = cleanup;
 
         acceptBtn.addEventListener('click', () => {
             setEditorValue(fieldOrEditor, corrected, editorType, originalData);
@@ -482,12 +490,6 @@
         rejectBtn.addEventListener('click', cleanup);
 
         // Allow ESC key to close modal (accessibility)
-        const handleEscape = (e) => {
-            if (e.key === 'Escape') {
-                cleanup();
-                document.removeEventListener('keydown', handleEscape);
-            }
-        };
         document.addEventListener('keydown', handleEscape);
     }
 

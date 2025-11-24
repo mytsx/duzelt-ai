@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Chrome Extension (Manifest V3) that adds AI-powered Turkish text correction buttons **ONLY to rich text editors** (CKEditor, Summernote, TinyMCE, Quill). Uses OpenAI GPT-4o to correct text according to TDK (Turkish Language Association) standards and official correspondence regulations.
 
-**Current Version:** 3.2.4
+**Current Version:** 3.3.0
 
 ## Build & Development Commands
 

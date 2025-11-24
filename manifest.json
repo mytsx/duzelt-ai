@@ -5,8 +5,7 @@
   "description": "Türkçe metinleri AI ile düzeltir. CKEditor, Summernote, TinyMCE ve Quill editörlerinde çalışır.",
 
   "permissions": [
-    "storage",
-    "activeTab"
+    "storage"
   ],
 
   "host_permissions": [

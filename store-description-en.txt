@@ -60,5 +60,5 @@ This extension works ONLY with the rich text editors listed above. It does NOT w
 
 Version: 3.3.0
 Developer: Mehmet Yerli
-GitHub: https://github.com/mytsx/OpenAiTextDuzeltimiChromeExtension
-Support: https://github.com/mytsx/OpenAiTextDuzeltimiChromeExtension/issues
+GitHub: https://github.com/mytsx/duzelt-ai
+Support: https://github.com/mytsx/duzelt-ai/issues

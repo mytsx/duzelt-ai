@@ -329,5 +329,5 @@ Priority order: Official correspondence rules > TDK general rules
 
 ## Repository
 
-- **GitHub:** https://github.com/mytsx/OpenAiTextDuzeltimiChromeExtension
-- **Issues:** https://github.com/mytsx/OpenAiTextDuzeltimiChromeExtension/issues
+- **GitHub:** https://github.com/mytsx/duzelt-ai
+- **Issues:** https://github.com/mytsx/duzelt-ai/issues

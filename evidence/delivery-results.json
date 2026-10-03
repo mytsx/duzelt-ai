@@ -1,0 +1,47 @@
+{
+  "checkedOn": "2026-10-03",
+  "extensionVersion": "3.4.0",
+  "runtimeAndDesignHead": "31925a1d391b39108330540c6d051d3d451d51ee",
+  "githubMainVerifiedAtThisHead": "31925a1d391b39108330540c6d051d3d451d51ee",
+  "pushSucceeded": true,
+  "githubActionsRunCount": 0,
+  "remoteCIVerified": false,
+  "websitePublished": false,
+  "videoProduced": false,
+  "storeSubmissionMade": false,
+  "publishedStoreVersion": "3.3.0",
+  "nextDependency": "User-provided Claude Design site source ZIP; requested gate precedes website/video/store visual work.",
+  "accountPanelAccess": "Browser account session/tab creation was denied with Not allowed; dashboard was not inspected or modified.",
+  "providerLiveCallMade": false,
+  "nativePermissionDialogVerified": false,
+  "testResults": {
+    "providers": 155,
+    "editorBrowser": 127,
+    "editorBootstrap": 7,
+    "uiBrowser": 19,
+    "catalog": 30,
+    "package": 7
+  },
+  "catalogCoverage": {
+    "providers": 228,
+    "protocolProfiles": 225,
+    "selectableModelRecords": 7804,
+    "manualLocalRequestFixtures": 2,
+    "inactiveProviders": [
+      "github-copilot",
+      "gitlab",
+      "v0"
+    ]
+  },
+  "artifacts": {
+    "dist/duzelt-ai-3.4.0.zip": {
+      "absolutePath": "/Users/yerli/Developer/duzelt-ai/dist/duzelt-ai-3.4.0.zip",
+      "sha256": "c72e73e20a9e048b9f3a708624df48a5336a5f2c47f6efd87f7023078eafe4fc"
+    },
+    "output/claude-design-kit-3.4.0.zip": {
+      "absolutePath": "/Users/yerli/Developer/duzelt-ai/output/claude-design-kit-3.4.0.zip",
+      "sha256": "eda2b18f259032b53c626160411b4948e2313053e63096a2ce67acbc0b3c688a"
+    }
+  },
+  "cleanup": "UI and editor tests close their disposable contexts, temporary profiles and HTTP servers; user browser/apps were not closed."
+}

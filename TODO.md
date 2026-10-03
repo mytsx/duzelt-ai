@@ -21,7 +21,7 @@
 - [x] Yerel 3.4.0 sürümü ve tek bağlantı yapılandırmasını hazırla.
 - [x] Tekrarlanabilir ZIP paketleme ve manifest/CRC/dosya doğrulamasını tamamla; 19 çalışma dosyası, 7 paket testi.
 - [x] README destek iddialarını ve sağlayıcı API ücretinin ayrı olduğunu düzelt.
-- [ ] Anlamlı Türkçe commitlerle main'e pushla.
+- [x] Anlamlı Türkçe commitlerle main'e pushla; bakım/arayüz/tasarım devri 31925a1 kod başlığında GitHub main ile eşleşti. Son teslim kaydı ayrıca sürümlenir.
 
 ## 2b. Kullanıcının genişlettiği kapsam: çoklu sağlayıcı ve yeni arayüz
 - [x] OpenCode/Models.dev ve sağlayıcıların resmî belgeleriyle tüm katalog/protokol/kimlik doğrulama eşlemesini araştır.

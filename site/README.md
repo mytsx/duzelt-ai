@@ -85,22 +85,27 @@ Hareket: menü açılışı, örnekteki Kabul et/İptal geçişi, SSS işareti v
 
 ## Geri bildirim kurulumu ve işletimi
 
-**4 Ekim 2026 durumu:** Form kodu ve Turnstile SDK düzeltmesi (`01ab2ef`, `6c96419`) main'e pushlandı; mevcut Workers Builds üzerinden otomatik build/deploy başarılı. Bu turdaki Worker sürümü `94e7bfa1…` ile başlıyor. Canlı yapılandırma HTTP 200 / `enabled: true`, `/.env` HTTP 404. İlk gerçek POST HTTP 503 döndüğü için gerçek kuyruk kabulü ve e-posta teslimi tamamlandı sayılmıyor. Worker uyumluluk düzeltmesi yerel workerd testiyle hazır; yeniden yayın ve canlı doğrulama bekliyor.
+**4 Ekim 2026 durumu:** Form ve SDK düzeltmesi mevcut `main` → Workers Builds düzeniyle yayımlandı. Worker uyumluluk düzeltmesinden sonra 6 açık TEST bildirimi HTTP 202 ile kabul edildi. İlk 4 için SMTP kabul kaydı; ilk 2 ve son 2 olmak üzere 4 mesaj için Gmail gelen kutusu kanıtı var. Önceki denemede aynı geçerli belirteç yeniden kabul edildi; kök neden kesinleşmedi. Ek Durable Object koruması yerelde hazır, yeni canlı yayın ve tekrar reddi henüz bekliyor. [Canlı sonuçlar](../evidence/feedback-live-results.json).
 
 Yerel test, canlı gönderim ve posta kutusu sonuçları aşağıdaki tabloda ayrı izlenir:
 
 | Kontrol | Sonuç |
 | --- | --- |
-| Sunucu birim testleri | 33/33; taklit SMTP/Turnstile/Queue, bağımsız tekrar başarılı. |
+| Sunucu testleri | 39/39; taklit SMTP/Turnstile/Queue ve gerçek yerel workerd Durable Object testleri. |
 | Form arayüzü | 37/37 Chromium; 8 tema/genişlik birleşimi, 13 görsel incelemesi. |
 | Genel site | 58 kontrol, 40 tema/genişlik ölçümü; `pageErrors: []`. |
 | E-posta şablonu | 390/768 px'de iki örnek, 4/4 render kontrolü; gelen kutusu testi değil. |
 | Yerel SMTP ön kontrolü | TLS sertifikası + auth başarılı; e-posta gönderilmedi. |
 | Turnstile | Yalnız `duzelt.yerli.dev` widget'ı; gerçek belirteç ayrı Siteverify işleminde doğru hostname/action ile kabul edildi. |
-| Canlı form kabulü | İlk deneme HTTP 503; düzeltme ve başarılı 202 denemesi bekliyor. |
-| Worker SMTP / gelen kutusu | Henüz doğrulanmadı. |
+| Önbellek düzeltmesi | 3/3 hedefli kontrol; betik adresi içerik özetiyle yenilenir. |
+| Canlı form kabulü | 6 açık TEST bildirimi HTTP 202; yanlış Origin/tip/boyut sırasıyla 403/415/413. |
+| Worker SMTP | İlk 4 bildirim için SMTP kabul kaydı var; son 2 için tail kaydı yok. |
+| Gelen kutusu | İlk 2 ve son 2 olmak üzere 4 bildirim Gmail'de doğrulandı. |
+| Ek token tekrar koruması | Yerel testler geçti; canlı tekrar reddi henüz bekliyor. |
 
-Gerçek Chrome'da 320, 390, 768 ve 1440 px genişliklerde yatay taşma görülmedi; e-posta alternatifi görünür kaldı. Bu canlı kontrol sırasında güncel SDK kodu önbellek kapatılarak yüklendi; eski önbelleğin giderilmesi ayrıca tamamlanacak.
+Gerçek Chrome'da 320, 390, 768 ve 1440 px genişliklerde yatay taşma görülmedi; e-posta alternatifi görünür kaldı. Bu canlı kontrol sırasında güncel SDK kodu önbellek kapatılarak yüklendi. `site:prepare`, `feedback.js` içeriğinin ilk 12 SHA-256 karakterini betik adresine ekleyerek eski dosyanın önbellekten gelmesini önler. Üç hedefli önbellek kontrolü, önceki 37 form testinin yeniden çalıştırıldığı anlamına gelmez. [Önbellek kanıtı](../evidence/feedback-cache-results.json).
+
+Sonraki canlı Chrome kontrolünde normal önbellekle güncel `ec4288fb…` betiği yüklendi; form hazırdı ve JavaScript hatası yoktu. Son yayın ön kontrolünde 14 site hazırlığı ve 39 sunucu testi, syntax/drift ve Durable Object binding'li bundle dry-run geçti. Yedi paket testi ve secret dışlama kontrolü de başarılı; `.env` 0600 izinli, Git dışında ve izlenen dosyalarda gizli değer sızıntısı bulgusuz.
 
 Mevcut `duzelt-site` Worker'ı korunur. `/api/*` istekleri `worker/` koduna, diğer istekler `ASSETS` binding'ine gider. `nodejs_compat` sunucudaki SMTP istemcisi içindir. Eklentinin model API akışı bu sunucuya taşınmaz. Kalbur Worker'ı, widget'ı ve kuyrukları değiştirilmez; yeni kaynak adları Düzelt'e aittir.
 
@@ -123,11 +128,15 @@ Gerçek değerleri komut argümanına, kabuk geçmişine, ekran görüntüsüne,
 
 `SMTP_SECURE=false` şifresiz e-posta demek değildir: STARTTLS zorunludur. SMTP istemcisi `requireTLS: true`, `rejectUnauthorized: true` ve SMTP hostname'ini koruyan bağlantı kullanır. Sertifika kontrolünü kapatmak çözüm değildir. [Nodemailer TLS/STARTTLS seçenekleri](https://nodemailer.com/smtp).
 
-`FEEDBACK_IP_HASH_KEY`, operatör tarafından güvenli rastgele üretilen en az 32 karakterlik ayrı Worker secret'ıdır; kullanıcının SMTP alanı değildir. IP rate-limit anahtarı bu sırla HMAC olarak üretilir. Anahtarı kaynağa veya tarayıcıya taşımayın.
+`FEEDBACK_IP_HASH_KEY`, operatör tarafından güvenli rastgele üretilen en az 32 karakterlik ayrı Worker secret'ıdır; kullanıcının SMTP alanı değildir. IP rate-limit anahtarı ve token nesne kimliği aynı sırla, birbirinden ayrı HMAC bağlamlarında üretilir. Anahtarı kaynağa veya tarayıcıya taşımayın. Anahtarın değiştirilmesi token nesne kimliklerini de değiştirir; tekrar korumasının mevcut kayıtlarıyla sürekliliğini etkiler.
 
 ### Worker, Turnstile ve kuyruk ayarları
 
-`SITE_ORIGIN=https://duzelt.yerli.dev`, `worker/feedback.mjs` içindeki sunucu sabitidir; `FEEDBACK_ENABLED` Wrangler yapılandırmasındaki etkinlik anahtarıdır. Form yalnız gerekli alanlar, Queue ve rate-limit binding'leri hazırken açılır. `/api/feedback/config` yalnız etkinlik durumu ve public sitekey döndürür; SMTP/Turnstile secret'ı istemciye verilmez. Üretim action'ı istemci ve sunucuda `feedback` değeridir. Turnstile Siteverify sonucu `success`, tam hostname ve action ile doğrulanır. Token tek kullanımlıktır; hata veya süresi dolma sonrasında yenilenir. Sunucudaki Siteverify isteği `redirect: manual` kullanır ve bütün 3xx yanıtları reddeder; doğrulama sırrı yönlendirme hedefine aktarılmaz. Tarayıcıya özgü istek seçenekleri sunucu çağrısına eklenmez. [Sunucu doğrulaması](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/).
+`SITE_ORIGIN=https://duzelt.yerli.dev`, `worker/feedback.mjs` içindeki sunucu sabitidir; `FEEDBACK_ENABLED` Wrangler yapılandırmasındaki etkinlik anahtarıdır. Form yalnız gerekli alanlar, Queue, Durable Object ve rate-limit binding'leri hazırken açılır. `/api/feedback/config` yalnız etkinlik durumu ve public sitekey döndürür; SMTP/Turnstile secret'ı istemciye verilmez. Üretim action'ı istemci ve sunucuda `feedback` değeridir. Turnstile Siteverify sonucu `success`, tam hostname ve action ile doğrulanır. Hata veya süresi dolma sonrasında tarayıcı belirteci yeniler. Sunucudaki Siteverify isteği `redirect: manual` kullanır ve bütün 3xx yanıtları reddeder; doğrulama sırrı yönlendirme hedefine aktarılmaz. Tarayıcıya özgü istek seçenekleri sunucu çağrısına eklenmez. [Sunucu doğrulaması](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/).
+
+Ek tekrar koruması için `FEEDBACK_TOKEN_GUARD` binding'i, `worker/runtime.mjs` içindeki `FeedbackTokenGuard` sınıfına bağlı SQLite Durable Object namespace'ini kullanır. Wrangler migration kaydında sınıf SQLite olarak tanımlanmalıdır; binding veya nesne erişimi yoksa gönderim HTTP 503 ile durur. Siteverify başarısından sonra aynı token her Cloudflare konumunda aynı HMAC nesne adına gider. RPC yalnız `claim()` çağrısıdır; ham token veya form alanları nesneye iletilmez. Atomik SQL işlemi ilk kullanımı kaydeder, ikinci kullanım HTTP 400 olur; ancak bundan sonra kuyruk yazılır. Koruma başarısız olduğunda kuyruk yazılmaz. Kuyruk yazımı sonradan hata verirse aynı token yeniden kullanılmaz; form yeni bir doğrulama belirteci almalıdır.
+
+Nesne adı HMAC özeti içerir; SQLite tablosu yalnız sabit `id = 1` ve `expires_at` tutar. Ham token, IP, mesaj veya e-posta bu depoya girmez. Aktif kayıt için 24 saat sonrasına alarm kurulur; alarm `deleteAll()` ile kaydı ve tabloyu siler. Hizmet kesintisi alarmı geciktirebilir. Aktif kaydın silinmesi platform kurtarma geçmişini hemen silmez: Cloudflare'ın SQLite PITR geçmişi 30 güne kadar geri yüklenebilir. Bunu 24 saatlik kuyruk ve 7 günlük log süreleriyle karıştırmayın. [Durable Object alarmları](https://developers.cloudflare.com/durable-objects/api/alarms/), [SQLite kurtarma geçmişi](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/).
 
 - Ana kuyruk: `duzelt-feedback`; binding `FEEDBACK_QUEUE`.
 - Başarısız kuyruk: `duzelt-feedback-dlq`; ana tüketicide `dead_letter_queue`.
@@ -161,6 +170,8 @@ Geliştiricinin posta kutusundaki bildirim ve yanıtları talep kapandıktan son
 
 Turnstile/SMTP arızasında `FEEDBACK_ENABLED=false` ile yeni gönderimleri durdurun. E-posta ve GitHub alternatifleri görünür kalır. Worker sürümüne geri dönmek, kuyrukta bekleyen mesajları veya posta kopyalarını kendiliğinden silmez; gizlilik ve form durumu fiilî veri akışıyla uyumlu tutulur. Mevcut `main` → Workers Builds düzeniyle yayın yapılır; ikinci bir CI/yayın düzeni kurulmaz.
 
+Durable Object arızasında korumayı atlamayın; HTTP 503 gönderimi durdurur. SQLite kaydını geçmiş bir zamana geri yüklemek tekrar korumasını da eski duruma getirebilir; normal arıza çözümü olarak kullanılmaz. Gizlilik kaynağı değiştiğinde `site:prepare` ile web kopyasını yeniden üretin; generated `privacy/index.html` metnini elle değiştirmeyin.
+
 ### Yeni form için kontrol listesi
 
 Yerel Chromium form turu **37/37** geçti: dört genişlik × iki tema, klavye/etiket/durum, çevrimdışı mesaj koruma ve eş zamanlı gönderim engeli. İzole fixture kullanılır; gerçek CAPTCHA/SMTP çağrısı yoktur. 13 form PNG'sinin görsel incelemesi tamamlandı. [Form kanıtı](../evidence/feedback-ui-results.json).
@@ -169,11 +180,12 @@ Mevcut site akışı **58 kontrol**, **40 tema/genişlik ölçümü** ve `pageEr
 
 HTML e-posta örnekleri 390/768 px'de 4/4 kontrolle taşmadan render edildi. Kuyruk panellerinde ana ve DLQ saklaması ayrı ayrı **86.400 saniye** olarak doğrulandı; bu, tüketicinin SMTP teslim kanıtı değildir. [E-posta görünümü](../evidence/feedback-email-render-results.json).
 
-Sunucu birim testleri: `node --test tests/feedback.test.mjs` — **33/33 geçti**, bağımsız tekrar da başarılı. Doğrulama/stream gövde sınırı/Origin, HMAC, Turnstile yanıtları, rate-limit reddi, kuyruğu bekleyen 202 yanıtı, sabit alıcı/Reply-To, HTML kaçışı, ACK/retry, özel veri içermeyen log ve 24 saatlik job sınırı kapsanır. Testler taklit SMTP/Turnstile/Queue kullanır; gerçek TLS el sıkışması, gerçek token tekrar kullanımı, Cloudflare DLQ yönlendirmesi veya gelen kutusu kanıtı değildir. Üretimdeki Siteverify modülü ayrıca yerel workerd içinde, dış istek göndermeyen fixture ile denenir: desteklenen Request seçenekleri ve 3xx reddi doğrulanır. SMTP bağlantı zaman aşımı kaynakta ayarlanır; sürenin gerçekten dolması bu birim turunda denenmez.
+Sunucu testleri: `npm run test:feedback` — **39/39 geçti**. Doğrulama/stream gövde sınırı/Origin, HMAC, Turnstile yanıtları, rate-limit reddi, kuyruğu bekleyen 202 yanıtı, sabit alıcı/Reply-To, HTML kaçışı, ACK/retry, özel veri içermeyen log ve 24 saatlik job sınırı kapsanır. Gerçek yerel workerd içinde 32 eş zamanlı token kullanımından biri başarılı, 31'i reddedildi; yeniden başlatma, süre dolması ve alarm silmesi denendi. Her doğrulamayı kabul eden taklit Siteverify ile ilk POST 202, aynı tokenla ikincisi 400 ve yalnız bir kuyruk yazımı; koruma arızasında 503 görüldü. Testler canlı Turnstile/SMTP kullanmaz; Cloudflare DLQ yönlendirmesi veya gelen kutusu kanıtı değildir. Üretimdeki Siteverify modülü ayrıca yerel workerd içinde dış istek göndermeyen fixture ile denenir: desteklenen Request seçenekleri ve 3xx reddi doğrulanır. SMTP bağlantı zaman aşımı kaynakta ayarlanır; sürenin gerçekten dolması bu turda denenmez.
 
 - 320, 390, 768 ve 1440 px; klavye odağı, etiketler, teknik bilgiler açılır alanı ve erişilebilir durum mesajları.
 - E-postasız gönderim, hata/ağ kesintisinde mesajın korunması, yinelenen gönderimin engellenmesi ve görünür e-posta alternatifi.
 - Doğrulama/boyut/Origin/içerik tipi, Turnstile hostname/action/süre ve hız sınırı.
+- Aynı tokenla tekrarın 400 olması ve kuyruk yazmaması; Durable Object arızasında 503, aktif kaydın alarm ile silinmesi. Canlı tekrar reddi henüz bekliyor.
 - Queue arızası, SMTP retry/ACK, sabit alıcı, Reply-To, HTML kaçışı ve düz metin e-posta.
 - `.env`/secret'ların Git, site varlıkları, dry-run çıktısı ve eklenti ZIP'i dışında kaldığı.
 - Canlı form kabulü, SMTP kabulü, varsa gelen kutusu; gerçek main push sonrası uzak build ve yayın.

@@ -69,7 +69,7 @@
 
 ## 4. Site üzerinden e-posta geri bildirimi
 
-4 Ekim 2026: form yayımlandı ve canlı yapılandırma yanıtı başarılı. İlk gerçek POST HTTP 503 döndü; gerçek kuyruk kabulü, Worker SMTP ve gelen kutusu teslimi tamamlanmadı.
+4 Ekim 2026: form yayımlandı; 6 açık TEST bildirimi HTTP 202 ile kabul edildi. İlk 4 için SMTP kabul kaydı, ilk 2 ve son 2 olmak üzere 4 mesaj için Gmail gelen kutusu kanıtı var. Önceki canlı denemede aynı belirteç yeniden kabul edildi; kök neden kesinleşmedi. Ek Durable Object korumasının yerel testleri geçti, canlı tekrar reddi henüz bekliyor. [Canlı sonuçlar](evidence/feedback-live-results.json).
 
 - [x] Kalbur'un Worker, form ve test kaynaklarını salt okunur incele; `.env` ve credential dosyalarını açma.
 - [x] İki aşamalı kurulum sınırını ve gerekli SMTP/Turnstile alanlarını belirle; ilk aşamada uygulama/yayın yapmadan dur.
@@ -79,21 +79,28 @@
 - [x] Düzelt için yalnız `duzelt.yerli.dev` alanına bağlı managed Turnstile widget'ı oluştur.
 - [x] `duzelt-feedback` / `duzelt-feedback-dlq` canlı kuyruklarını ve her birinde 86.400 saniye saklamayı ayrı doğrula; her iki panelde 86.400 saniye görüldü.
 - [x] Sunucu kaynaklarında Origin/içerik tipi, 16 KiB gövde, 4.000 karakter mesaj, tuzak alanı, HMAC IP özeti ve Turnstile token/hostname/action kontrollerini uygula; kaynak salt okunur gözden geçirildi.
-- [x] Sunucu kontrollerini `node --test tests/feedback.test.mjs` ile doğrula; 33/33 ve bağımsız tekrar başarılı.
+- [x] Sunucu kontrollerini `npm run test:feedback` ile doğrula; Durable Object korumasıyla 39/39. Gerçek yerel workerd, eş zamanlı kullanım, yeniden başlatma, süre dolması ve alarm silmesini kapsar; canlı doğrulama ayrı tutulur.
 - [x] Canlı yapılandırmayı doğrula: `/api/feedback/config` HTTP 200 ve `enabled: true`; `/.env` HTTP 404.
 - [x] Gerçek widget belirtecini ayrı Siteverify işleminde doğru hostname/action ile doğrula; bu sonuç Worker POST kabulü değildir.
 - [x] Canlı Chrome'da 320/390/768/1440 px yatay taşma ve görünür e-posta alternatifini kontrol et; güncel SDK için önbellek kapalıydı.
-- [ ] Eski SDK dosyasının önbelleğini gider; gerçek Worker POST için başarılı 202 kuyruk kabulünü doğrula. İlk deneme 503; uyumluluk düzeltmesi yerel workerd regresyonuyla hazır, yeni yayın bekliyor.
-- [ ] Worker SMTP kabulünü ve erişilebiliyorsa gelen kutusunu ayrıca doğrula.
-- [ ] IP başına 5/dk ve uygulama anahtarına 60/dk yaklaşık, Cloudflare konumu bazlı sınırı doğrula; kesin küresel kota diye sunma.
+- [x] Eski SDK dosyası için içerik özetli betik adresi üret; 3/3 hedefli önbellek kontrolünü çalıştır. Önceki 37 form kontrolünü URL değişikliği sonrası yeniden çalıştırılmış diye sunma.
+- [x] Canlı Chrome'da normal önbellekle güncel `feedback.js` dosyasını ve formun hazır olmasını doğrula; JavaScript hatası görülmedi.
+- [x] Worker uyumluluk düzeltmesi sonrası gerçek POST HTTP 202 kuyruk kabulünü doğrula; 6 TEST bildirimi kabul edildi.
+- [x] Worker SMTP kabulünü ve gelen kutusunu ayrı doğrula; ilk 4 SMTP kaydı, toplam 4 gelen kutusu kanıtı var. Bütün 6 mesaj için aynı kanıt düzeyi iddia edilmez.
+- [x] IP başına 5/dk ve uygulama anahtarına 60/dk binding'lerini ve taklit reddetme testlerini doğrula; sınır yaklaşık ve Cloudflare konumu bazlıdır. Canlı kısa denemede HTTP 429 görülmedi; eşik ölçümü yapılmış sayılmaz.
+- [x] Canlı yanlış Origin, içerik tipi ve büyük gövde isteklerini reddet; sırasıyla HTTP 403, 415 ve 413 görüldü.
+- [x] Token HMAC'ı ile nesne kimliği, atomik SQLite kullanım kaydı ve 24 saatlik silme alarmını uygula; `FEEDBACK_TOKEN_GUARD` / `FeedbackTokenGuard`. Ham token/IP/mesaj/e-posta depoya girmez; 30 güne kadar platform kurtarma geçmişi belgelenir.
+- [ ] Yeni korumayı yayımla; aynı geçerli belirtecin ikinci kullanımında HTTP 400 ve yeni kuyruk kaydı olmamasını canlı doğrula. Koruma arızasında HTTP 503 davranışını yerel sonuçla karıştırma.
+- [ ] Yeni koruma sonrası son kontrollü TEST bildiriminin kuyruk, SMTP ve gelen kutusu sonuçlarını ayrı doğrula.
 - [x] Yerel testlerde sabit gönderen/alıcı, yalnız Reply-To, TLS seçenekleri, retry/ACK ve kayıt kimliğiyle izleme akışını doğrula. Gerçek DLQ yönlendirmesi bekliyor.
 - [x] Yerel SMTP ön kontrolü (`transporter.verify()`): TLS sertifikası ve kimlik doğrulaması başarılı; e-posta gönderilmedi.
 - [x] Gerekli 11 alanı mevcut Worker'a şifreli secret olarak aktar; değerleri gösterme. Yerel `.env` 0600 izinli ve Git dışında, sızıntı kontrolü bulgusuz.
-- [ ] Son derleme/paket turunda secret ve `.env` dışlama kontrollerini yenile.
-- [x] Doğrulama, boyut/Origin, taklit Turnstile hataları, hız sınırı, kuyruk arızası, SMTP retry, HTML kaçışı ve sabit alıcı testlerini çalıştır; 33/33.
-- [ ] Az sayıda açıkça test olarak işaretli bildirimle gerçek form kabulünü, SMTP sunucusunun kabulünü ve mümkünse alıcı gelen kutusu görünümünü ayrı doğrula.
+- [x] Son derleme/paket turunda secret ve `.env` dışlama kontrollerini yenile; 7/7 paket testi, `.env` 0600/Git dışında ve izlenen dosyalarda gizli değer sızıntısı bulgusuz.
+- [x] Doğrulama, boyut/Origin, taklit Turnstile hataları, hız sınırı, kuyruk arızası, SMTP retry, HTML kaçışı, sabit alıcı ve Durable Object tekrar koruması testlerini çalıştır; 39/39.
+- [x] Açıkça TEST işaretli canlı bildirimlerde kuyruk kabulünü, SMTP kabulünü ve gelen kutusu görünümünü ayrı kaydet; 6 kabul, 4 SMTP kayıtlı, 4 gelen kutusu doğrulanmış.
 - [x] Form kodunu ve SDK düzeltmesini (`01ab2ef`, `6c96419`) main'e pushla; mevcut Workers Builds otomatik build/deploy başarılı. Worker sürümü `94e7bfa1…`.
-- [ ] Son Worker/önbellek düzeltmesinden sonra main push, uzak build ve canlı form teslimini tekrar doğrula.
+- [x] Yeni gizlilik kaynağından site kopyasını üret; son `site:check` turunda 14 hazırlık ve 39 sunucu testi, syntax/drift ve Durable Object binding'li bundle dry-run geçti.
+- [ ] Son Durable Object/gizlilik değişikliğinden sonra site hazırlığı, main push, uzak build ve canlı koruma sonucunu doğrula; yalnız önceki yayın kanıtıyla tamamlandı sayma.
 - [ ] 24 saatlik hata kuyruğunu arıza halinde izle; kapanan talebin posta yazışmalarını en geç 30 gün içinde sil ve aylık kontrolü işlet.
 
 ## Kanıt sınırları

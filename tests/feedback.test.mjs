@@ -2,11 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { EventEmitter } from 'node:events';
-import { readFile } from 'node:fs/promises';
+import { readFile, mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import worker, { handleFeedback, deliverFeedback } from '../worker/index.mjs';
 import { FeedbackError, SITE_ORIGIN, FEEDBACK_ACTION, MAX_BODY_BYTES, JOB_MAX_AGE_MS,
-    validateFeedback, readFeedback, verifyTurnstile, feedbackJob, validateJob, ipRateKey, emailMessage } from '../worker/feedback.mjs';
+    validateFeedback, readFeedback, verifyTurnstile, feedbackJob, validateJob, ipRateKey, tokenClaimKey, emailMessage } from '../worker/feedback.mjs';
 import { smtpOptions, sendFeedbackMail } from '../worker/mail.mjs';
+import { TOKEN_CLAIM_TTL_MS } from '../worker/token-guard.mjs';
 
 const NOW = Date.parse('2026-10-03T10:11:00Z');
 const ID = 'a1234567-1234-4234-8234-123456789abc';
@@ -16,6 +19,7 @@ const logger = () => ({ logs: [], log(value) { this.logs.push(JSON.parse(value))
 
 function environment(overrides = {}) {
     const jobs = [];
+    const claimedTokens = new Set();
     return {
         jobs, FEEDBACK_ENABLED: 'true', TURNSTILE_SITE_KEY: 'fixture-public-site-key',
         TURNSTILE_SECRET_KEY: 'fixture-private-turnstile-key', FEEDBACK_IP_HASH_KEY: 'fixture-hmac-key-at-least-thirty-two-characters',
@@ -24,6 +28,11 @@ function environment(overrides = {}) {
         MAIL_FROM: 'duzelt@example.test', MAIL_TO: 'owner@example.test',
         FEEDBACK_RATE_LIMITER: { limit: async () => ({ success: true }) },
         FEEDBACK_GLOBAL_LIMITER: { limit: async () => ({ success: true }) },
+        FEEDBACK_TOKEN_GUARD: { getByName: key => ({ claim: async () => {
+            if (claimedTokens.has(key)) return false;
+            claimedTokens.add(key);
+            return true;
+        } }) },
         FEEDBACK_QUEUE: { send: async (job, options) => { jobs.push({ job, options }); } },
         ...overrides,
     };
@@ -113,7 +122,7 @@ test('public config exposes only readiness, site key and action with no-store', 
 test('missing bindings/secrets or unsafe SMTP disables public form and submission', async () => {
     for (const overrides of [{ FEEDBACK_ENABLED: 'false' }, { TURNSTILE_SECRET_KEY: '' },
         { FEEDBACK_IP_HASH_KEY: 'short' }, { FEEDBACK_QUEUE: null }, { FEEDBACK_RATE_LIMITER: null },
-        { FEEDBACK_GLOBAL_LIMITER: null }, { SMTP_PASSWORD: '' }, { SMTP_SECURE: 'invalid' },
+        { FEEDBACK_GLOBAL_LIMITER: null }, { FEEDBACK_TOKEN_GUARD: null }, { SMTP_PASSWORD: '' }, { SMTP_SECURE: 'invalid' },
         { SMTP_REQUIRE_TLS: 'false' }, { SMTP_REQUIRE_TLS: '' }, { MAIL_TO: 'multiple@example.test,other@example.test' }]) {
         const env = environment(overrides);
         const config = await (await handleFeedback(new Request(`${SITE_ORIGIN}/api/feedback/config`), env)).json();
@@ -164,6 +173,144 @@ test('IP rate key is an HMAC with a private deployment key, never plain IP or ba
     await rejectsCode(ipRateKey(ip, 'short'), 'unavailable');
 });
 
+test('token object identity uses a separate private HMAC domain and never raw tokens', async () => {
+    const secret = environment().FEEDBACK_IP_HASH_KEY;
+    const hash = await tokenClaimKey(VALID.turnstileToken, secret);
+    assert.equal(hash, createHmac('sha256', secret).update('duzelt-feedback-token\n' + VALID.turnstileToken).digest('hex'));
+    assert.match(hash, /^[a-f0-9]{64}$/);
+    assert.notEqual(hash, await ipRateKey(VALID.turnstileToken, secret));
+    assert.notEqual(hash, await tokenClaimKey(VALID.turnstileToken, secret + 'other'));
+    await rejectsCode(tokenClaimKey(VALID.turnstileToken, 'short'), 'unavailable');
+});
+
+test('replayed vendor success still accepts only one job and logs no token or hash', async () => {
+    const env = environment();
+    const logs = logger();
+    const first = await handleFeedback(request(), env, dependencies(logs));
+    const second = await handleFeedback(request(), env, dependencies(logs));
+    assert.equal(first.status, 202);
+    assert.equal(second.status, 400);
+    assert.deepEqual(await second.json(), { error: 'turnstile' });
+    assert.equal(env.jobs.length, 1);
+    assert.deepEqual(logs.logs[1], { event: 'feedback_validation_failed', class: 'token_replay' });
+    assert.doesNotMatch(JSON.stringify(logs.logs), /fixture|token-[a-f0-9]{64}|192\.0\.2/);
+});
+
+test('token guard failure or malformed response fails closed before queueing', async () => {
+    for (const claim of [async () => { throw new Error('private token and credential'); },
+        async () => undefined, async () => 'true', async () => ({ accepted: true })]) {
+        const logs = logger();
+        const env = environment({ FEEDBACK_TOKEN_GUARD: { getByName: name => {
+            assert.match(name, /^duzelt-feedback-token-[a-f0-9]{64}$/);
+            assert.doesNotMatch(name, /fixture|192\.0\.2/);
+            return { claim: async (...args) => { assert.equal(args.length, 0); return claim(); } };
+        } } });
+        const response = await handleFeedback(request(), env, dependencies(logs));
+        assert.equal(response.status, 503);
+        assert.deepEqual(await response.json(), { error: 'unavailable' });
+        assert.equal(env.jobs.length, 0);
+        assert.deepEqual(logs.logs, [{ event: 'feedback_validation_failed', class: 'token_guard_unavailable' }]);
+    }
+});
+
+test('invalid verification and exhausted app rate never claim a token', async () => {
+    let claims = 0;
+    for (const invalidToken of [true, false]) {
+        const env = environment({
+            FEEDBACK_GLOBAL_LIMITER: { limit: async () => ({ success: false }) },
+            FEEDBACK_TOKEN_GUARD: { getByName: () => ({ claim: async () => { claims++; return true; } }) },
+        });
+        const response = await handleFeedback(request(), env, { ...dependencies(),
+            fetcher: invalidToken ? async () => Response.json({ success: false }) : verify });
+        assert.equal(response.status, invalidToken ? 400 : 429);
+    }
+    assert.equal(claims, 0);
+});
+
+test('queue failure retains the consumed token claim so retry cannot enqueue a duplicate', async () => {
+    let queueCalls = 0;
+    const env = environment({ FEEDBACK_QUEUE: { send: async () => { queueCalls++; throw new Error('private queue failure'); } } });
+    assert.equal((await handleFeedback(request(), env, dependencies())).status, 503);
+    assert.equal((await handleFeedback(request(), env, dependencies())).status, 400);
+    assert.equal(queueCalls, 1);
+});
+
+test('real workerd SQLite token claims are atomic, survive restart, expire and remove alarms', async () => {
+    const { Miniflare, convertV4MiniflareOptions } = await import('miniflare');
+    const directory = await mkdtemp(join(tmpdir(), 'duzelt-feedback-guard-'));
+    const epoch = Date.now() + 3_600_000;
+    const options = convertV4MiniflareOptions({
+        compatibilityDate: '2026-10-03', compatibilityFlags: ['nodejs_compat'],
+        durableObjects: { FEEDBACK_TOKEN_GUARD: { className: 'TestTokenGuard', useSQLite: true } },
+        resourcePersistencePath: directory,
+        modules: [
+            { type: 'ESModule', path: 'guard-test.mjs', contents: `
+                import { FeedbackTokenGuard } from './worker/runtime.mjs';
+                export class TestTokenGuard extends FeedbackTokenGuard {
+                    setClock(now) { this.claims.now = () => now; }
+                    inspect() {
+                        const exists = this.ctx.storage.sql.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='token_claim'").toArray();
+                        const rows = exists.length ? this.ctx.storage.sql.exec('SELECT * FROM token_claim').toArray() : [];
+                        return this.ctx.storage.getAlarm().then(alarm => ({rows,alarm,tables:exists.length}));
+                    }
+                    pruneForTest() { return this.alarm(); }
+                }
+                export default { async fetch(request,env) {
+                    const stub = env.FEEDBACK_TOKEN_GUARD.getByName('fixture-hmac-object');
+                    const epoch = ${epoch};
+                    await stub.setClock(epoch);
+                    if (new URL(request.url).pathname === '/restart') {
+                        return Response.json({claimed:await stub.claim(),state:await stub.inspect()});
+                    }
+                    if (new URL(request.url).pathname === '/expire') {
+                        await stub.setClock(epoch + ${TOKEN_CLAIM_TTL_MS - 1});
+                        await stub.pruneForTest();
+                        const before = await stub.inspect();
+                        await stub.setClock(epoch + ${TOKEN_CLAIM_TTL_MS});
+                        await stub.pruneForTest();
+                        const expired = await stub.inspect();
+                        const afterExpiry = await stub.claim();
+                        return Response.json({before,expired,afterExpiry,state:await stub.inspect()});
+                    }
+                    const claimed = await Promise.all(Array.from({length:32},()=>env.FEEDBACK_TOKEN_GUARD.getByName('fixture-hmac-object').claim()));
+                    const other = env.FEEDBACK_TOKEN_GUARD.getByName('independent-fixture-object');
+                    await other.setClock(epoch);
+                    return Response.json({claimed,independent:await other.claim(),state:await stub.inspect()});
+                } }
+            ` },
+            { type: 'ESModule', path: 'worker/runtime.mjs', contents: await readFile(new URL('../worker/runtime.mjs', import.meta.url), 'utf8') },
+            { type: 'ESModule', path: 'worker/token-guard.mjs', contents: await readFile(new URL('../worker/token-guard.mjs', import.meta.url), 'utf8') },
+            // The HTTP/SMTP worker is outside this storage test. This stub has
+            // no network operations and does not replace the production DO.
+            { type: 'ESModule', path: 'worker/index.mjs', contents: 'export default {};' },
+        ],
+    });
+    let runtime;
+    try {
+        runtime = new Miniflare(options);
+        const result = await (await runtime.dispatchFetch('https://fixture.example.test/')).json();
+        assert.equal(result.claimed.filter(value => value === true).length, 1);
+        assert.equal(result.claimed.filter(value => value === false).length, 31);
+        assert.equal(result.independent, true);
+        assert.deepEqual(result.state, { rows: [{ id: 1, expires_at: epoch + TOKEN_CLAIM_TTL_MS }],
+            alarm: epoch + TOKEN_CLAIM_TTL_MS, tables: 1 });
+        await runtime.dispose();
+        runtime = new Miniflare(options);
+        const restarted = await (await runtime.dispatchFetch('https://fixture.example.test/restart')).json();
+        assert.equal(restarted.claimed, false);
+        assert.deepEqual(restarted.state, result.state);
+        const expired = await (await runtime.dispatchFetch('https://fixture.example.test/expire')).json();
+        assert.deepEqual(expired.before, result.state);
+        assert.deepEqual(expired.expired, { rows: [], alarm: null, tables: 0 });
+        assert.equal(expired.afterExpiry, true);
+        assert.deepEqual(expired.state.rows, [{ id: 1, expires_at: epoch + 2 * TOKEN_CLAIM_TTL_MS }]);
+        assert.equal(expired.state.alarm, epoch + 2 * TOKEN_CLAIM_TTL_MS);
+    } finally {
+        if (runtime) await runtime.dispose();
+        await rm(directory, { recursive: true, force: true });
+    }
+});
+
 test('IP limit denial occurs before token verification and never accepts a job', async () => {
     let key;
     let calls = 0;
@@ -205,21 +352,43 @@ test('Turnstile uses server form secret and token without raw IP or URL credenti
         assert.equal(options.redirect, 'manual');
         assert.equal(Object.hasOwn(options, 'credentials'), false);
         assert.equal(Object.hasOwn(options, 'referrerPolicy'), false);
-        assert.deepEqual([...options.body.keys()].sort(), ['response', 'secret']);
-        assert.equal(options.body.get('secret'), env.TURNSTILE_SECRET_KEY);
-        assert.equal(options.body.get('response'), VALID.turnstileToken);
+        assert.equal(options.cache, 'no-store');
+        assert.equal(options.headers['Content-Type'], 'application/x-www-form-urlencoded');
+        assert.equal(typeof options.body, 'string');
+        const form = new URLSearchParams(options.body);
+        assert.deepEqual([...form.keys()].sort(), ['response', 'secret']);
+        assert.equal(form.get('secret'), env.TURNSTILE_SECRET_KEY);
+        assert.equal(form.get('response'), VALID.turnstileToken);
         return verify();
     });
 });
 
-test('real workerd accepts Siteverify options and refuses redirects without any outbound fetch', async () => {
+test('real workerd Siteverify native fetch sends explicit no-store form and refuses redirects without external network', async () => {
     const { Miniflare, convertV4MiniflareOptions } = await import('miniflare');
+    const outboundBodies = [];
     const runtime = new Miniflare(convertV4MiniflareOptions({
         compatibilityDate: '2026-10-03', compatibilityFlags: ['nodejs_compat'],
+        outboundService: async request => {
+            assert.equal(request.url, 'https://challenges.cloudflare.com/turnstile/v0/siteverify');
+            assert.equal(request.method, 'POST');
+            assert.equal(request.headers.get('Content-Type'), 'application/x-www-form-urlencoded');
+            assert.equal(request.headers.get('Cache-Control'), 'no-cache');
+            assert.equal(request.headers.get('Pragma'), 'no-cache');
+            const body = await request.text();
+            outboundBodies.push(body);
+            assert.deepEqual(Object.fromEntries(new URLSearchParams(body)), {
+                secret: 'fixture-secret+slash/', response: 'fixture-token+slash/',
+            });
+            return verify();
+        },
         modules: [
             { type: 'ESModule', path: 'runtime-test.mjs', contents: `
                 import { verifyTurnstile } from './worker/feedback.mjs';
-                export default { async fetch() {
+                export default { async fetch(request) {
+                    if (new URL(request.url).pathname === '/native') {
+                        await verifyTurnstile({turnstileToken:'fixture-token+slash/'}, {TURNSTILE_SECRET_KEY:'fixture-secret+slash/'});
+                        return Response.json({accepted:true});
+                    }
                     const results = [];
                     for (const status of [200,301,302,307,308]) {
                         let calls = 0;
@@ -250,6 +419,11 @@ test('real workerd accepts Siteverify options and refuses redirects without any 
         for (const result of results.slice(1)) {
             assert.deepEqual(result, { status: result.status, accepted: false, calls: 1, mode: 'manual', code: 'unavailable', diagnosticClass: 'turnstile_http_status' });
         }
+        for (let index = 0; index < 2; index++) {
+            assert.deepEqual(await (await runtime.dispatchFetch('https://fixture.example.test/native')).json(), { accepted: true });
+        }
+        assert.equal(outboundBodies.length, 2);
+        assert.equal(outboundBodies[0], outboundBodies[1]);
     } finally {
         await runtime.dispose();
     }

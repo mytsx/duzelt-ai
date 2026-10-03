@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "duzelt-site",
-  "main": "worker/index.mjs",
+  "main": "worker/runtime.mjs",
   "account_id": "be07ea38add164a83cc48c714ecbf9e2",
   "compatibility_date": "2026-10-03",
   "compatibility_flags": ["nodejs_compat"],
@@ -16,6 +16,10 @@
     "not_found_handling": "404-page"
   },
   "vars": { "FEEDBACK_ENABLED": "true" },
+  "durable_objects": {
+    "bindings": [{ "name": "FEEDBACK_TOKEN_GUARD", "class_name": "FeedbackTokenGuard" }]
+  },
+  "migrations": [{ "tag": "duzelt-feedback-token-guard-v1", "new_sqlite_classes": ["FeedbackTokenGuard"] }],
   "ratelimits": [
     { "name": "FEEDBACK_RATE_LIMITER", "namespace_id": "2026100303", "simple": { "limit": 5, "period": 60 } },
     { "name": "FEEDBACK_GLOBAL_LIMITER", "namespace_id": "2026100304", "simple": { "limit": 60, "period": 60 } }

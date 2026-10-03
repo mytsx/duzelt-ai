@@ -99,7 +99,9 @@ export async function verifyTurnstile(feedback, env, fetcher = fetch) {
     let response;
     try {
         response = await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-            method: 'POST', body, signal,
+            method: 'POST', body: body.toString(), signal,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            cache: 'no-store',
             // workerd implements manual/follow, not redirect:error. Manual
             // never forwards the verification secret to a redirect target;
             // the non-2xx check below rejects every redirect response.
@@ -121,12 +123,20 @@ export async function verifyTurnstile(feedback, env, fetcher = fetch) {
         result.action !== FEEDBACK_ACTION) throw new FeedbackError(400, 'turnstile');
 }
 
-export async function ipRateKey(ip, secret) {
+async function privateHash(value, secret, domain) {
     if (typeof secret !== 'string' || secret.length < 32) throw new FeedbackError(503, 'unavailable');
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-    const digest = await crypto.subtle.sign('HMAC', key, encoder.encode('duzelt-feedback-ip\n' + ip));
+    const digest = await crypto.subtle.sign('HMAC', key, encoder.encode(domain + '\n' + value));
     return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+export function ipRateKey(ip, secret) {
+    return privateHash(ip, secret, 'duzelt-feedback-ip');
+}
+
+export function tokenClaimKey(token, secret) {
+    return privateHash(token, secret, 'duzelt-feedback-token');
 }
 
 export function feedbackJob(feedback, { now = () => new Date(), uuid = () => crypto.randomUUID() } = {}) {

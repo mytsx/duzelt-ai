@@ -1,10 +1,11 @@
-import { FeedbackError, FEEDBACK_ACTION, SITE_ORIGIN, UUID, readFeedback, verifyTurnstile, feedbackJob, ipRateKey, validateJob } from './feedback.mjs';
+import { FeedbackError, FEEDBACK_ACTION, SITE_ORIGIN, UUID, readFeedback, verifyTurnstile, feedbackJob, ipRateKey, tokenClaimKey, validateJob } from './feedback.mjs';
 import { smtpOptions, sendFeedbackMail } from './mail.mjs';
 
 function ready(env) {
     const required = ['TURNSTILE_SITE_KEY', 'TURNSTILE_SECRET_KEY', 'FEEDBACK_IP_HASH_KEY'];
     if (env.FEEDBACK_ENABLED !== 'true' || !required.every(key => typeof env[key] === 'string' && env[key].trim()) ||
         env.FEEDBACK_IP_HASH_KEY.length < 32 || typeof env.FEEDBACK_QUEUE?.send !== 'function' ||
+        typeof env.FEEDBACK_TOKEN_GUARD?.getByName !== 'function' ||
         typeof env.FEEDBACK_RATE_LIMITER?.limit !== 'function' || typeof env.FEEDBACK_GLOBAL_LIMITER?.limit !== 'function') return false;
     try {
         smtpOptions(env);
@@ -64,13 +65,25 @@ export async function handleFeedback(request, env, dependencies = {}) {
         // location; this is an app-wide key per location, not a global quota.
         const appRate = await env.FEEDBACK_GLOBAL_LIMITER.limit({ key: 'duzelt-feedback' });
         if (appRate?.success !== true) return json({ error: 'rate_limit' }, 429, { 'Retry-After': '60' });
+        // One token always reaches the same durable object, independent of the
+        // request's Cloudflare location. Only a domain-separated HMAC is sent.
+        const tokenKey = await tokenClaimKey(feedback.turnstileToken, env.FEEDBACK_IP_HASH_KEY);
+        let claimed;
+        try {
+            claimed = await env.FEEDBACK_TOKEN_GUARD.getByName('duzelt-feedback-token-' + tokenKey).claim();
+        } catch {
+            throw new FeedbackError(503, 'unavailable', 'token_guard_unavailable');
+        }
+        if (claimed === false) throw new FeedbackError(400, 'turnstile', 'token_replay');
+        if (claimed !== true) throw new FeedbackError(503, 'unavailable', 'token_guard_unavailable');
         const job = feedbackJob(feedback, dependencies);
         await env.FEEDBACK_QUEUE.send(job, { contentType: 'json' });
         safeLog(logger, 'feedback_accepted', job.id);
         return json({ accepted: true, id: job.id.slice(0, 8), message: 'Geri bildiriminiz alındı.' }, 202);
     } catch (error) {
         if (error instanceof FeedbackError) {
-            if (['turnstile_runtime', 'turnstile_transport', 'turnstile_timeout', 'turnstile_http_status', 'turnstile_json'].includes(error.diagnosticClass)) {
+            if (['turnstile_runtime', 'turnstile_transport', 'turnstile_timeout', 'turnstile_http_status', 'turnstile_json',
+                'token_replay', 'token_guard_unavailable'].includes(error.diagnosticClass)) {
                 safeLog(logger, 'feedback_validation_failed', undefined, error.diagnosticClass);
             }
             return json({ error: error.code }, error.status);

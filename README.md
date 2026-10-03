@@ -128,13 +128,16 @@ Yerel `.env` ve `.env.example` alanları, secret aktarımı, hız/saklama sını
 
 **4 Ekim 2026 doğrulama durumu:**
 
-- Sunucu birim testleri **33/33**; bağımsız tekrar başarılı. Bunlar SMTP, Turnstile ve Queue taklitleri kullanır.
+- Sunucu testleri **39/39** geçti. SMTP, Turnstile ve Queue taklitlerine ek olarak gerçek yerel workerd içinde 32 eş zamanlı Durable Object kullanım isteğinden yalnız biri kabul edildi; yeniden başlatma, süre dolması ve silme alarmı da denendi. Bu yerel sonuç, yeni korumanın canlı doğrulaması değildir.
 - Form arayüzü **37/37 Chromium kontrolü**, 8 tema/genişlik birleşimi ve 13 incelenmiş ekran görüntüsüyle doğrulandı. Klavye, alan etiketleri, mesajın hatada korunması ve tek gönderim kapsanır; gerçek ekran okuyucu oturumu değildir. [Form kanıtı](evidence/feedback-ui-results.json).
 - Genel site akışı **58 kontrol** ve 40 tema/genişlik ölçümüyle geçti. İki HTML e-posta örneği 390/768 px'de **4/4** render kontrolünden geçti; bu görünüm testi posta teslimi değildir. [Site kanıtı](evidence/feedback-site-ui-results.json), [e-posta görünümü](evidence/feedback-email-render-results.json).
 - Mevcut `main` → Workers Builds düzeniyle form ve SDK düzeltmesi yayımlandı. Canlı `/api/feedback/config` HTTP 200 ve `enabled: true`; `/.env` HTTP 404. Gerekli 11 alan Worker'ın şifreli secret mekanizmasına aktarıldı. Yerel `.env` Git dışında ve `0600` izinli tutuluyor; sızıntı kontrolünde bulgu yok.
 - Yerel SMTP ön kontrolünde TLS sertifikası ve kimlik doğrulaması başarılı; bu kontrolde e-posta gönderilmedi. Gerçek widget belirteci ayrı Siteverify kontrolünde doğru hostname/action ile kabul edildi.
+- Önbellek düzeltmesi için **3/3** hedefli hazırlık ve tarayıcı kontrolü geçti. Destek sayfasındaki betik adresi içerik özetiyle yenilenir; bu URL değişikliği, önceki 37 kontrolün yeniden çalıştırıldığı anlamına gelmez. [Önbellek kanıtı](evidence/feedback-cache-results.json).
+- Canlı Chrome'da normal önbellekle güncel form betiği, hazır olma durumu ve hatasız açılış doğrulandı. Son hazırlık/yayın kontrolü 14 site hazırlığı, 39 sunucu ve 7 paket testiyle geçti; `.env` ve gizli değerler yayın paketine alınmadı.
+- Canlı formdan açıkça TEST olarak işaretli **6 bildirim HTTP 202** ile kuyruğa kabul edildi. İlk 4 için Worker SMTP kabul kaydı; ilk 2 ve son 2 olmak üzere **4 mesaj için gerçek Gmail gelen kutusu doğrulaması** var. Diğer mesajların teslimi bu kanıttan çıkarılmaz. Canlı sonuçlar [teslimat kaydında](evidence/feedback-live-results.json) ayrı tutulur.
 
-**Teslimat doğrulaması sürüyor:** İlk canlı POST, HTTP 503 döndü. Worker çalışma ortamındaki uyumsuz istek seçenekleri için düzeltme ve yerel workerd regresyonu hazır; yeniden yayın ve canlı kontrol sürüyor. Kuyruğa kabul edilen gerçek bildirim, Worker'dan SMTP sunucusunun kabulü ve alıcı gelen kutusu görünümü henüz doğrulanmadı. Tamamlanan işler ve kalanlar [TODO.md](TODO.md#4-site-%C3%BCzerinden-e-posta-geri-bildirimi) içinde ayrı izlenir.
+**Token tekrar korumasının canlı doğrulaması bekliyor:** Önceki canlı denemede aynı geçerli belirteç yeniden HTTP 202 ile kabul edildi; kök neden kesinleşmedi. Ek koruma, belirtecin HMAC özetiyle bulunan `FeedbackTokenGuard` Durable Object'inde atomik kullanım kaydı tutar: tekrar HTTP 400, koruma hizmeti arızası HTTP 503 olur ve mesaj kuyruğa eklenmez. Bu depoya ham belirteç, IP, mesaj veya e-posta yazılmaz. Aktif kayıt için 24 saatlik silme alarmı kurulur; Cloudflare'ın SQLite kurtarma geçmişi 30 güne kadar bulunabilir. Yeni koruma için canlı sonuç henüz başarılı sayılmaz. Tamamlanan işler ve kalanlar [TODO.md](TODO.md#4-site-%C3%BCzerinden-e-posta-geri-bildirimi) içinde ayrı izlenir.
 
 ## Video ve mağaza gönderimi
 

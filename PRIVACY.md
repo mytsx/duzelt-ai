@@ -1,6 +1,6 @@
 # AI Türkçe Metin Düzeltici — Gizlilik Politikası
 
-Son güncelleme: 3 Ekim 2026
+Son güncelleme: 4 Ekim 2026
 
 Bu politika, Mehmet Yerli tarafından geliştirilen AI Türkçe Metin Düzeltici Chrome eklentisinin ve duzelt.yerli.dev web sitesindeki geri bildirim formunun veri işlemesini açıklar. Politikanın tek kaynak dosyası budur; web sitesindeki kopya bu dosyadan üretilir.
 
@@ -49,13 +49,15 @@ Destek için e-posta gönderir veya GitHub'da sorun açarsanız, sizin paylaşt�
 
 Mesaj, Düzelt'in Cloudflare Worker'ında doğrulanır ve Cloudflare Queues üzerinden sunucuda tanımlı alıcı posta kutusuna iletilir. Cloudflare siteyi barındırır, kuyruk verisini işler ve Turnstile ile spam doğrulaması sağlar. Turnstile doğrulama belirteci yalnız doğrulama için kullanılır; e-posta veya kuyruk kaydına eklenmez. Bağlantı IP'si istek sırasında Cloudflare tarafından işlenir; uygulama gönderim sınırı için sunucu sırrıyla üretilen geçici bir IP özeti (HMAC) kullanır, ham IP'yi bildirim e-postasına veya uygulama loguna yazmaz. Cloudflare'ın hizmeti kendi bağlantı ve güvenlik verilerini de kendi koşulları uyarınca işler. Postayı ileten SMTP hizmeti ve alıcı posta hizmeti, bildirim içeriğini e-posta teslimi için işler.
 
+Aynı doğrulama belirtecinin yeniden kullanılmasını engellemek için belirteçten sunucu sırrıyla bir HMAC özeti üretilir. Bu özet Cloudflare Durable Object kimliği olarak kullanılır; o nesnenin SQLite kaydı yalnız kullanım durumu ve sona erme zamanını tutar. Ham belirteç, IP, mesaj ve e-posta bu güvenlik deposuna yazılmaz. Aktif kayıt için **24 saat sonra otomatik silme alarmı** kurulur; hizmet kesintisi alarmın çalışmasını geciktirebilir. Aktif verinin silinmesinden ayrı olarak Cloudflare'ın SQLite geri yükleme geçmişi **30 güne kadar** bulunabilir. Bu süre, mesaj içeriğinin bu depoda tutulduğu anlamına gelmez. [SQLite kurtarma geçmişi](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/).
+
 Gönderen ve alıcı adresleri sunucu ayarlarından gelir. Kullanıcının verdiği e-posta yalnız **Reply-To / yanıt adresi** olarak kullanılır; formdan keyfî alıcı seçilemez. SMTP bağlantısı TLS ve sertifika doğrulaması kullanır. Bildirim, HTML ve düz metin olarak hazırlanır; dış görsel, uzak font veya izleme pikseli içermez. Mesaj, kayıt kimliği ve Türkiye saatine göre oluşturulan tarih bildirimde yer alır.
 
 **Alındı**, mesajın kuyruğa kabul edildiğini belirtir; alıcı posta kutusuna kesin teslim garantisi değildir. SMTP hatalarında sınırlı yeniden deneme yapılır; üç yeniden denemeden sonra kayıt başarısız mesaj kuyruğuna taşınır. Kuyruk en az bir kez teslim düzeni kullanır; aynı kayıt nadiren birden fazla e-posta olarak gelebilir. Kayıt kimliği bu bildirimleri eşleştirmek için kullanılır.
 
 Ana ve başarısız mesaj kuyruklarının her biri için saklama süresi **24 saattir**. Süresini dolduran kayıt ilgili kuyruktan otomatik silinir; başarılı SMTP işleminin ardından ana kuyruk kaydı onaylanır ve kaldırılır. Başarısız kuyruğa aktarılan kayıt için o kuyruğun ayrı saklama süresi geçerlidir; iki kuyrukta toplam süre 48 saate kadar çıkabilir. Oluşturulmasının üzerinden 24 saat geçen bir kayıt yeniden SMTP’ye gönderilmez. Bu süreler, alıcı posta kutusundaki e-postayı silmez.
 
-Geliştiricinin kontrolündeki posta kutusunda bildirim ve yanıt yazışmaları, destek talebi kapandıktan sonra en geç **30 gün içinde elle silinir**. Aylık kontrol, süresi dolan kayıtları ve çöp kutusunu da kapsar. Uygulama işletim logları mesajı, e-postayı, ham IP'yi, doğrulama belirtecini veya şifreyi içermez; olay adı, kayıt kimliği ve sınırlı hata sınıfı içerir. Otomatik invocation logları ve trace kaydı kapalıdır. Cloudflare Workers Logs saklaması hesap planına göre değişir ve en çok **7 gündür**. Geri bildirim için ayrı bir kullanıcı veritabanı veya metin düzeltme geçmişi oluşturulmaz.
+Geliştiricinin kontrolündeki posta kutusunda bildirim ve yanıt yazışmaları, destek talebi kapandıktan sonra en geç **30 gün içinde elle silinir**. Aylık kontrol, süresi dolan kayıtları ve çöp kutusunu da kapsar. Uygulama işletim logları mesajı, e-postayı, ham IP'yi, doğrulama belirtecini veya şifreyi içermez; olay adı, kayıt kimliği ve sınırlı hata sınıfı içerir. Otomatik invocation logları ve trace kaydı kapalıdır. Cloudflare Workers Logs saklaması hesap planına göre değişir ve en çok **7 gündür**. Token tekrarını engelleyen güvenlik kaydı bir kullanıcı profili veya metin düzeltme geçmişi içermez.
 
 Bildirimlerinizi silme talebinde aşağıdaki iletişim adresine kayıt numarasıyla yazabilirsiniz. Henüz teslim edilmemiş bir kuyruk kaydı süre dolunca otomatik silinir; geliştiricinin posta kutusundaki kayıtlar ayrıca yönetilir. Kendi gönderdiğiniz e-postanın sizin posta kutunuzdaki kopyası ve GitHub'da paylaştığınız içerik bu site tarafından silinmez.
 

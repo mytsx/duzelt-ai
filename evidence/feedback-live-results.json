@@ -1,0 +1,119 @@
+{
+  "recordedAt": "2026-10-03T21:31:07.377361+00:00",
+  "form": "https://duzelt.yerli.dev/support/#geri-bildirim",
+  "scope": "Explicitly marked controlled TEST feedback to fixed server MAIL_TO; no reply email sent.",
+  "beforeTokenGuard": {
+    "sourceCommit": "2f5a5054a2d47ed2169e550713dacc54a9631420",
+    "controlledAcceptedMessages": 6,
+    "smtpAcceptedLogIds": [
+      "17339f1b-c0a6-4c8f-beab-6ed2f60733a7",
+      "51cd9ab3-0e4d-4a64-a476-5bdb104e1324",
+      "e303e02a-bc8b-41df-a3ed-91c6c52176c6",
+      "1d9c83e2-d188-4321-bf93-72a3fd93fa58"
+    ],
+    "gmailInboxVerifiedShortIds": [
+      "17339f1b",
+      "51cd9ab3",
+      "2b59165e",
+      "a754fe4f"
+    ],
+    "sameCapturedValidRequestReplay": {
+      "status": 202,
+      "problem": "Previously accepted again; vendor/root cause not established."
+    },
+    "invalidToken": {
+      "status": 400,
+      "error": "turnstile"
+    },
+    "liveValidation": [
+      {
+        "check": "origin",
+        "status": 403
+      },
+      {
+        "check": "content_type",
+        "status": 415
+      },
+      {
+        "check": "body_over_16KiB",
+        "status": 413
+      }
+    ],
+    "ipRateProbe": {
+      "rejectionObserved": false,
+      "note": "Short malformed-request probes did not establish a live 429. Native limits are approximate per location; configuration and denial paths tested separately."
+    }
+  },
+  "localVerification": {
+    "sitePreparation": {
+      "passed": 14
+    },
+    "feedbackServer": {
+      "passed": 39
+    },
+    "feedbackUI": {
+      "passed": 37,
+      "evidence": "feedback-ui-results.json"
+    },
+    "existingWebsite": {
+      "passed": 58,
+      "evidence": "feedback-site-ui-results.json",
+      "allGeneralScreenshotsVisuallyReviewed": false
+    },
+    "feedbackCache": {
+      "passed": 3,
+      "evidence": "feedback-cache-results.json"
+    },
+    "emailRenders": {
+      "passed": 4,
+      "evidence": "feedback-email-render-results.json"
+    },
+    "durableTokenGuard": {
+      "runtime": "real workerd SQLite",
+      "concurrentClaims": 32,
+      "accepted": 1,
+      "rejected": 31,
+      "restartPersistence": true,
+      "independentObjects": true,
+      "expiryAlarmDeletesStorage": true
+    },
+    "siteCheckAndBundleDryRunPassed": true,
+    "storePackageExclusions": {
+      "passed": 7
+    }
+  },
+  "productionResources": {
+    "worker": "duzelt-site",
+    "mainQueue": "duzelt-feedback",
+    "deadLetterQueue": "duzelt-feedback-dlq",
+    "queueRetentionSecondsEach": 86400,
+    "consumerMaxRetries": 3,
+    "ipLimit": {
+      "limit": 5,
+      "periodSeconds": 60,
+      "semantics": "approximate per Cloudflare location"
+    },
+    "appLimit": {
+      "limit": 60,
+      "periodSeconds": 60,
+      "semantics": "approximate per Cloudflare location, not a strict global quota"
+    },
+    "tokenGuard": {
+      "binding": "FEEDBACK_TOKEN_GUARD",
+      "class": "FeedbackTokenGuard",
+      "routing": "per token HMAC",
+      "activeTtlHours": 24,
+      "platformPitrHistoryUpToDays": 30
+    },
+    "realDlqFailureRoutingExercised": false
+  },
+  "afterTokenGuard": {
+    "status": "pending existing Workers Builds publish and one final controlled TEST"
+  },
+  "secretProtection": {
+    "envMode": "0600",
+    "envIgnored": true,
+    "envTracked": false,
+    "privateValueLeaksInTrackedFiles": 0
+  }
+}

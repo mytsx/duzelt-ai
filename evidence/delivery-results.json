@@ -1,10 +1,10 @@
 {
   "checkedOn": "2026-10-03",
   "extensionVersion": "3.4.0",
-  "runtimeAndDesignHead": "31925a1d391b39108330540c6d051d3d451d51ee",
-  "githubMainVerifiedAtThisHead": "31925a1d391b39108330540c6d051d3d451d51ee",
+  "runtimeAndDesignHead": "2d465504418f9136bf9c8431531602054571d133",
+  "githubMainVerifiedAtThisHead": "2d465504418f9136bf9c8431531602054571d133",
   "pushSucceeded": true,
-  "githubActionsRunCount": 0,
+  "githubActionsRunCount": null,
   "remoteCIVerified": false,
   "websitePublished": false,
   "videoProduced": false,
@@ -12,13 +12,13 @@
   "publishedStoreVersion": "3.3.0",
   "nextDependency": "User-provided Claude Design site source ZIP; requested gate precedes website/video/store visual work.",
   "accountPanelAccess": "Browser account session/tab creation was denied with Not allowed; dashboard was not inspected or modified.",
-  "providerLiveCallMade": false,
+  "providerLiveCallMade": true,
   "nativePermissionDialogVerified": false,
   "testResults": {
-    "providers": 155,
+    "providers": 188,
     "editorBrowser": 127,
     "editorBootstrap": 7,
-    "uiBrowser": 19,
+    "uiBrowser": 29,
     "catalog": 30,
     "package": 7
   },
@@ -36,12 +36,18 @@
   "artifacts": {
     "dist/duzelt-ai-3.4.0.zip": {
       "absolutePath": "/Users/yerli/Developer/duzelt-ai/dist/duzelt-ai-3.4.0.zip",
-      "sha256": "c72e73e20a9e048b9f3a708624df48a5336a5f2c47f6efd87f7023078eafe4fc"
+      "sha256": "6020d93155d44da9dd86585d8fad38c1190e71924090d4c6f694f5c87c18623d",
+      "fileCount": 19
     },
     "output/claude-design-kit-3.4.0.zip": {
       "absolutePath": "/Users/yerli/Developer/duzelt-ai/output/claude-design-kit-3.4.0.zip",
-      "sha256": "eda2b18f259032b53c626160411b4948e2313053e63096a2ce67acbc0b3c688a"
+      "sha256": "d0023ec4e6a8d2059fb075e95de717574ae6d06650a83c0d5e4e2e5276888232",
+      "fileCount": 22
     }
   },
-  "cleanup": "UI and editor tests close their disposable contexts, temporary profiles and HTTP servers; user browser/apps were not closed."
+  "cleanup": "UI and editor tests close their disposable contexts, temporary profiles and HTTP servers; user browser/apps were not closed.",
+  "localModelDiscoveryVerified": true,
+  "providerLiveInferenceVerified": false,
+  "liveCallScope": "Final central service local Ollama model-list GET HTTP 200; Chrome permission API is a fixture, browser origin remains unverified.",
+  "browserExtensionUpdate": "User reload required; chrome://extensions navigation was blocked by the browser URL policy. User Chrome configuration was not modified."
 }

@@ -101,9 +101,34 @@ Paketleyici manifestteki referansları ve yerel çalışma bağımlılıkların�
 
 Katalog hazırlama aracı `tools/update-provider-catalog.py` yalnız yerel geliştirme sırasında kullanılır; kaynak tarihi, SHA-256 değeri ve MIT lisansı üretilmiş dosyada bulunur. Kaynağı yenilemek eklentiyi yayımlamaz veya kullanıcı adına API isteği yapmaz. Tekrarlanabilir hazırlık ve tüm sağlayıcı dökümü [docs/providers-research.md](docs/providers-research.md) dosyasındadır.
 
-Web sitesi tasarımı Claude Design'dan geldikten sonra `site/` altında entegre edilecektir. Cloudflare yayını, video görselleri ve mağaza tanıtım görselleri bu tasarım aşamasını bekler. Popup bağlantıları bu sırada mevcut depo/destek/gizlilik adreslerini kullanır; tek bağlantı yapılandırması `lib/product-config.js` dosyasındadır.
+## Web sitesi ve yayın
 
-Claude Design'a [hazır promptu](design/claude-design-prompt.txt) yapıştırın. `npm run design:kit`, güncel test/görsel kanıtlarını kontrol ederek ikonlar, gerçek uygulama ekranları, gizlilik metni ve ürün sınırlarıyla `output/claude-design-kit-3.4.0.zip` üretir. Bu paketteki referans dosyalarını tasarım aracına verin; düzenlenebilir `site/` kaynaklarını ZIP olarak geri getirin. Tasarım kiti mağazaya yüklenecek eklenti paketinden ayrıdır.
+Claude Design kaynakları `site/` altında entegre edildi. [duzelt.yerli.dev](https://duzelt.yerli.dev/), [destek](https://duzelt.yerli.dev/support/) ve [gizlilik](https://duzelt.yerli.dev/privacy/) 3 Ekim 2026'da canlı HTTPS ile doğrulandı. Site yalnız statik varlık sunan ayrı `duzelt-site` Worker'ıdır; eklenti API isteği veya kullanıcı anahtarı bu siteye gönderilmez.
+
+Bağlantılar `lib/product-config.js`, sürüm/ikonlar `manifest.json`, politika `PRIVACY.md` kaynağından hazırlanır. `site/assets/js/config.js` ve sitedeki politika kopyası elle düzenlenmez. İkon, güncel popup/ayar ekranları, HTML bağlantıları, favicon, robots ve sitemap aynı hazırlık adımında eşitlenir.
+
+```sh
+npm ci
+npm run site:prepare
+npm run site:preview
+npm run site:test:browser
+npm run site:check
+npm run site:deploy
+```
+
+Önizleme yalnız `127.0.0.1:8787` adresinde çalışır. Dağıtım yapılandırması `wrangler.site.jsonc` dosyasındadır. Cloudflare Workers Builds mevcut `mytsx/duzelt-ai` deposunun `main` dalına bağlandı; kök `/`, kontrol `npm run site:check`, yayın `npm run site:deploy`, preview build kapalıdır. Bağlantının kaydedilmesi uzak build başarısı sayılmaz; gerçek push/build/canlı sonuçları [teslim kaydında](evidence/delivery-results.json) ayrı tutulur.
+
+## Video ve mağaza gönderimi
+
+32 saniyelik Türkçe tanıtımın kaynakları ve gerçek ekranları `store/video/`, beş mağaza ekranı `store/screenshots/`, promosyonlar `store/promos/`, YouTube kapak ve açıklaması `store/youtube/` altındadır. MP4, ses ve Türkçe SRT yerel `output/video/licensed/` klasöründedir; eklenti çalışma ZIP'ine ve Git'e dahil edilmez. Üretim ve sınırlı kalite kanıtı [video notlarında](store/video/RENDER.md) ve [QA kaydında](store/video/qa.json) bulunur.
+
+ElevenLabs Starter planından alınan lisanslı kayıt, gerçek sözcük/durak zamanları ve özgün fon müziği kullanıldı. Kod çözümleme, ses seviyeleri, altyazı ve bütün sahne/geçiş kareleri kontrol edildi. Araç ses girdisi desteklemediğinden baştan sona insan dinlemesi tamamlanmış sayılmaz.
+
+[Tanıtım videosu](https://youtu.be/q4k1awKQu1w) mevcut Yerli Developer kanalında liste dışı yayımlandı. Kayıtlı özel kapak, ürüne ait oynatma listesi, tamamlanmış HD işlemi, manuel Türkçe altyazı ve sorunsuz telif kontrolü gerçek YouTube arayüzünde doğrulandı. Merkezi yapılandırmadaki bu adresi kullanan site oynatıcıyı yalnız kullanıcı tıklamasıyla yükler; ses kapalı ve Türkçe altyazı tercihli başlar.
+
+Mevcut mağaza öğesine 3.4.0 paketi, beş yeni ekran görüntüsü, iki promosyon görseli, video/site/destek bağlantıları ve güncel gizlilik/izin beyanları kaydedildi. 3 Ekim 2026'da **incelemeye gönderildi**; panel **İncelenmeyi bekliyor** gösterdi. İncelemeyi geçtikten sonra otomatik yayın seçeneği açıktır. Kamuya sunulan 3.3.0 ile incelemedeki 3.4.0 ayrı tutulur; gönderim kaydı [store/submission.json](store/submission.json) içindedir.
+
+Özgün Claude Design teslimi yerel `output/site-design-original-2026-10-03/` klasöründe yedeklidir. Eski tasarım referans kiti `npm run design:kit` ile yeniden üretilebilir; site ve mağaza çalışma paketi birbirinden ayrıdır.
 
 ## Destek
 

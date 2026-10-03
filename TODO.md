@@ -3,12 +3,12 @@
 ## 1. Tasarım aracına devir (önce)
 - [x] Kullanıcı kapsamı, AGENTS.md, CLAUDE.md, manifest, README ve PRIVACY okundu.
 - [x] Yerel değişiklikler ve Git durumu kontrol edildi; başlangıç çalışma ağacı temiz, ana dal main.
-- [x] Kamu mağaza öğesi ve CRX manifesti: gnkhgnhdokinbamhokpljgafapfjhjhl, yayın 3.3.0. Panel izin engeli nedeniyle henüz doğrulanmadı.
+- [x] Kamu mağaza öğesi ve CRX manifesti: gnkhgnhdokinbamhokpljgafapfjhjhl, yayın 3.3.0; mevcut geliştirici paneli gerçek Chrome arayüzünde doğrulandı.
 - [x] Editör desteğini gerçek editörlerle test et; platform iddialarını ayır.
 - [x] Gizlilik metnini gerçek veri akışına göre düzelt.
 - [x] Gerçek arayüz ekran görüntülerini ve mevcut ikonları tasarım paketi için hazırla.
 - [x] Claude Design için eksiksiz promptu ve 22 dosyalık tasarım referans paketini hazırla.
-- [ ] Kullanıcıdan web tasarım dosyalarını bekle. Bu aşamadan önce web tasarımı/yayını, video görseli ve mağaza tanıtım görseli üretme.
+- [x] Kullanıcı web tasarım dosyalarını 3 Ekim 2026'da site/ altında getirdi; özgün tasarım output/site-design-original-2026-10-03/ içinde yedeklendi. Entegrasyon, yayın, video ve mağaza görselleri aşaması başladı.
 
 ## 2. Tasarımdan bağımsız bakım
 - [x] CKEditor 4/5, Summernote, TinyMCE, Quill veri modeliyle uyumlu uygula; 127 gerçek tarayıcı ve 7 bootstrap kontrolü geçti.
@@ -51,21 +51,25 @@
 - [x] Son UI 36/36 ve açık/koyu beş genişlik görsellerini doğrula; test/görsel kanıtlarını ve paket kaynaklarını yenile.
 
 ## 3. Tasarım tesliminden sonra
-- [ ] Gelen site tasarımını site/ altında entegre et; /privacy/ ve /support/ bağla.
-- [ ] Tek politika kaynağı, manifest sürümü/ikon eşlemesi, sosyal görsel/favicon/robots/sitemap/404 hazırla.
-- [ ] 320, 390, 768, 1024, 1440 px görsel tarayıcı, klavye ve hareket azaltma kontrolü yap.
-- [ ] duzelt.yerli.dev DNS/Worker sahipliğini doğrula; ayrı Worker ve Workers Builds kur.
+- [x] Gelen site tasarımını site/ altında entegre et; /privacy/ ve /support/ bağla. Özgün kaynak yedeği korundu.
+- [x] Tek politika kaynağı, manifest sürümü/ikon eşlemesi, sosyal görsel/favicon/robots/sitemap/404 hazırla; 14 hazırlık testi ve kaynak drift kontrolü geçti.
+- [x] 320, 390, 768, 1024, 1440 px görsel tarayıcı, klavye ve hareket azaltma kontrolü yap; final kaynaklarla 58/58 geçti.
+- [x] duzelt.yerli.dev DNS/Worker sahipliğini doğrula; ayrı assets-only duzelt-site Worker yayımlandı, mevcut GitHub bağlantısıyla main Workers Builds kaydedildi.
 - [ ] Yerel kontrol, gerçek main push uzak build ve canlı HTTPS yayınını ayrı doğrula.
-- [ ] Video senaryosu/storyboard, ElevenLabs canlı plan/ses koşulları/kredi kontrolü.
-- [ ] 25–40 saniye gerçek ürün videosu, seslendirme, özgün müzik, zamanlanmış SRT ve küçük resim hazırla.
-- [ ] Video 1080p/H.264/30fps/AAC, senkron ve baştan sona görsel/işitsel kalite kontrolü.
-- [ ] Mevcut @yerlideveloper kanalına liste dışı yükle; HD/telif/SRT/küçük resim doğrula.
-- [ ] YouTube nocookie oynatıcıyı yalnız tıklamayla yükle; süre/erişilebilir isim eşle.
-- [ ] Mevcut mağaza öğesini yeni paket ve doğru açıklama/gizlilik/izin beyanlarıyla güncelle.
-- [ ] Mağaza incelemesine gönder; onay sonrası otomatik yayın durumunu gerçekte doğrula.
+- [x] Video senaryosu/storyboard, ElevenLabs canlı plan/ses koşulları/kredi kontrolü. Aktif Starter planında tek 476 kredi üretimi, 38.852 kredi kaldı; yeni ödeme yok.
+- [x] 32 saniye gerçek ürün videosu, lisanslı seslendirme, özgün müzik, zamanlanmış 11 cue Türkçe SRT ve 1280/3840 kapak hazırla.
+- [x] Video 1080p/H.264/30fps/AAC, tam decode, gerçek sözcük/durak senkronu, ses seviyeleri ve bütün sahne/geçiş karelerinin görsel kontrolü.
+- [ ] Baştan sona insan dinlemesi: araç ses girdisi desteklemediğinden tamamlanmış sayılmaz; oynatılabilir final dosya kullanıcıya açıldı.
+- [x] Mevcut @yerlideveloper kanalına liste dışı yükle; HD/telif/SRT/küçük resim doğrula. Video q4k1awKQu1w, ürün oynatma listesi PLcynHQ4VkUWY.
+- [x] YouTube nocookie oynatıcıyı yalnız tıklamayla yükle; süre/erişilebilir isim eşle. Yerel etkileşim testleri geçti; canlı gömme kontrolü ayrı kaydedilir.
+- [x] Mevcut mağaza öğesini yeni paket ve doğru açıklama/gizlilik/izin beyanlarıyla güncelle.
+- [x] Mağaza için 5 gerçek 1280×800 ekran, 440×280/1400×560 promosyon, açıklama/veri/izin beyanı ve inceleme notlarını hazırla.
+- [x] Mağaza incelemesine gönder; otomatik yayın seçeneğini final gönderim ekranında doğrula. Panel: İncelenmeyi bekliyor; 3.4.0 henüz yayımlanmış değildir.
 - [ ] Geçici sekmeleri/sunucuları temizle; nihai bağlantılar ve dosya yollarını teslim et.
 
 ## Kanıt sınırları
 - Anahtar gerektirmeyen deterministik API testleri gerçek sağlayıcı/model erişimi veya düzeltme kalitesini kanıtlamaz. Gerçek hesapla API çağrısı yapılmadı.
 - Seçici veya DOM maketi testi, belirli CMS/platform desteği ya da gerçek editör veri modeli kanıtı değildir.
 - Yerel test, uzak build, canlı site ve mağaza incelemesi ayrı durumlarla raporlanır.
+- Cloudflare, mevcut Yerli Developer ve mağaza panelleri gerçek kullanıcı hesabında doğrulandı. Mağazanın DOM betik kısıtı nedeniyle native erişilebilirlik arayüzü kullanıldı.
+- YouTube şart kabulü ve eski dört mağaza görselinin kalıcı kaldırılması kullanıcı tarafından açıkça onaylandı. Kullanıcının dosya erişim iznini açmasından sonra video, kapak, altyazı, paket ve mağaza görselleri gerçek dosya seçicilerle yüklendi.

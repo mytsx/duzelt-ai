@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="tr" class="no-js" data-root="./">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Türkçe Metin Düzeltici — Chrome eklentisi</title>
+<meta name="description" content="Uyumlu zengin metin editörlerinde Türkçe imla, noktalama ve resmî üslup önerileri. Değişiklikleri inceleyin, uygun bulursanız kabul edin.">
+<meta name="author" content="Mehmet Yerli">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f4f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e111b">
+<link rel="canonical" href="https://duzelt.yerli.dev/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:site_name" content="AI Türkçe Metin Düzeltici">
+<meta property="og:title" content="AI Türkçe Metin Düzeltici — Chrome eklentisi">
+<meta property="og:description" content="Türkçe metninizi düzeltin, değişikliklere siz karar verin. Uyumlu zengin metin editörlerinde imla, noktalama ve resmî üslup önerileri.">
+<meta property="og:url" content="https://duzelt.yerli.dev/">
+<meta property="og:image" content="https://duzelt.yerli.dev/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI Türkçe Metin Düzeltici: Türkçe metninizi düzeltin, değişikliklere siz karar verin. Düzelt, incele, kabul et.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/img/icon48.png">
+<link rel="apple-touch-icon" href="assets/img/icon128.png">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/config.js"></script>
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#icerik">İçeriğe geç</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="./" aria-label="AI Türkçe Metin Düzeltici — ana sayfa">
+      <img src="assets/img/icon48.png" width="34" height="34" alt="">
+      <span class="brand-name"><strong>AI Türkçe</strong><span>Metin Düzeltici</span></span>
+    </a>
+    <nav id="site-menu" class="nav-menu" aria-label="Ana menü">
+      <ul>
+        <li><a href="#nasil-calisir">Nasıl çalışır</a></li>
+        <li><a href="#editorler">Editörler</a></li>
+        <li><a href="#kurulum">Kurulum</a></li>
+        <li><a href="#ucret-ve-veri">Ücret ve veri</a></li>
+        <li><a href="#sss">SSS</a></li>
+        <li><a href="support/">Destek</a></li>
+        <li><a href="privacy/">Gizlilik</a></li>
+      </ul>
+    </nav>
+    <button class="btn btn-secondary nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-menu" hidden>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+      <span class="nav-toggle-label">Menü</span>
+    </button>
+    <a class="btn btn-primary nav-cta" data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome'a ekle <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+  </div>
+</header>
+
+<main id="icerik" tabindex="-1">
+
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <p class="product-line">
+      <img src="assets/img/icon128.png" width="56" height="56" alt="">
+      <span><strong>AI Türkçe Metin Düzeltici</strong><span>Masaüstü Chrome eklentisi · Mehmet Yerli</span></span>
+    </p>
+    <h1 id="hero-title" class="display"><span class="line">Türkçe metninizi düzeltin,</span> <span class="line">değişikliklere siz karar verin.</span></h1>
+    <div class="hero-grid">
+      <p class="lead">Uyumlu zengin metin editörlerinde imla, noktalama ve resmî üslup önerileri. Sonucu inceleyin, uygun bulursanız kabul edin.</p>
+      <div class="hero-actions">
+        <div class="btn-row">
+          <a class="btn btn-primary btn-lg btn-wide" data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome'a ekle <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+          <a class="btn btn-secondary btn-lg" href="#nasil-calisir">Nasıl çalışır <svg class="icon icon-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></a>
+        </div>
+        <p class="fine">Chrome Web Store · Masaüstü Chrome <span data-config="minimumChromeVersion">111</span> veya üzeri</p>
+      </div>
+    </div>
+    <ul class="req-grid" aria-label="Kullanım koşulları">
+      <li>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+        <div><strong class="req-title">Bulut sağlayıcısı</strong><p>Kendi API anahtarınız veya erişim belirteciniz gerekir. Kullanım, sağlayıcınız tarafından eklentiden ayrı ücretlendirilir.</p></div>
+      </li>
+      <li>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg>
+        <div><strong class="req-title">Yerel model</strong><p>Ollama veya llama.cpp gibi bilgisayarınızda çalışan bir servis ve yüklü bir model gerekir. İstek bu yerel sunucuya gider.</p></div>
+      </li>
+      <li>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+        <div><strong class="req-title">Uyumlu editörler</strong><p>CKEditor 4/5, Summernote, TinyMCE ve Quill'in test edilmiş standart kurulumları. Normal metin kutuları desteklenmez.</p></div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="ornek" class="section wrap rule-top" aria-labelledby="ornek-title">
+    <div class="section-head">
+      <p class="kicker">Açıklayıcı örnek</p>
+      <h2 id="ornek-title" class="h2">Önce öneriyi görün, sonra karar verin.</h2>
+      <p class="section-lead">Bu örnek elle hazırlanmıştır ve kişisel veri içermez. Canlı bir yapay zekâ sonucu değildir; gerçek öneriler metne, kurallara ve seçtiğiniz modele göre değişir.</p>
+    </div>
+    <div class="demo" data-demo data-before="bugun toplantida aldigimiz kararlari yarin paylasacagiz. herkesin gorusunu bekliyoruz." data-after="Bugün toplantıda aldığımız kararları yarın paylaşacağız. Herkesin görüşünü bekliyoruz.">
+      <div class="demo-bar">
+        <span class="tag">Örnek</span>
+        <p>Bu alan sunucuya bağlanmaz; metin veya anahtar istemez.</p>
+      </div>
+      <div class="demo-grid">
+        <div class="demo-cell">
+          <p class="demo-label"><span class="num" aria-hidden="true">1</span> Önce</p>
+          <p class="demo-text">bugun toplantida aldigimiz kararlari yarin paylasacagiz. herkesin gorusunu bekliyoruz.</p>
+        </div>
+        <div class="demo-cell">
+          <p class="demo-label"><span class="num" aria-hidden="true">2</span> İnceleme</p>
+          <p class="demo-text"><del>bugun</del><ins>Bugün</ins> <del>toplantida</del><ins>toplantıda</ins> <del>aldigimiz</del><ins>aldığımız</ins> <del>kararlari</del><ins>kararları</ins> <del>yarin</del><ins>yarın</ins> <del>paylasacagiz</del><ins>paylaşacağız</ins>. <del>herkesin</del><ins>Herkesin</ins> <del>gorusunu</del><ins>görüşünü</ins> bekliyoruz.</p>
+          <ul class="legend" aria-label="İşaretlerin anlamı">
+            <li><span class="mark mark-add" aria-hidden="true">+</span> Eklenen: altı çizili</li>
+            <li><span class="mark mark-del" aria-hidden="true">−</span> Çıkarılan: üstü çizili</li>
+          </ul>
+          <div class="demo-actions" data-demo-actions hidden>
+            <button class="btn btn-primary" type="button" data-demo-action="accepted" aria-pressed="false">Kabul et</button>
+            <button class="btn btn-secondary" type="button" data-demo-action="cancelled" aria-pressed="false">İptal</button>
+          </div>
+        </div>
+        <div class="demo-cell demo-result" data-demo-result-cell aria-live="polite">
+          <p class="demo-label"><span class="num" aria-hidden="true">3</span> <span data-demo-result-label>Sonra</span></p>
+          <p class="demo-text" data-demo-result>Bugün toplantıda aldığımız kararları yarın paylaşacağız. Herkesin görüşünü bekliyoruz.</p>
+          <p class="demo-status"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span data-demo-status-text>Kabul ederseniz editöre bu metin yazılır. İptal asıl metni korur.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="nasil-calisir" class="section wrap" aria-labelledby="akis-title">
+    <div class="section-head">
+      <p class="kicker">Nasıl çalışır</p>
+      <h2 id="akis-title" class="h2">Düzelt, inceleyin, karar verin.</h2>
+      <p class="section-lead">Düzeltme isteğini siz başlatırsınız. Öneri önce önizlenir; siz kabul etmeden editördeki metin değişmez.</p>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <div class="step-text">
+          <p class="step-num">01</p>
+          <h3 class="h3">Düzelt</h3>
+          <p>Uyumlu editörün araç çubuğuna eklenen <b>Düzelt</b> düğmesine basın. Metin ve düzeltme kuralları, ayarlarda seçtiğiniz bağlantıya gönderilir. Siz basmadan hiçbir metin gönderilmez.</p>
+        </div>
+        <figure class="shot" data-shot>
+          <div class="shot-frame crop crop-editor">
+            <img src="assets/img/editor-before.png" width="1440" height="1000" alt="Quill 2.0.3 editörü: araç çubuğunun başında Düzelt düğmesi; altında Türkçe karakterleri eksik örnek metin, kalın bir sözcük, bir bağlantı ve iki maddelik liste." loading="lazy" decoding="async">
+            <span class="shot-missing"><strong>Görsel bekleniyor</strong><code>assets/img/editor-before.png</code><span>Gerçek Quill akış görüntüsü bu dosya adıyla eklenecek.</span></span>
+          </div>
+          <figcaption>Quill 2.0.3, düzeltmeden önce. <a href="assets/img/editor-before.png">Tam boyutta aç</a></figcaption>
+        </figure>
+      </li>
+      <li class="step">
+        <div class="step-text">
+          <p class="step-num">02</p>
+          <h3 class="h3">İnceleyin</h3>
+          <p><b>Düzeltmeleri inceleyin</b> penceresinde eklenen ifadeler altı çizili, çıkarılan ifadeler üstü çizili gösterilir. Biçimler güvenle eşleştirilemezse sonucun düz metin olarak uygulanacağı ayrıca belirtilir.</p>
+        </div>
+        <figure class="shot" data-shot>
+          <div class="shot-frame crop crop-preview">
+            <img src="assets/img/editor-preview.png" width="1440" height="1000" alt="Düzeltmeleri inceleyin penceresi: çıkarılan ifadeler kırmızı ve üstü çizili, eklenen ifadeler yeşil ve altı çizili; Eklenen ve Çıkarılan açıklaması; altta İptal ve Kabul et düğmeleri. Arkada araç çubuğundaki düğme Düzeltiliyor yazıyor." loading="lazy" decoding="async">
+            <span class="shot-missing"><strong>Görsel bekleniyor</strong><code>assets/img/editor-preview.png</code><span>Gerçek değişiklik önizlemesi bu dosya adıyla eklenecek.</span></span>
+          </div>
+          <figcaption>Değişiklik önizlemesi. İptal ve Kabul et aynı satırdadır.</figcaption>
+        </figure>
+      </li>
+      <li class="step">
+        <div class="step-text">
+          <p class="step-num">03</p>
+          <h3 class="h3">Kabul edin ya da iptal edin</h3>
+          <p>Karar her zaman sizdedir. Öneriyi anlam ve biçim açısından kontrol edin; eklenti her hatayı bulacağını vaat etmez.</p>
+          <div class="decision">
+            <div><strong>Kabul et</strong><span>Öneri editöre uygulanır.</span></div>
+            <div><strong>İptal veya <kbd>Esc</kbd></strong><span>Asıl metin korunur.</span></div>
+          </div>
+        </div>
+        <figure class="shot" data-shot>
+          <div class="shot-frame crop crop-editor">
+            <img src="assets/img/editor-accepted.png" width="1440" height="1000" alt="Kabul sonrası Quill editörü: Türkçe karakterleri düzeltilmiş metin; kalın sözcük, bağlantı ve liste biçimleri yerinde." loading="lazy" decoding="async">
+            <span class="shot-missing"><strong>Görsel bekleniyor</strong><code>assets/img/editor-accepted.png</code><span>Kabul sonrası gerçek editör görüntüsü bu dosya adıyla eklenecek.</span></span>
+          </div>
+          <figcaption>Kabul edildikten sonra: biçimler korunmuş. <a href="assets/img/editor-accepted.png">Tam boyutta aç</a></figcaption>
+        </figure>
+      </li>
+    </ol>
+    <p class="note"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span>Bu görüntüler gerçek Quill editöründe, kontrollü örnek yanıtla kaydedildi. Canlı model kalitesini göstermez.</span></p>
+  </section>
+
+  <section id="editorler" class="section wrap" aria-labelledby="editor-title">
+    <div class="section-head">
+      <p class="kicker">Editör desteği</p>
+      <h2 id="editor-title" class="h2">Test edilmiş editörler ve sınırlar</h2>
+      <p class="section-lead">Aşağıdaki editörlerin standart (classic) kurulumları gerçek tarayıcıda test edildi. Bir editörün test edilmiş olması, onu kullanan her sitede çalışacağı anlamına gelmez.</p>
+    </div>
+    <div class="split-2">
+      <table class="table">
+        <caption class="sr-only">Test edilen editörler ve sürümleri</caption>
+        <thead><tr><th scope="col">Editör</th><th scope="col">Test edilen sürüm</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">CKEditor 4</th><td>4.22.1</td></tr>
+          <tr><th scope="row">CKEditor 5</th><td>48.5.2</td></tr>
+          <tr><th scope="row">Summernote</th><td>0.9.1 <span class="muted">(jQuery 3.7.1)</span></td></tr>
+          <tr><th scope="row">TinyMCE</th><td>8.9.2</td></tr>
+          <tr><th scope="row">Quill</th><td>2.0.3 ve 1.3.7</td></tr>
+        </tbody>
+      </table>
+      <div>
+        <h3 class="h3">Genel destek verilmeyen durumlar</h3>
+        <ul class="limits">
+          <li><strong>Normal metin kutuları</strong><span>input ve textarea alanlarına Düzelt düğmesi eklenmez.</span></li>
+          <li><strong>Platformlar</strong><span>WordPress, Drupal, Joomla ve Notion için ayrıca platform testi yapılmadı. Sitenin editör kurulumu, sürümü ve özelleştirmeleri sonucu etkiler.</span></li>
+          <li><strong>Özel editör yapıları</strong><span>Çok köklü veya ortak düzenleme editörleri, kapalı shadow DOM ve ayrı iframe uygulamaları için genel destek verilmez.</span></li>
+          <li><strong>Biçimler</strong><span>Paragraf, liste, bağlantı ve kalın/italik biçimler güvenli eşleme yapılabildiğinde korunur. Yapısal değişikliklerde düz metne dönüşme uyarısı görebilirsiniz.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="kurulum" class="section wrap" aria-labelledby="kurulum-title">
+    <div class="section-head">
+      <p class="kicker">Kurulum</p>
+      <h2 id="kurulum-title" class="h2">Altı adımda hazır</h2>
+      <p class="section-lead">Sağlayıcı, model, anahtar ve bağlantı bilgileri tek bir ayarlar ekranında yönetilir. Ayrıntılı yardım için <a href="support/">destek sayfasına</a> bakın.</p>
+    </div>
+    <ol class="setup">
+      <li><p class="step-num">01</p><h3 class="h3">Mağazadan ekleyin</h3><p>Eklentiyi <a data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome Web Store</a>'dan masaüstü Chrome'a ekleyin.</p></li>
+      <li><p class="step-num">02</p><h3 class="h3">Sağlayıcıyı ve modeli seçin</h3><p>Ayarlarda sağlayıcıyı arayın veya listeden seçin. Modeli katalog önerilerinden seçin ya da tam adını girin.</p></li>
+      <li><p class="step-num">03</p><h3 class="h3">Anahtarı veya yerel adresi kaydedin</h3><p>Bulut için API anahtarınızı veya erişim belirtecinizi, gerekiyorsa hesap ve bölge alanlarını girin. Yerel servis için localhost adresini kullanın.</p></li>
+      <li><p class="step-num">04</p><h3 class="h3">Bağlantı iznini verin</h3><p>Kaydederken Chrome, yalnız seçilen API adresi ve gerekiyorsa belirteç adresi için izin ister. Bu izin, editörlerin bulunduğu sayfalarla ilgili değildir.</p></li>
+      <li><p class="step-num">05</p><h3 class="h3">Kuralları düzenleyin</h3><p class="opt">İsteğe bağlı</p><p>Varsayılan kurallar Türkçe imla, noktalama, dilbilgisi ve resmî üslup içindir. Kendi sistem promptunuzu yazabilirsiniz.</p></li>
+      <li><p class="step-num">06</p><h3 class="h3">Düzeltin ve inceleyin</h3><p>Uyumlu editörde Düzelt'e basın, değişiklikleri inceleyin, ardından Kabul Et ya da İptal'i seçin.</p></li>
+    </ol>
+  </section>
+
+  <section id="ucret-ve-veri" class="section wrap" aria-labelledby="veri-title">
+    <div class="section-head">
+      <p class="kicker">Ücret ve veri akışı</p>
+      <h2 id="veri-title" class="h2">Ne ödersiniz, metniniz nereye gider?</h2>
+      <p class="section-lead">Eklenti size API kredisi sağlamaz ve geliştiricinin sunucusuna metin göndermez. Düzeltme, sizin seçtiğiniz servise sizin hesabınızla yapılan bir istektir.</p>
+    </div>
+    <div class="split-2">
+      <div>
+        <h3 class="h3">Ücret</h3>
+        <ul class="cost-list">
+          <li><strong>Eklenti</strong><span>Chrome Web Store'dan ücretsiz kurulur. Hesap veya abonelik yoktur.</span></li>
+          <li><strong>Bulut sağlayıcı</strong><span>Her düzeltme ve bağlantı testi, sağlayıcınızın fiyatlandırmasıyla kendi hesabınızdan ücretlendirilir. ChatGPT, Claude veya Copilot aboneliği API anahtarının yerine geçmez.</span></li>
+          <li><strong>Yerel sunucu</strong><span>İstek bilgisayarınızdaki sunucuya gider. Sunucuyu ve modeli siz çalıştırırsınız; başka bir servise yönlendirip yönlendirmediğini siz belirlersiniz.</span></li>
+          <li><strong>Değişiklik</strong><span>Model veya sağlayıcı değiştirmek ücreti ve veri işleme koşullarını değiştirebilir.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="h3">Veri akışı</h3>
+        <ol class="flow" aria-label="Düzelt'e bastığınızda">
+          <li><small>Gönderilen</small><strong>Editördeki metin ve düzeltme kuralları</strong></li>
+          <li><small>Gönderen</small><strong>Tarayıcınızdaki eklenti</strong></li>
+          <li><small>Alıcı</small><strong>Yalnız etkin sağlayıcının kayıtlı API adresi</strong></li>
+        </ol>
+        <ul class="data-list">
+          <li><span><strong>Anahtar ve özel prompt</strong> bağlantı profilleriyle birlikte bu Chrome profilinde, <code>chrome.storage.local</code> içinde tutulur. Yalnız aç/kapa ayarı <code>chrome.storage.sync</code> ile eşitlenebilir.</span></li>
+          <li><span><strong>Anahtar veya belirteç</strong> ilgili istekte kimlik doğrulama için kullanılır. IBM ve SAP bağlantılarında önce hizmetin belirteç sunucusuyla kimlik değişimi yapılır; metin ve kurallar belirteç sunucusuna gönderilmez.</span></li>
+          <li><span><strong>Geliştiriciye</strong> metin aktarımı, reklam, analitik veya telemetri yoktur. Bu, kullanımın tamamen yerel olduğu ya da sağlayıcının veriyi saklamayacağı anlamına gelmez.</span></li>
+          <li><span><strong>Başka bir sağlayıcıya</strong> kendiliğinden yedek geçiş yapılmaz.</span></li>
+        </ul>
+        <p class="fine mt-4"><a href="privacy/">Gizlilik politikasının tamamını okuyun</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="arayuz" class="section wrap" aria-labelledby="arayuz-title">
+    <div class="section-head">
+      <p class="kicker">Gerçek arayüz</p>
+      <h2 id="arayuz-title" class="h2">Popup ve ayarlar</h2>
+      <p class="section-lead">Görüntüler çalışan eklentiden alınmıştır. <span data-version-note>Ekranlar sürüm <span data-config="version">3.4.0</span> arayüzünü gösterir; mağazada şu an <span data-config="publishedVersion">3.3.0</span> sunuluyor.</span></p>
+    </div>
+    <div class="gallery">
+      <div class="gallery-row">
+        <div class="gallery-copy">
+          <h3 class="h3">Popup</h3>
+          <p>Eklenti simgesinden açılır. Açık ve koyu temada aynı bilgiyi verir.</p>
+          <ul class="feature-list">
+            <li>Düzeltme asistanını açma ve kapatma</li>
+            <li>Etkin sağlayıcı ve model</li>
+            <li>Düzelt → İncele → Kabul et akışı</li>
+            <li>Sağlayıcı ve ayarları yönetme</li>
+          </ul>
+        </div>
+        <figure class="shot">
+          <div class="popup-pair">
+            <div class="shot-frame"><img src="assets/img/popup-light.png" width="380" height="522" alt="Açık temada popup: Düzeltme asistanı açık, etkin sağlayıcı OpenAI, model gpt-4o, Düzelt İncele Kabul et adımları ve Sağlayıcı ve ayarları yönet düğmesi." loading="lazy" decoding="async"></div>
+            <div class="shot-frame"><img src="assets/img/popup-dark.png" width="380" height="522" alt="Koyu temada aynı popup." loading="lazy" decoding="async"></div>
+          </div>
+          <figcaption>Popup, açık ve koyu tema · gerçek boyut 380 × 522 piksel.</figcaption>
+        </figure>
+      </div>
+      <div class="gallery-row">
+        <div class="gallery-copy">
+          <h3 class="h3">Ayarlar: sağlayıcı ve model</h3>
+          <p>Bulut hizmetleri ve yerel modeller aynı ekranda seçilir.</p>
+          <ul class="feature-list">
+            <li>Etkin bağlantı özeti</li>
+            <li>Aranabilir sağlayıcı seçimi ve sık kullanılanlar</li>
+            <li>Model listesi, elle model adı ve Modelleri getir</li>
+            <li>API anahtarı ve gelişmiş bağlantı ayarları</li>
+            <li>Metnin gideceği adresin gösterimi, kaydetme ve test</li>
+          </ul>
+          <a class="full-link" href="assets/img/options-openrouter.png">Tam boyutta aç <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        </div>
+        <figure class="shot">
+          <div class="shot-frame crop crop-connection"><img src="assets/img/options-openrouter.png" width="1440" height="2359" alt="Ayarlar, Sağlayıcı ve model bölümü: OpenRouter seçili, model openai/gpt-4o-mini, aranabilir sağlayıcı seçimi, API anahtarı alanı, hedef adres ve kayıt durumu; Kaydet ve kullan ile Bağlantıyı test et düğmeleri." loading="lazy" decoding="async"></div>
+          <figcaption>Ayarlar sayfasından bölüm · OpenRouter örneği, anahtar girilmemiş.</figcaption>
+        </figure>
+      </div>
+      <div class="gallery-row">
+        <div class="gallery-copy">
+          <h3 class="h3">Ayarlar: ortak kurallar ve kullanım rehberi</h3>
+          <p>Düzeltme kuralları seçtiğiniz bütün sağlayıcılarda ortaktır.</p>
+          <ul class="feature-list">
+            <li>İmla ve noktalama, Türkçe dilbilgisi, resmî üslup</li>
+            <li>Özel sistem promptu</li>
+            <li>Varsayılan kurallara dönme</li>
+          </ul>
+          <a class="full-link" href="assets/img/options-desktop.png">Ayarlar sayfasının tamamı <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        </div>
+        <figure class="shot">
+          <div class="shot-frame crop crop-rules"><img src="assets/img/options-desktop.png" width="1440" height="2359" alt="Ayarlar, Düzeltmenin dilini belirleyin bölümü: varsayılan kapsam etiketleri, özel sistem promptu alanı, Kuralları kaydet ve Varsayılanı yükle düğmeleri; altında Son karar her zaman sizde başlıklı üç adımlı kullanım rehberi." loading="lazy" decoding="async"></div>
+          <figcaption>Ayarlar sayfasından bölüm · varsayılan kurallar.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="video" class="section wrap" aria-labelledby="video-title" data-video-section hidden>
+    <div class="section-head">
+      <p class="kicker">Tanıtım</p>
+      <h2 id="video-title" class="h2">Akışı videoda izleyin</h2>
+      <p class="section-lead">Oynatıcı yalnız düğmeye bastığınızda youtube-nocookie.com üzerinden yüklenir ve sessiz başlar.</p>
+    </div>
+    <div class="video">
+      <div class="video-frame" data-video-frame>
+        <img data-video-cover src="assets/img/video-cover.png" width="1280" height="720" alt="" loading="lazy" decoding="async">
+        <button class="video-play" type="button" data-video-play>
+          <span class="video-play-block">
+            <span class="video-play-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><polygon points="6 3 20 12 6 21 6 3"/></svg></span>
+            <span class="video-play-text"><span class="video-play-label">Tanıtımı izle</span><time class="video-duration" data-video-duration hidden></time></span>
+          </span>
+        </button>
+      </div>
+      <p class="fine" data-video-status aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section id="sss" class="section wrap" aria-labelledby="sss-title">
+    <div class="faq-grid">
+      <div>
+        <p class="kicker">SSS</p>
+        <h2 id="sss-title" class="h2">Sık sorulan sorular</h2>
+        <p class="fine mt-4">Yanıt bulamazsanız <a href="support/">destek sayfasına</a> bakın.</p>
+      </div>
+      <div class="faq">
+        <details id="sss-saglayicilar">
+          <summary>Hangi sağlayıcıları seçebilirim?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Ayarlar ekranında OpenAI, OpenRouter, Anthropic, Google Gemini, Groq, DeepSeek, Mistral ve diğer API servislerini; Azure, Vertex ve Bedrock gibi ek hesap, bölge veya proje alanı isteyen servisleri; IBM watsonx (IAM) ve SAP AI Core (hizmet kimliği ve deployment) bağlantılarını; Ollama ve llama.cpp gibi yerel servisleri seçebilirsiniz.</p>
+            <p>Katalog OpenCode'un kullandığı Models.dev kaynağından hazırlanır; özel bir API adresi de girebilirsiniz. Katalogda görünmek, her modelin canlı test edildiği veya hesabınızla çalışacağı anlamına gelmez. Erişiminizi <strong>Bağlantıyı test et</strong> ile doğrulayın.</p>
+          </div>
+        </details>
+        <details id="sss-etkinlestirilemeyen">
+          <summary>Katalogda görünen bazı hizmetler neden etkinleştirilemiyor?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>GitHub Copilot, GitLab Duo ve v0 kendi ürün oturumunu, girişini veya çalışma akışını gerektirir. Katalogda açıklamalarıyla görünürler; bu eklentide doğrudan etkinleştirilemezler.</p>
+            <p>Görsel, ses, gerçek zamanlı veya özel araç akışı gerektiren modeller de metin düzeltme adaylarından ayrılır.</p>
+          </div>
+        </details>
+        <details id="sss-anahtar">
+          <summary>API anahtarı veya erişim belirteci neden gerekiyor?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Her düzeltme, seçtiğiniz sağlayıcının API'sine sizin hesabınızla yapılan bir istektir. Sağlayıcı isteği anahtar veya belirteçle doğrular ve kullanımı hesabınıza yazar. Eklenti API kredisi sağlamaz.</p>
+            <p>ChatGPT, Claude veya Copilot aboneliği API anahtarının yerine geçmez. IBM watsonx ve SAP AI Core bağlantılarında anahtar veya hizmet kimliği önce kısa ömürlü bir erişim belirtecine dönüştürülür.</p>
+          </div>
+        </details>
+        <details id="sss-yerel">
+          <summary>Yerel model nasıl kullanılır?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Ayarlarda Ollama veya llama.cpp'yi seçin. Ollama için aynı ekrandaki bağlantı yardımını izleyerek sunucuyu bu eklentiye özel izinli komutla başlatın. Yerel adrese Chrome iznini verdikten sonra yüklü modeller listelenir; bir model seçip <strong>Kaydet ve kullan</strong>'a basın. Sunucu adresini değiştirdiğinizde <strong>Modelleri getir</strong> ile yeni adresteki listeyi alın.</p>
+            <p>Yerel bağlantıda HTTP kullanılabilir ve istek bu sunucuya gider; bulut sağlayıcısı gibi internet gerektirmeyebilir. Sunucu kapalıysa veya model yüklü değilse düzeltme yapılamaz.</p>
+          </div>
+        </details>
+        <details id="sss-ucret">
+          <summary>Ücretsiz mi ve sağlayıcı ücreti nasıl ayrılıyor?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Eklenti Chrome Web Store'dan ücretsiz kurulur; hesap veya abonelik yoktur. Bulut sağlayıcısı kullanıyorsanız her düzeltme ve her bağlantı testi, sağlayıcınızın fiyatlandırmasıyla kendi hesabınızdan ücretlendirilir.</p>
+            <p>Model veya sağlayıcı değiştirmek ücreti değiştirebilir. Bakiye ve kotanızı sağlayıcı hesabınızdan izleyin.</p>
+          </div>
+        </details>
+        <details id="sss-editorler">
+          <summary>Hangi editörlerde çalışır?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Test edilen standart kurulumlar: CKEditor 4 (4.22.1), CKEditor 5 (48.5.2), Summernote (0.9.1), TinyMCE (8.9.2) ve Quill (2.0.3, 1.3.7). Bir editörün test edilmiş olması, onu kullanan her sitenin desteklendiği anlamına gelmez.</p>
+            <p>WordPress, Drupal, Joomla ve Notion için ayrıca platform testi yapılmadı. Normal input ve textarea alanları desteklenmez.</p>
+          </div>
+        </details>
+        <details id="sss-dugme">
+          <summary>Düğme neden görünmeyebilir?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Alan normal bir metin kutusu olabilir, editör desteklenen türde olmayabilir ya da özelleştirilmiş, ayrı iframe, kapalı shadow DOM veya çok köklü bir yapıda çalışıyor olabilir. Eklenti popup'tan kapatılmış veya sayfa eklentiden önce açılmış da olabilir; bu durumda sayfayı yenileyin.</p>
+            <p><a href="support/#dugme-gorunmuyor">Adım adım kontrol listesi</a></p>
+          </div>
+        </details>
+        <details id="sss-bicimler">
+          <summary>Biçimler her zaman korunur mu?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Her durumda değil. Paragraf, liste, bağlantı ve kalın/italik biçimler güvenli eşleme yapılabildiğinde korunur. Yapısal değişikliklerde önizleme, sonucun düz metin olarak uygulanacağını ve biçimlerin kaldırılacağını belirten bir uyarı gösterebilir. Kabul etmeden önce önizlemeyi kontrol edin.</p>
+          </div>
+        </details>
+        <details id="sss-otomatik">
+          <summary>Sonuç otomatik uygulanır mı?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Hayır. Öneri önce önizlemede gösterilir; siz <strong>Kabul Et</strong>'e basmadan editördeki metin değişmez. <strong>İptal</strong> veya Escape önizlemeyi kapatır.</p>
+            <p>Düzeltme sürerken metni değiştirirseniz yeni metniniz korunur ve eski yanıt uygulanmaz; Düzelt'i yeniden kullanın.</p>
+          </div>
+        </details>
+        <details id="sss-veri">
+          <summary>Metin nereye gönderilir?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Düzelt'e bastığınızda editördeki metin ve düzeltme kuralları yalnız etkin sağlayıcının kaydedilmiş API adresine gönderilir; anahtar veya belirteç bu istekte kimlik doğrulama için kullanılır. Yerel adres seçtiyseniz istek yerel sunucuya gider.</p>
+            <p>IBM watsonx'te API anahtarı IBM IAM belirteç sunucusuna, SAP AI Core'da Client ID ve secret hizmetin belirteç sunucusuna gönderilir. Metin ve kurallar bu belirteç sunucularına gönderilmez. Ayrıntılar <a href="privacy/">gizlilik politikasında</a>.</p>
+          </div>
+        </details>
+        <details id="sss-temizleme">
+          <summary>Anahtar ve prompt nasıl temizlenir?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Ayarlarda bir sağlayıcının anahtar alanını boş kaydetmek o profilin anahtarını temizler; sağlayıcı değiştirmek diğer profilleri silmez. Özel promptu boş kaydetmek ya da varsayılanı yükleyip kaydetmek özel promptu kaldırır.</p>
+            <p>Eklentiyi Chrome'dan kaldırmak, o Chrome profilindeki eklenti verilerini kaldırır. Sağlayıcıya daha önce gönderilmiş veriler için sağlayıcınızın hesap kontrollerini kullanın.</p>
+          </div>
+        </details>
+        <details id="sss-hatalar">
+          <summary>Hatalarda ne yapmalıyım?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Hata mesajı nedeni Türkçe olarak belirtir: eksik veya geçersiz anahtar, bağlantı izni, kota, istek sınırı, zaman aşımı ya da geçersiz yanıt. Bu durumlarda asıl metniniz korunur.</p>
+            <p><a href="support/#hata-mesajlari">Hata mesajları ve çözümleri</a> sayfasındaki adımları izleyin. Sorun sürerse e-posta veya GitHub Issues ile bildirin; API anahtarınızı, özel promptunuzu veya gizli metninizi paylaşmayın.</p>
+          </div>
+        </details>
+        <details id="sss-telefon">
+          <summary>Telefonda kullanabilir miyim?<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="M12 5v14"/></svg></summary>
+          <div class="answer">
+            <p>Hayır. Eklenti masaüstü Chrome içindir. Bu sayfayı telefonda inceleyebilir, kurulumu bilgisayarınızda yapabilirsiniz.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="destek" class="section wrap" aria-labelledby="destek-title">
+    <div class="section-head">
+      <p class="kicker">Destek ve geliştirici</p>
+      <h2 id="destek-title" class="h2">Yardım ve iletişim</h2>
+      <p class="section-lead">Sorun bildirirken Chrome, eklenti ve editör sürümünü paylaşın. API anahtarınızı, özel promptunuzu veya gizli metninizi paylaşmayın.</p>
+    </div>
+    <ul class="link-grid">
+      <li><a href="support/"><span class="link-title">Destek sayfası <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span>Kurulum, düğme görünmemesi, bağlantı izni ve hata mesajları.</span></a></li>
+      <li><a href="privacy/"><span class="link-title">Gizlilik politikası <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span>Hangi verinin nerede tutulduğu ve nereye gönderildiği.</span></a></li>
+      <li><a data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues"><span class="link-title">Sorun bildir <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></span><span>GitHub Issues — herkese açıktır.</span></a></li>
+      <li><a data-link="email" href="mailto:iletisim@mehmetyerli.com"><span class="link-title">E-posta <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span><span class="break">iletisim@mehmetyerli.com</span></a></li>
+      <li><a data-link="repository" href="https://github.com/mytsx/duzelt-ai"><span class="link-title">Kaynak kod <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></span><span class="break">github.com/mytsx/duzelt-ai</span></a></li>
+      <li><a data-link="developer" href="https://yerli.dev/"><span class="link-title">Yerli.dev <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></span><span>Mehmet Yerli ve Yerli Developer ürünleri.</span></a></li>
+    </ul>
+  </section>
+
+  <section class="poster" aria-labelledby="poster-title">
+    <div class="wrap">
+      <h2 id="poster-title" class="poster-title"><span class="line">Daha iyi metin.</span> <span class="line">Son karar sizde.</span></h2>
+      <div class="poster-side">
+        <a class="btn btn-on-field btn-lg btn-wide" data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome'a ekle <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        <p>Masaüstü Chrome için. Bulut sağlayıcılarında kendi API anahtarınız gerekir ve kullanım ayrıca ücretlendirilir.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="./"><img src="assets/img/icon48.png" width="34" height="34" alt=""><span class="brand-name"><strong>AI Türkçe</strong><span>Metin Düzeltici</span></span></a>
+      <p>Mehmet Yerli tarafından geliştirildi. Yerli Developer ürün ailesinin bir parçasıdır.</p>
+    </div>
+    <nav aria-labelledby="f-urun"><h2 id="f-urun" class="footer-h">Ürün</h2><ul>
+      <li><a data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome Web Store</a></li>
+      <li><a href="#nasil-calisir">Nasıl çalışır</a></li>
+      <li><a href="#sss">SSS</a></li>
+    </ul></nav>
+    <nav aria-labelledby="f-yardim"><h2 id="f-yardim" class="footer-h">Yardım</h2><ul>
+      <li><a href="support/">Destek</a></li>
+      <li><a href="privacy/">Gizlilik</a></li>
+      <li><a data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues">Sorun bildir</a></li>
+    </ul></nav>
+    <div><h2 class="footer-h">İletişim</h2><ul>
+      <li><a class="break" data-link="email" href="mailto:iletisim@mehmetyerli.com">iletisim@mehmetyerli.com</a></li>
+      <li><a data-link="repository" href="https://github.com/mytsx/duzelt-ai">GitHub</a></li>
+      <li><a data-link="developer" href="https://yerli.dev/">Yerli.dev</a></li>
+    </ul></div>
+  </div>
+  <div class="wrap"><div class="footer-meta">
+    <span>Mağazadaki sürüm <span data-config="publishedVersion">3.3.0</span></span>
+    <span>Chrome ve Chrome Web Store, Google LLC'nin ticari markalarıdır.</span>
+  </div></div>
+</footer>
+</body>
+</html>

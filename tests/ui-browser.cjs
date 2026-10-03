@@ -16,6 +16,8 @@ const path = require('node:path');
     let context;
     try {
         context = await chromium.launchPersistentContext(profile, { channel: 'chromium', headless: true, args: [`--disable-extensions-except=${root}`, `--load-extension=${root}`], viewport: { width: 1024, height: 900 } });
+        // External page requests must stay in fixtures, including public product links.
+        await context.route(/^https?:\/\//, route => route.abort('blockedbyclient'));
         const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
         const extensionId = new URL(worker.url()).host;
         await worker.evaluate(() => {
@@ -635,16 +637,20 @@ const path = require('node:path');
         await popup.keyboard.press('Tab');
         assert.equal(await popup.evaluate(() => document.activeElement.id), 'open-settings');
         checks.push('Klavye odağı görünür; ana kontroller Tab ile erişilebilir.');
-        const links = await popup.locator('a').evaluateAll(nodes => nodes.map(node => ({ href: node.href, target: node.target, rel: node.rel })));
+        const productLinks = await popup.evaluate(() => ({ website: PRODUCT_CONFIG.website, support: PRODUCT_CONFIG.support, privacy: PRODUCT_CONFIG.privacy }));
+        const links = await popup.locator('a').evaluateAll(nodes => nodes.map(node => ({ key: node.dataset.productLink, href: node.href, target: node.target, rel: node.rel })));
         assert.equal(links.length, 3);
-        links.forEach(link => { assert.equal(link.target, '_blank'); assert.match(link.rel, /noopener/); assert.equal(new URL(link.href).search, ''); });
+        assert.deepEqual(links.map(link => link.key).sort(), Object.keys(productLinks).sort());
+        links.forEach(link => { assert.equal(link.href, productLinks[link.key]); assert.equal(link.target, '_blank'); assert.match(link.rel, /noopener/); assert.equal(new URL(link.href).search, ''); });
         const pagesBefore = context.pages().length;
         await popup.waitForTimeout(150);
         assert.equal(context.pages().length, pagesBefore);
-        await context.route('https://github.com/**', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Ürün bağlantısı</title><p>Test bağlantısı</p>' }));
+        for (const href of Object.values(productLinks)) {
+            await context.route(url => url.href === href, route => route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Ürün bağlantısı</title><p>Test bağlantısı</p>' }));
+        }
         const [linkPage] = await Promise.all([context.waitForEvent('page'), popup.locator('[data-product-link="website"]').click()]);
         await linkPage.waitForLoadState();
-        assert.equal(linkPage.url(), 'https://github.com/mytsx/duzelt-ai');
+        assert.equal(linkPage.url(), productLinks.website);
         await linkPage.close();
         await popup.evaluate(() => {
             const nativeOpen = chrome.runtime.openOptionsPage.bind(chrome.runtime);

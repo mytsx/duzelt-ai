@@ -1,0 +1,132 @@
+{
+  "status": "licensed-aligned",
+  "provider": "ElevenLabs",
+  "voice": "Mustafa Silici - Energetic Commercial",
+  "model": "Eleven v4",
+  "language": "tr",
+  "planObserved": "Starter",
+  "creditsBeforeObserved": 39328,
+  "planObservedAt": "2026-10-03",
+  "licenseSource": "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+  "audio": "output/video/licensed/duzelt-seslendirme-v1.mp3",
+  "audioLeadSeconds": 0.35,
+  "durationSeconds": 32.0,
+  "sceneStarts": [
+    0,
+    6.45,
+    8.85,
+    12.94,
+    18.67,
+    26.42
+  ],
+  "captions": [
+    {
+      "start": 0.35,
+      "end": 2.19,
+      "text": "AI Türkçe Metin Düzeltici."
+    },
+    {
+      "start": 2.75,
+      "end": 5.99,
+      "text": "Türkçe metninizi düzeltin,\ndeğişikliklere siz karar verin."
+    },
+    {
+      "start": 6.45,
+      "end": 8.33,
+      "text": "Uyumlu editörde Düzelt'e basın."
+    },
+    {
+      "start": 8.85,
+      "end": 9.95,
+      "text": "Önerileri inceleyin;"
+    },
+    {
+      "start": 10.4,
+      "end": 12.43,
+      "text": "eklenen ve çıkarılan ifadeleri görün."
+    },
+    {
+      "start": 12.94,
+      "end": 15.38,
+      "text": "Kabul ederseniz öneri metninize uygulanır."
+    },
+    {
+      "start": 15.75,
+      "end": 18.15,
+      "text": "İptal ederseniz asıl metniniz korunur."
+    },
+    {
+      "start": 18.67,
+      "end": 22.47,
+      "text": "Bulut sağlayıcınızı ya da bilgisayarınızda\nçalışan yerel modeli seçin."
+    },
+    {
+      "start": 22.94,
+      "end": 25.84,
+      "text": "Bulut kullanımı için kendi\nerişim bilgileriniz gerekir."
+    },
+    {
+      "start": 26.42,
+      "end": 28.9,
+      "text": "Düzeltin. İnceleyin. Karar verin."
+    },
+    {
+      "start": 29.32,
+      "end": 30.38,
+      "text": "Chrome Web Store'da."
+    }
+  ],
+  "outputDir": "output/video/licensed",
+  "sceneDir": "output/video/scenes",
+  "outputVideo": "duzelt-ai-tanitim-1080p.mp4",
+  "mixedAudio": "output/video/licensed/duzelt-ai-ses-muzik-mix.wav",
+  "music": {
+    "composition": "Original sparse warm keys and soft pulse; D major / B minor / G major / A suspended",
+    "bpm": 92,
+    "dryRmsDbfs": -34
+  },
+  "mastering": {
+    "targetIntegratedLufs": -16.5,
+    "maxVoiceTruePeakDbtp": -1.8
+  },
+  "alignment": {
+    "status": "verified",
+    "method": "Local faster-whisper-base words cross-checked with ffmpeg silencedetect actual sentence onsets; approved text used verbatim for subtitles",
+    "sourceAudioSha256": "6e1ab1043f5bf9c4e6bb8749d65aba1c656020ed96886a996f02dd70d07f80fa",
+    "wordTimingArtifact": "output/video/licensed/duzelt-seslendirme-v1.word-timing.json",
+    "silenceThresholdDbfs": -35,
+    "silenceMinimumSeconds": 0.12,
+    "audioLeadSeconds": 0.35,
+    "sceneAnchorTimesSource": [
+      0,
+      6.1,
+      8.5,
+      12.59,
+      18.32,
+      26.07
+    ],
+    "limitations": "ASR spellings are not authoritative copy. Agent audio input is unavailable; no claim of full human listening."
+  },
+  "generation": {
+    "stability": 0.5,
+    "similarity": 0.75,
+    "prompt": "store/video/narration.tr.txt",
+    "count": 1,
+    "includedVariants": 2,
+    "selectedVariant": 1,
+    "charactersReported": 476,
+    "audioTags": [
+      "confident",
+      "confident, upbeat"
+    ],
+    "sourceFormat": "MP3 44.1kHz 128kbps mono",
+    "selection": "Complete approved copy; distinct sentence pauses support clear scene and subtitle alignment. Aesthetic audio listening is unavailable in this agent interface.",
+    "narrationFileCharacters": 440,
+    "narrationFileWords": 55
+  },
+  "videoComment": "AI Türkçe Metin Düzeltici; real UI with controlled sample response; stationary scenes; licensed narration and original music",
+  "generatedAt": "2026-10-03",
+  "license": "Standard voice generation made while paid ElevenLabs Starter subscription was active; subject to service terms and third-party rights",
+  "creditsUsed": 476,
+  "creditsAfterObserved": 38852
+}

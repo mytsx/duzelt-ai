@@ -18,7 +18,7 @@ Bu kayıt, bakım testlerini, gerçek uygulama doğrulamasını ve yayın durumu
 
 ## Mevcut durum
 
-3 Ekim 2026'da Google'ın mevcut mağaza sayfası HTTP 200 ile doğrulandı: öğe kimliği `gnkhgnhdokinbamhokpljgafapfjhjhl`, yayın sürümü `3.3.0`, son mağaza güncellemesi 27 Kasım 2025. Yerel bakım sürümü `3.4.0`; aynı öğe için hazırlanıyor. Geliştirici paneli henüz doğrulanmadı ve yeni paket mağazaya gönderilmedi. GitHub varsayılan dalı `main`; release listesi boş. Kaynak kayıt: [current-state.json](current-state.json).
+3 Ekim 2026'da Google'ın mevcut mağaza sayfası HTTP 200 ile doğrulandı: öğe kimliği `gnkhgnhdokinbamhokpljgafapfjhjhl`, yayın sürümü `3.3.0`, son mağaza güncellemesi 27 Kasım 2025. Aynı öğeye bakım sürümü `3.4.0` yüklendi ve gerçek geliştirici panelinden incelemeye gönderildi. Sonuç **İncelenmeyi bekliyor**; onay sonrası otomatik yayın seçeneği açıktır. Bu, 3.4.0'ın kamuya yayımlandığı anlamına gelmez. GitHub varsayılan dalı `main`; release listesi boş. Kaynak kayıt: [current-state.json](current-state.json), [submission.json](../store/submission.json).
 
 Gerçek, yerel classic editör kurulumlarıyla test edilen sürümler: CKEditor 4 **4.22.1**, CKEditor 5 **48.5.2**, Summernote **0.9.1** (jQuery **3.7.1**), TinyMCE **8.9.2**, Quill **2.0.3** ve **1.3.7**. Editör desteği bu sürüm/kurulumlarla sınırlıdır. WordPress, Drupal, Joomla ve Notion için ayrıca platform testi yoktur; cross-origin iframe, CKEditor 5 çok köklü/işbirlikçi kurulumlar ve Markdown/XML veri işlemcileri doğrulanmadı.
 
@@ -39,7 +39,7 @@ python3 tools/package-store.py
 
 API testleri sahte anahtar/metin ve taklit servis yanıtları kullanır; gerçek hesap, kişisel sır veya ücretli istek kullanılmaz. Paket testleri geçici örnek çalışma klasörlerini kullanır; gerçek kullanıcı ayarlarını okumaz.
 
-Paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik ve kaynak değişmeden tekrarlanan üretimin aynı ZIP'i vermesi doğrulandı. `dist/duzelt-ai-3.4.0.zip` güncel kaynakla iki kez üretildi; SHA-256: `22727bbdcd4cbd3a162aa5a17806b6f73880dff02cbcad8056e1c5f6c63f16c4`. ZIP içeriği kaynak dosyalarla birebir karşılaştırıldı.
+Paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik ve kaynak değişmeden tekrarlanan üretimin aynı ZIP'i vermesi doğrulandı. `dist/duzelt-ai-3.4.0.zip` güncel kaynakla iki kez üretildi; SHA-256: `974ae8d6008fc75289796521a2800936ff81d0004d19a360e3b852de9f01223b`. ZIP içeriği kaynak dosyalarla birebir karşılaştırıldı.
 
 Gerçek paketlenmemiş eklentinin yeni popup/ayarlar kontrolü Chromium **151.0.7922.34** ile **36/36 geçti**. Kanıt dosyası: [ui-results.json](../evidence/ui-results.json); ayrıntılı kaynak `output/playwright/ui-results.json`. Sağlayıcı seçimi/anahtar/prompt kaydı, eski OpenAI kaydının korunması, ayrı profiller, model araması, desteklenmeyen kayıtların durumu, kaydedilmiş bağlantıyla test, IBM/SAP dinamik alanları ve iki origin izni, sır alanlarının maskelenmesi, tokenın depoya yazılmaması, toggle ve sabit bağlantılar kapsanır. Sağlayıcı listesindeki arama ile Home/End/Escape klavye akışı; Ollama seçiminde otomatik keşif; taslak URL değişince eski sonuçların uygulanmaması; komut kopyalama; bağlantı hatası/403/boş liste davranışı doğrulandı. İlk açılışta izin yoksa GET yapılmaz; izin varsa kayıtlı model korunur ve liste kapalı kalır. Chrome'un yerel API izin penceresinin sonucu fixture ile taklit edildi; gerçek kullanıcının izin kabulü bu koşuda doğrulanmadı. Bu arayüz koşusunda gerçek sağlayıcı ağ isteği **0**.
 
@@ -106,14 +106,16 @@ Son 36/36 arayüz koşusu bu hizalama, rehber ve kayıt durumlarını da kapsar.
 - [ ] Gerçek bulut hesabı/anahtarı/bölgesi ile model erişimi ve faturalandırma. Yerel fixture başarısı bu kontrolün yerine geçmez.
 - [ ] Belirli bir WordPress/Drupal/Joomla/Notion veya diğer üretim sitesinin kendi editör kurulumuyla uyumluluk.
 - [x] Son arayüzün bütün ekran görüntülerinde gerçek görsel inceleme sonucu.
-- [ ] Uzak build/canlı site ve Chrome Web Store geliştirici paneli/inceleme/yayın sonucu.
+- [x] Canlı site: 3 Ekim 2026 ayrı duzelt-site Worker, ana/destek/gizlilik HTTPS200, 9 route/CSP kontrolü. `evidence/site-live-results.json` ilk manuel dağıtımı kaydeder.
+- [ ] Gerçek main push'una ait uzak Workers Builds sonucu.
+- [x] Chrome Web Store geliştirici paneli, paket ve incelemeye gönderme sonucu doğrulandı; 3.4.0 incelemesi bekleniyor, kamu yayını ayrı süreçtir.
 
 ## Tasarım ve yayın aşaması
 
-Claude Design dosyaları henüz gelmedi. Bu aşamadan önce site tasarımı/yayını, video görselleri veya mağaza tanıtım görselleri tamamlanmış sayılmaz.
+Claude Design dosyaları 3 Ekim 2026'da `site/` altında geldi. Özgün teslim yedeği `output/site-design-original-2026-10-03/` içinde korundu; tasarım dili korunarak güncel ayar görselleri, politika ve bağlantılar entegre edildi.
 
-Claude Design referans kiti **22 dosya** içerir; Ollama masaüstü/dar ekran referansları da dahildir. Bu kit bir site tasarımı veya mağaza eklenti paketi değildir. Kullanıcıdan düzenlenebilir site kaynaklarını içeren tasarım ZIP'i beklenir.
+Claude Design referans kiti **22 dosya** içerir; Ollama masaüstü/dar ekran referansları da dahildir. Bu kit bir site tasarımı veya mağaza eklenti paketi değildir; artık kaynak teslimini bekleyen bir kapı yoktur.
 
-Tasarım geldiğinde 320, 390, 768, 1024 ve 1440 px genişliklerde gerçek tarayıcı görsel kontrolü; klavye erişimi; hareket azaltma; yalnız tıklama sonrası YouTube oynatıcı yükleme; güncel süre/erişilebilir düğme adı kontrol edilir. Ardından gerçek `main` push'u için uzak build ve canlı HTTPS kanıtları kaydedilir.
+`tests/site-browser.mjs` final kaynaklarla **58/58 geçti**: 320, 390, 768, 1024 ve 1440 px genişliklerde dört sayfa/açık-koyu tema, klavye erişimi, hareket azaltma, JavaScript kapalı görünüm, TOC ve açıklayıcı örnek kontrol edilir. Video için geçerli/geçersiz URL, sonlu süre, kullanıcı etkileşimi ve başlangıçta uzak istek yapılmaması yerel fixture ile sınanır; bu gerçek YouTube oynatma kanıtı değildir. Son kaynak/hash/görsel kontrol sonucu `evidence/site-ui-results.json` içinde tutulur. Ayrı gerçek YouTube kontrolünde q4k1awKQu1w video sayfası liste dışı olarak açıldı; oynatma ilerlemesi, 1080p HD seçeneği ve manuel Türkçe altyazı görüntüsü doğrulandı. Kayıtlı özel kapak/ürün listesi ile tamamlanmış HD ve sorunsuz telif kontrolü Studio arayüzünde görüldü.
 
-Video kontrolü, 1920×1080 H.264/30 fps/AAC biçimini, Türkçe SRT'yi, ses/müzik seviyelerini, gerçek sözcük/durak senkronunu ve baştan sona izleme/dinlemeyi kapsar. YouTube HD/telif sonucu ile mağaza inceleme durumu ayrı kaydedilir.
+Final video 32 saniye, 1920×1080 H.264/30 fps/AAC; 960 kare ve bütün dosya decode geçti. Lisanslı ElevenLabs kayıt kaynak hash'i, yerel ASR ve gerçek duraklar, 11 cue Türkçe SRT, sabit sahneler ve bütün geçiş kareleri `store/video/qa.json` ile kayıtlıdır. Final AAC −17,67 LUFS/−1,71 dBTP, konuşma/fon alt yüzde10 farkı19,79 dB. Ses girdisi desteklenmediğinden insan tarafından baştan sona dinleme doğrulanmış değildir. YouTube HD/telif sonucu ile mağaza inceleme durumu ayrı kaydedilir.

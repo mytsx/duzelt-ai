@@ -1,0 +1,50 @@
+{
+  "checkedOn": "2026-10-03",
+  "source": "Parent agent native Chrome Developer Dashboard UI and final accessibility state",
+  "itemId": "gnkhgnhdokinbamhokpljgafapfjhjhl",
+  "publicStoreUrl": "https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl",
+  "publicVersion": "3.3.0",
+  "uploadedVersion": "3.4.0",
+  "package": {
+    "file": "dist/duzelt-ai-3.4.0.zip",
+    "sha256": "974ae8d6008fc75289796521a2800936ff81d0004d19a360e3b852de9f01223b",
+    "fileCount": 19,
+    "uploaded": true,
+    "processingVerified": true
+  },
+  "listing": {
+    "descriptionSaved": true,
+    "homepageSaved": true,
+    "supportSaved": true,
+    "videoSaved": true,
+    "homepageUrl": "https://duzelt.yerli.dev/",
+    "supportUrl": "https://duzelt.yerli.dev/support/",
+    "privacyUrl": "https://duzelt.yerli.dev/privacy/",
+    "videoUrl": "https://youtu.be/q4k1awKQu1w",
+    "privacyPracticesSaved": true,
+    "privacyDataDeclarations": [
+      "authentication-information",
+      "website-content"
+    ],
+    "testInstructionsSaved": true,
+    "screenshotsSaved": 5,
+    "promosSaved": 2,
+    "oldScreenshotRemovalExplicitlyAuthorizedByUser": true
+  },
+  "submitted": true,
+  "reviewPending": true,
+  "newVersionPublished": false,
+  "autoPublishOnApproval": true,
+  "autoPublishSelectionVerifiedValue": 1,
+  "finalUiMessages": [
+    "uzantı öğeniz incelenmek üzere gönderildi",
+    "Durum: İncelenmeyi bekliyor",
+    "Kimlik: gnkhgnhdokinbamhokpljgafapfjhjhl",
+    "Öğe gönderildi."
+  ],
+  "proof": {
+    "file": "output/publish-proof/store-submitted.png",
+    "sha256": "77eb92b7fc5f2d0e55e195543788d9849d3da695bbccf80c27323aa0e4fb32ba"
+  },
+  "note": "Existing item retained. Submission accepted for review; 3.4.0 publication depends on Google review and is not verified."
+}

@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="tr" class="no-js" data-root="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Destek — AI Türkçe Metin Düzeltici</title>
+<meta name="description" content="AI Türkçe Metin Düzeltici kurulum rehberi ve sorun giderme: düğme görünmemesi, sağlayıcı ve model seçimi, bağlantı izni, anahtar, yerel sunucu, zaman aşımı ve hata mesajları.">
+<meta name="author" content="Mehmet Yerli">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f4f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e111b">
+<link rel="canonical" href="https://duzelt.yerli.dev/support/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:site_name" content="AI Türkçe Metin Düzeltici">
+<meta property="og:title" content="Destek — AI Türkçe Metin Düzeltici">
+<meta property="og:description" content="Kurulum rehberi, sorun giderme adımları ve hata mesajlarının anlamı.">
+<meta property="og:url" content="https://duzelt.yerli.dev/support/">
+<meta property="og:image" content="https://duzelt.yerli.dev/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI Türkçe Metin Düzeltici: Türkçe metninizi düzeltin, değişikliklere siz karar verin.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="../assets/img/icon48.png">
+<link rel="apple-touch-icon" href="../assets/img/icon128.png">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#icerik">İçeriğe geç</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="../" aria-label="AI Türkçe Metin Düzeltici — ana sayfa">
+      <img src="../assets/img/icon48.png" width="34" height="34" alt="">
+      <span class="brand-name"><strong>AI Türkçe</strong><span>Metin Düzeltici</span></span>
+    </a>
+    <nav id="site-menu" class="nav-menu" aria-label="Ana menü">
+      <ul>
+        <li><a href="../#nasil-calisir">Nasıl çalışır</a></li>
+        <li><a href="../#editorler">Editörler</a></li>
+        <li><a href="../#kurulum">Kurulum</a></li>
+        <li><a href="../#ucret-ve-veri">Ücret ve veri</a></li>
+        <li><a href="../#sss">SSS</a></li>
+        <li><a href="./" aria-current="page">Destek</a></li>
+        <li><a href="../privacy/">Gizlilik</a></li>
+      </ul>
+    </nav>
+    <button class="btn btn-secondary nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-menu" hidden>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+      <span class="nav-toggle-label">Menü</span>
+    </button>
+    <a class="btn btn-primary nav-cta" data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome'a ekle <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+  </div>
+</header>
+
+<main id="icerik" tabindex="-1">
+  <section class="doc-hero">
+    <div class="wrap">
+      <p class="kicker">Destek</p>
+      <h1 class="display">Kurulum ve sorun giderme</h1>
+      <p class="lead">Adımlar en sık karşılaşılan durumlardan başlar. Çözüm bulamazsanız e-posta veya GitHub Issues üzerinden bildirin.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues">Sorun bildir <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        <a class="btn btn-secondary break" data-link="email" href="mailto:iletisim@mehmetyerli.com">iletisim@mehmetyerli.com</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap doc-grid">
+    <aside aria-label="Bu sayfada">
+      <nav class="toc" data-toc aria-label="Destek bölümleri" hidden><p class="kicker">Bu sayfada</p></nav>
+    </aside>
+    <div data-toc-source>
+
+      <section class="issue" id="kurulum" aria-labelledby="h-kurulum">
+        <h2 id="h-kurulum">Kısa kurulum rehberi</h2>
+        <ol class="check-list">
+          <li><span>Eklentiyi <a data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome Web Store</a>'dan ekleyin. Masaüstü Chrome <span data-config="minimumChromeVersion">111</span> veya üzeri gerekir.</span></li>
+          <li><span>Eklenti simgesinden popup'ı açın ve <b>Sağlayıcı ve ayarları yönet</b> ile Ayarlar'a geçin.</span></li>
+          <li><span>Sağlayıcı alanını açıp listede arayın veya sık kullanılan bir sağlayıcıya basın. Modeli açılır listeden seçin ya da tam adını yazın.</span></li>
+          <li><span>API anahtarınızı veya erişim belirtecinizi, gerekiyorsa hesap, bölge ve proje alanlarını girin. Yerel servis için yerel adresi yazın.</span></li>
+          <li><span><b>Kaydet ve kullan</b> düğmesine basın ve Chrome'un seçilen adres için istediği izni verin. Formdaki taslak değişiklikler kaydetmeden etkin bağlantıyı değiştirmez.</span></li>
+          <li><span>İsterseniz <b>Bağlantıyı test et</b> ile kaydedilmiş bağlantıyı deneyin. Test gerçek bir istektir ve ücret doğurabilir.</span></li>
+          <li><span>İsteğe bağlı olarak <b>Düzeltme kuralları</b> bölümünde kendi sistem promptunuzu kaydedin.</span></li>
+          <li><span>Uyumlu editörde <b>Düzelt</b>'e basın, değişiklikleri inceleyin, <b>Kabul Et</b> ya da <b>İptal</b>'i seçin.</span></li>
+        </ol>
+      </section>
+
+      <section class="issue" id="dugme-gorunmuyor" aria-labelledby="h-dugme">
+        <h2 id="h-dugme">Editörde Düzelt düğmesi görünmüyor</h2>
+        <p>Aşağıdakileri sırayla kontrol edin.</p>
+        <ol class="check-list">
+          <li><span>Popup'ta <b>Düzeltme asistanı</b> açık olmalı.</span></li>
+          <li><span>Eklentiyi kurduktan veya açtıktan sonra editörün bulunduğu sayfayı yenileyin.</span></li>
+          <li><span>Alan normal bir <code>input</code> veya <code>textarea</code> ise düğme eklenmez; yalnız zengin metin editörleri desteklenir.</span></li>
+          <li><span>Editör, test edilen türlerden biri olmalı: CKEditor 4/5, Summernote, TinyMCE veya Quill. Sitenin kurulumu, sürümü ve özelleştirmeleri sonucu etkileyebilir.</span></li>
+          <li><span>Ayrı iframe içinde çalışan uygulamalar, kapalı shadow DOM ve çok köklü veya ortak düzenleme editörleri genel olarak desteklenmez.</span></li>
+          <li><span>Eklenti yalnız <code>http</code> ve <code>https</code> adresli sayfalarda çalışır.</span></li>
+        </ol>
+      </section>
+
+      <section class="issue" id="saglayici-model" aria-labelledby="h-model">
+        <h2 id="h-model">Sağlayıcı, model ve deployment seçimi</h2>
+        <ul class="check-list bullets">
+          <li><span>Sağlayıcı alanını açın; içindeki <b>Sağlayıcı ara</b> alanına adını yazın. GitHub Copilot, GitLab Duo ve v0 açıklamalarıyla görünür; bu eklentide doğrudan etkinleştirilemez.</span></li>
+          <li><span>Model önerileri eklentiyle gelen yerleşik katalogdan gelir. Listede olmayan modelin tam adını veya deployment kimliğini elle girebilirsiniz.</span></li>
+          <li><span><b>Modelleri getir</b>, bulut sağlayıcılarında kaydedilmiş bağlantıyla model listesi ister. Bu yol desteklenmiyorsa yerleşik kayıtlar gösterilir. Anahtarsız yerel sağlayıcılarda formdaki sunucu adresi kullanılır; Ollama veya llama.cpp seçimi de izin sonrası modelleri getirir. Model keşfinde editör metni veya prompt gönderilmez ve bağlantı kendiliğinden kaydedilmez.</span></li>
+          <li><span>Azure'da model adı ile deployment adı ayrı alanlardır. Görsel, ses veya gerçek zamanlı modeller metin düzeltme için listelenmez.</span></li>
+          <li><span>Katalogda görünmek, modelin hesabınızla çalışacağı anlamına gelmez. Erişimi <b>Bağlantıyı test et</b> ile doğrulayın.</span></li>
+        </ul>
+        <div class="callout"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span>Model değiştirmek veya başka bir sağlayıcıya geçmek ücreti ve veri işleme koşullarını değiştirebilir. Yeni servisin fiyat ve veri koşullarını kendi hesabınızdan kontrol edin.</span></div>
+      </section>
+
+      <section class="issue" id="bulut-alanlari" aria-labelledby="h-bulut">
+        <h2 id="h-bulut">Bulut hesap ve bölge alanları</h2>
+        <p>Bazı servisler anahtarın yanında bölge, proje veya alan kimliği, hesap, kaynak grubu, gateway ya da deployment adı ister. Bu alanlar hesabınızdaki yetkilere bağlıdır; eklenti sizin adınıza hesap veya deployment oluşturmaz.</p>
+        <ul class="check-list bullets">
+          <li><span><b>IBM watsonx:</b> IBM Cloud API anahtarı ile proje kimliği veya alan (space) kimliğinden biri gerekir. Anahtar, her işlemde kısa ömürlü bir IAM belirtecine dönüştürülür.</span></li>
+          <li><span><b>SAP AI Core:</b> servis anahtarındaki Client ID, client secret ve <code>/oauth/token</code> ile biten token adresi, kaynak grubu ve deployment bilgisi gerekir. Varsayılan yol Orchestration V2'dir; doğrudan OpenAI deployment seçeneği de vardır.</span></li>
+          <li><span><b>Bedrock ve Vertex:</b> bölgesel erişim ve model sınırları vardır. Modelin seçtiğiniz bölgede hesabınıza açık olduğundan emin olun.</span></li>
+        </ul>
+      </section>
+
+      <section class="issue" id="kaydet-test" aria-labelledby="h-test">
+        <h2 id="h-test">Kaydetme, bağlantı izni ve test</h2>
+        <ul class="check-list bullets">
+          <li><span>Değişiklikler <b>Kaydet ve kullan</b> ile kaydedilir. Chrome bu sırada seçilen API adresi ve gerekiyorsa ayrı belirteç adresi için izin ister. Ayarlar ekranı hangi bağlantının kayıtlı olduğunu ve hangi değişikliklerin taslak kaldığını gösterir.</span></li>
+          <li><span>İzni reddederseniz o adrese düzeltme veya kimlik isteği gönderilmez. Ayarlarda yeniden kaydedip izin penceresinde izin verin.</span></li>
+          <li><span>Bu izin yalnız düzeltme isteğinin gideceği adresi kapsar; eklentinin editörleri bulmak için sayfalarda çalışmasından ayrıdır.</span></li>
+          <li><span><b>Bağlantıyı test et</b> yalnız kaydedilmiş bağlantıyı ve kaydedilmiş promptu kullanır. Formdaki kaydedilmemiş değişiklikler teste dahil edilmez.</span></li>
+          <li><span>Test, sabit bir örnek metinle gerçek düzeltme isteği gönderir ve sağlayıcınızda ücret doğurabilir.</span></li>
+        </ul>
+      </section>
+
+      <section class="issue" id="hata-mesajlari" aria-labelledby="h-hata">
+        <h2 id="h-hata">Hata mesajları ve çözümleri</h2>
+        <p>Bu hatalarda düzeltme uygulanmaz ve asıl metniniz korunur.</p>
+        <table class="rtable" role="table">
+          <caption class="sr-only">Ekranda görülen hata mesajları, anlamları ve yapılacaklar</caption>
+          <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Ekranda görülen mesaj</th><th scope="col" role="columnheader">Anlamı</th><th scope="col" role="columnheader">Ne yapmalı</th></tr></thead>
+          <tbody role="rowgroup">
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Bu sağlayıcı için API anahtarı veya erişim tokenı gereklidir.</span></td><td role="cell" data-label="Anlamı">Seçili profilde anahtar veya belirteç kayıtlı değil.</td><td role="cell" data-label="Ne yapmalı">Ayarlarda anahtarı girip kaydedin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcı anahtarı veya erişim tokenı kabul etmedi. Ayarlardan kontrol edin.</span></td><td role="cell" data-label="Anlamı">Anahtar geçersiz veya iptal edilmiş ya da belirtecin süresi dolmuş.</td><td role="cell" data-label="Ne yapmalı">Sağlayıcı hesabınızdan yeni anahtar veya belirteç alıp kaydedin. IBM ve SAP'de API anahtarını ya da Client ID ve secret'ı kontrol edin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcı erişime izin vermedi. Anahtar izinlerini, modeli ve bulut proje erişimini kontrol edin.</span></td><td role="cell" data-label="Anlamı">Anahtar geçerli ama bu model, proje veya bölge için yetkisi yok.</td><td role="cell" data-label="Ne yapmalı">Model erişimini, bölgeyi, proje veya alan kimliğini ve anahtar yetkilerini kontrol edin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Bu sağlayıcı adresi için bağlantı izni gerekiyor. Ayarlardan izin verip yeniden deneyin.</span></td><td role="cell" data-label="Anlamı">Chrome'un API adresi izni verilmemiş veya reddedilmiş.</td><td role="cell" data-label="Ne yapmalı">Ayarlarda yeniden kaydedin ve izin penceresinde izin verin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcıya bağlanılamadı. İnternet bağlantısını ve doğrudan API adresini kontrol edin.</span></td><td role="cell" data-label="Anlamı">Ağ hatası veya yanlış API adresi.</td><td role="cell" data-label="Ne yapmalı">İnterneti, VPN veya proxy ayarlarını ve API adresini kontrol edin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Yerel sunucuya bağlanılamadı. Sunucunun çalıştığını, adresini, portunu ve eklenti origin iznini kontrol edin.</span></td><td role="cell" data-label="Anlamı">Yerel sunucu kapalı veya bu adreste erişilemiyor.</td><td role="cell" data-label="Ne yapmalı">Ayarlardaki yerel bağlantı yardımını açın, sunucuyu başlatın ve adresi kontrol edip Modelleri getir'e basın.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Yerel sunucu erişime izin vermedi. Sunucu adresini, portunu, erişim ayarlarını ve eklenti origin iznini kontrol edin.</span></td><td role="cell" data-label="Anlamı">Sunucu isteği reddetti; izinli kaynak ayarı eksik olabilir.</td><td role="cell" data-label="Ne yapmalı">Ollama'da çalışan sunucuyu durdurun; Ayarlar'daki yardımda verilen bu eklentiye özel başlatma komutunu kullanın.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcı isteği zaman aşımına uğradı.</span></td><td role="cell" data-label="Anlamı">Bir HTTP isteği 25 saniye içinde tamamlanmadı.</td><td role="cell" data-label="Ne yapmalı">Yeniden deneyin; metni bölün veya daha hızlı bir model seçin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcının kullanım kotası veya bütçe sınırı dolmuş. Hesabınızın bakiye ve sınırlarını kontrol edin.</span></td><td role="cell" data-label="Anlamı">Bakiye, kota veya harcama sınırı doldu.</td><td role="cell" data-label="Ne yapmalı">Sağlayıcı hesabınızdan bakiye ve sınırları kontrol edin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcının istek sınırına ulaşıldı. Bir süre bekleyip yeniden deneyin.</span></td><td role="cell" data-label="Anlamı">Kısa sürede çok fazla istek gönderildi.</td><td role="cell" data-label="Ne yapmalı">Bekleyip yeniden deneyin. Sık tekrarlanıyorsa hesabınızın istek sınırlarını inceleyin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcı yanıtı tamamlanmadan kesildi. Asıl metin korunuyor; daha kısa metinle deneyin.</span></td><td role="cell" data-label="Anlamı">Yanıt modelin çıktı sınırında kesildi.</td><td role="cell" data-label="Ne yapmalı">Metni daha kısa parçalarla düzeltin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcının düzeltme yanıtı geçerli JSON değil. Asıl metin korunuyor.</span></td><td role="cell" data-label="Anlamı">Yanıt beklenen biçimde gelmedi.</td><td role="cell" data-label="Ne yapmalı">Yeniden deneyin veya başka bir model seçin. Özel prompt kullanıyorsanız varsayılan kurallarla deneyin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Sağlayıcı şu anda yanıt veremiyor. Bir süre sonra yeniden deneyin.</span></td><td role="cell" data-label="Anlamı">Sağlayıcı tarafında geçici hata.</td><td role="cell" data-label="Ne yapmalı">Bir süre sonra yeniden deneyin.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Metin düzeltme sırasında değişti. Yeni metin korunuyor; yeniden Düzelt seçeneğini kullanın.</span></td><td role="cell" data-label="Anlamı">Yanıt gelmeden editördeki metin değişti; eski yanıt uygulanmadı.</td><td role="cell" data-label="Ne yapmalı">Yeni metniniz yerinde kalır. Düzelt'e yeniden basarak isteği baştan başlatın.</td></tr>
+            <tr role="row"><td role="cell" data-label="Mesaj"><span class="msg">Anahtarı yalnız anahtar alanına yazın; model veya deployment adı alanına yazmayın.</span></td><td role="cell" data-label="Anlamı">Anahtar yanlış alana yazılmış.</td><td role="cell" data-label="Ne yapmalı">Model alanını düzeltip anahtarı yalnız anahtar alanına girin.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-warn"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span><strong>Düz metin uyarısı:</strong> Önizlemede biçimlerin güvenle eşleştirilemediği yazıyorsa sonuç kabul edildiğinde düz metin olarak uygulanır; biçimler ve bağlantılar kaldırılır. Biçimleri korumak istiyorsanız İptal'i seçip metni daha küçük parçalarla deneyin.</span></div>
+      </section>
+
+      <section class="issue" id="yerel-sunucu" aria-labelledby="h-yerel">
+        <h2 id="h-yerel">Yerel sunucu çalışmıyor</h2>
+        <ol class="check-list">
+          <li><span>Ollama için eklentinin Ayarlar sayfasında <b>Ollama</b>'yı seçip <b>Ollama’yı nasıl bağlarım?</b> yardımını açın. Çalışan sunucuyu önce durdurun; ardından bu eklentiye özel izinli başlatma komutunu <b>Kopyala</b> ile alın, Terminalde çalıştırın ve Terminali açık bırakın. llama.cpp için kendi sunucunuzun başlatma talimatlarını izleyin.</span></li>
+          <li><span><b>Modelleri getir</b> ile yüklü metin modellerinizi listeleyin. Bir modeli seçip <b>Kaydet ve kullan</b>'a basın. Tam model adını elle de yazabilirsiniz.</span></li>
+          <li><span>Adres <code>localhost</code>, <code>127.0.0.1</code> veya <code>[::1]</code> olmalı. Yerel adreslerde HTTP kullanılabilir; uzak adresler HTTPS olmalıdır.</span></li>
+          <li><span>Port ve yol, sunucunuzun belgesindeki adresle aynı olmalı.</span></li>
+          <li><span>Bazı yerel sunucular istek kaynağını kısıtlayabilir; sunucunuzun izinli kaynak ayarını kontrol edin.</span></li>
+          <li><span>Yerel sunucu isteği başka bir servise yönlendiriyorsa o servisin koşulları ve gereksinimleri geçerlidir.</span></li>
+        </ol>
+      </section>
+
+      <section class="issue" id="internet-zaman-asimi" aria-labelledby="h-zaman">
+        <h2 id="h-zaman">İnternet, zaman aşımı ve uzun metinler</h2>
+        <ul class="check-list bullets">
+          <li><span>Bulut sağlayıcıları internet bağlantısı gerektirir. Yerel model, sunucu başka bir servise bağlanmıyorsa internetsiz de çalışabilir.</span></li>
+          <li><span>VPN, kurumsal proxy veya güvenlik duvarı API adresini engelleyebilir.</span></li>
+          <li><span>Her HTTP isteği, yanıtın okunması dahil 25 saniyeyle sınırlıdır.</span></li>
+          <li><span>IBM watsonx ve SAP AI Core'da belirteç değişimi ve düzeltme ayrı istekler olduğundan toplam süre yaklaşık 50 saniyeye çıkabilir.</span></li>
+          <li><span>Uzun metinleri parçalara bölün. Girdi ve çıktı için üst sınır yaklaşık 100.000 karakterdir.</span></li>
+        </ul>
+      </section>
+
+      <section class="issue" id="sorun-bildir" aria-labelledby="h-bildir">
+        <h2 id="h-bildir">Sorun bildirme</h2>
+        <p>GitHub Issues herkese açıktır. Kişisel bilgi içermeyen, yeniden üretilebilir adımlar en hızlı yardımı sağlar.</p>
+        <div class="split-2">
+          <div>
+            <h3 class="h3 mt-4">Paylaşabileceğiniz bilgiler</h3>
+            <ul class="check-list bullets">
+              <li><span>Chrome sürümü</span></li>
+              <li><span>Eklenti sürümü (popup'ın sağ üst köşesi)</span></li>
+              <li><span>Editör ve sürümü, mümkünse sayfa türü</span></li>
+              <li><span>Seçili sağlayıcı ve model adı</span></li>
+              <li><span>Ekrandaki hata mesajı ve kişisel veri içermeyen adımlar</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="h3 mt-4">Paylaşmayın</h3>
+            <ul class="check-list bullets">
+              <li><span>API anahtarı, erişim belirteci, Client ID veya secret</span></li>
+              <li><span>Özel sistem promptunuz</span></li>
+              <li><span>Gizli veya kişisel bilgi içeren metinler</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="btn-row mt-4">
+          <a class="btn btn-primary" data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues">GitHub Issues <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+          <a class="btn btn-secondary break" data-link="email" href="mailto:iletisim@mehmetyerli.com">iletisim@mehmetyerli.com</a>
+        </div>
+        <p class="fine mt-4">Verilerin nasıl işlendiği için <a href="../privacy/">gizlilik politikasına</a> bakın.</p>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="../"><img src="../assets/img/icon48.png" width="34" height="34" alt=""><span class="brand-name"><strong>AI Türkçe</strong><span>Metin Düzeltici</span></span></a>
+      <p>Mehmet Yerli tarafından geliştirildi. Yerli Developer ürün ailesinin bir parçasıdır.</p>
+    </div>
+    <nav aria-labelledby="f-urun"><h2 id="f-urun" class="footer-h">Ürün</h2><ul>
+      <li><a data-link="store" href="https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl">Chrome Web Store</a></li>
+      <li><a href="../#nasil-calisir">Nasıl çalışır</a></li>
+      <li><a href="../#sss">SSS</a></li>
+    </ul></nav>
+    <nav aria-labelledby="f-yardim"><h2 id="f-yardim" class="footer-h">Yardım</h2><ul>
+      <li><a href="./" aria-current="page">Destek</a></li>
+      <li><a href="../privacy/">Gizlilik</a></li>
+      <li><a data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues">Sorun bildir</a></li>
+    </ul></nav>
+    <div><h2 class="footer-h">İletişim</h2><ul>
+      <li><a class="break" data-link="email" href="mailto:iletisim@mehmetyerli.com">iletisim@mehmetyerli.com</a></li>
+      <li><a data-link="repository" href="https://github.com/mytsx/duzelt-ai">GitHub</a></li>
+      <li><a data-link="developer" href="https://yerli.dev/">Yerli.dev</a></li>
+    </ul></div>
+  </div>
+  <div class="wrap"><div class="footer-meta">
+    <span>Mağazadaki sürüm <span data-config="publishedVersion">3.3.0</span></span>
+    <span>Chrome ve Chrome Web Store, Google LLC'nin ticari markalarıdır.</span>
+  </div></div>
+</footer>
+</body>
+</html>

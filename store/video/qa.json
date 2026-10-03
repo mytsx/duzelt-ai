@@ -1,0 +1,273 @@
+{
+  "product": "AI Türkçe Metin Düzeltici",
+  "date": "2026-10-03",
+  "status": "local-media-checks-complete-human-listening-unavailable",
+  "durationSeconds": 32,
+  "format": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 960,
+    "video": "H.264 yuv420p",
+    "audio": "AAC stereo 48kHz 160kbps"
+  },
+  "artifacts": {
+    "output/video/licensed/duzelt-ai-tanitim-1080p.mp4": {
+      "bytes": 1740356,
+      "sha256": "8b50ff1f15531ff152b1ab6d335c07d25b5944bde3d0b42c51d5401cc7276e0a"
+    },
+    "output/video/licensed/duzelt-ai-tanitim-1080p.tr.srt": {
+      "bytes": 843,
+      "sha256": "0ecc18ce583a4cadac5a849469ac21f23b159e146caf76764e59ff49a17e30a4"
+    },
+    "output/video/licensed/duzelt-seslendirme-v1.mp3": {
+      "bytes": 500098,
+      "sha256": "6e1ab1043f5bf9c4e6bb8749d65aba1c656020ed96886a996f02dd70d07f80fa"
+    },
+    "output/video/licensed/duzelt-ai-ses-muzik-mix.wav": {
+      "bytes": 6144078,
+      "sha256": "a9a0d91e40789a7bcdc78df673455424917d9b355a9836cd1272df2a7a74cfa5"
+    },
+    "store/youtube/thumbnail-1280x720.png": {
+      "bytes": 63829,
+      "sha256": "f6964708280d522155b1f97f9f7a0ebcfa3a88a5a6892a8fc06c10481962a877"
+    },
+    "store/youtube/thumbnail-3840x2160.png": {
+      "bytes": 298756,
+      "sha256": "5ca379afd591d3128812d6e04c9d64160cdc924c165246c9a996b9737be98d56"
+    }
+  },
+  "renderCheck": {
+    "status": "rendered-awaiting-human-full-watch-and-listen",
+    "video": "output/video/licensed/duzelt-ai-tanitim-1080p.mp4",
+    "sha256": "8b50ff1f15531ff152b1ab6d335c07d25b5944bde3d0b42c51d5401cc7276e0a",
+    "duration": 32.0,
+    "videoStream": {
+      "index": 0,
+      "codec_name": "h264",
+      "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+      "profile": "High",
+      "codec_type": "video",
+      "codec_tag_string": "avc1",
+      "codec_tag": "0x31637661",
+      "mime_codec_string": "avc1.640028",
+      "width": 1920,
+      "height": 1080,
+      "coded_width": 1920,
+      "coded_height": 1080,
+      "has_b_frames": 2,
+      "sample_aspect_ratio": "1:1",
+      "display_aspect_ratio": "16:9",
+      "pix_fmt": "yuv420p",
+      "level": 40,
+      "chroma_location": "left",
+      "field_order": "progressive",
+      "is_avc": "true",
+      "nal_length_size": "4",
+      "id": "0x1",
+      "r_frame_rate": "30/1",
+      "avg_frame_rate": "30/1",
+      "time_base": "1/15360",
+      "start_pts": 0,
+      "start_time": "0.000000",
+      "duration_ts": 491520,
+      "duration": "32.000000",
+      "bit_rate": "266394",
+      "bits_per_raw_sample": "8",
+      "nb_frames": "960",
+      "extradata_size": 48,
+      "disposition": {
+        "default": 1,
+        "dub": 0,
+        "original": 0,
+        "comment": 0,
+        "lyrics": 0,
+        "karaoke": 0,
+        "forced": 0,
+        "hearing_impaired": 0,
+        "visual_impaired": 0,
+        "clean_effects": 0,
+        "attached_pic": 0,
+        "timed_thumbnails": 0,
+        "non_diegetic": 0,
+        "captions": 0,
+        "descriptions": 0,
+        "metadata": 0,
+        "dependent": 0,
+        "still_image": 0,
+        "multilayer": 0
+      },
+      "tags": {
+        "language": "und",
+        "handler_name": "VideoHandler",
+        "encoder": "Lavc62.28.102 libx264"
+      }
+    },
+    "fullDecode": "passed",
+    "stationaryComparisons": [
+      {
+        "scene": 1,
+        "times": [
+          0.8,
+          5.65
+        ],
+        "decodedFrameHashes": [
+          "9be7fbe57ed5abf87ed790e3940ed83653a2903519bb0192b20d73185c005786",
+          "e63d08d529b737de3f55da1eb0b6b66278aebb848bc5aaecba1add9621d9bbcb"
+        ],
+        "identical": false,
+        "meanAbsolutePixelDifference": 0.001261252572016461,
+        "fractionAbove8Levels": 0.0,
+        "withinCodecNoiseThreshold": true
+      },
+      {
+        "scene": 2,
+        "times": [
+          7.25,
+          8.049999999999999
+        ],
+        "decodedFrameHashes": [
+          "411510afcbc74c17a658d85bcf3ddc1b4cc8c8a27f9059a83a096da3538e5b6d",
+          "c19cbfed846265538a1efd34f8e247f60b04190f2925eea84bad8777bf32bbbb"
+        ],
+        "identical": false,
+        "meanAbsolutePixelDifference": 0.0032098765432098763,
+        "fractionAbove8Levels": 4.018775720164609e-06,
+        "withinCodecNoiseThreshold": true
+      },
+      {
+        "scene": 3,
+        "times": [
+          9.65,
+          12.139999999999999
+        ],
+        "decodedFrameHashes": [
+          "47bee307e13e19e75e83097ab56e2718ebfcc59de600ba18ee7ff98280cff139",
+          "3ea7145678cb583ef6ec53b1f7cc2442f15181cef2e87db9443dc0f25260d915"
+        ],
+        "identical": false,
+        "meanAbsolutePixelDifference": 0.002442772633744856,
+        "fractionAbove8Levels": 3.69727366255144e-06,
+        "withinCodecNoiseThreshold": true
+      },
+      {
+        "scene": 4,
+        "times": [
+          13.74,
+          17.87
+        ],
+        "decodedFrameHashes": [
+          "f7b1c0c3db8d12ded9e2c833e7ab9b2e158c12fb18344efab1811a0c71b85041",
+          "4b2a1c079dbe6a858f6147d10eacad8a8ce12107093cc096d63da215a1e86f16"
+        ],
+        "identical": false,
+        "meanAbsolutePixelDifference": 0.18395945859053497,
+        "fractionAbove8Levels": 0.0007844650205761317,
+        "withinCodecNoiseThreshold": true
+      },
+      {
+        "scene": 5,
+        "times": [
+          19.470000000000002,
+          25.62
+        ],
+        "decodedFrameHashes": [
+          "de69730200ff98f9e5ff0e249c3aa5d87089f04b63c4b53c6d3da49dc8e6a6cf",
+          "96b5d03fa8f407e3476035508d3d453f389b5e016434bcbadcf52e275a975703"
+        ],
+        "identical": false,
+        "meanAbsolutePixelDifference": 0.2138768325617284,
+        "fractionAbove8Levels": 0.001007908950617284,
+        "withinCodecNoiseThreshold": true
+      },
+      {
+        "scene": 6,
+        "times": [
+          27.220000000000002,
+          31.2
+        ],
+        "decodedFrameHashes": [
+          "f50a837d6641cdfd2ddf3fe9a839eeff89030dbe1a9bc243e20e8ac45e26f565",
+          "7952238c890ddc4e40cb3e481bd17c79b1347bd533513c2f47d1502f7b370e4f"
+        ],
+        "identical": false,
+        "meanAbsolutePixelDifference": 0.0061541923868312755,
+        "fractionAbove8Levels": 2.3469650205761318e-05,
+        "withinCodecNoiseThreshold": true
+      }
+    ],
+    "sourceSha256": {
+      "output/video/scenes/scene-1.png": "5840d821b9e62cd701157c781dfb43381511824cf0a67bdee588d920029eb1e7",
+      "output/video/scenes/scene-2.png": "6b96946dc8a583fe51e86cd92422f33e7bc9a89d47e09c53cc9bae29eb1d6053",
+      "output/video/scenes/scene-3.png": "5ace29a625eeda3d5a88ff960e152fb90a68957dd30f260a3d7e17e160f1c118",
+      "output/video/scenes/scene-4.png": "8034d740fb1737fecb67c5af7bb5d92a33d51da27fa98ba1021bc22cb1a2cb51",
+      "output/video/scenes/scene-5.png": "2f7a416c4913d5e0232c5dd7e4518e5ff48a903cf90344b41f611d546bd31535",
+      "output/video/scenes/scene-6.png": "d644c4b30577438219127ecddba3a863011230fd4b92a6c5901ce2a74ccebfe1"
+    },
+    "captions": "SRT sidecar; never cover product UI"
+  },
+  "musicMixCheck": {
+    "durationSeconds": 32.0,
+    "music": "Original procedural instrumental; no external music samples",
+    "voiceRmsDbfs": -21.245126122407477,
+    "musicRmsDbfs": -44.41869264187878,
+    "voiceToMusicMedianDb": 31.771690986951604,
+    "voiceToMusic10thPercentileDb": 19.794027938844422,
+    "mixPeakDbfs": -1.8103864101968066,
+    "speechBlocksMeasured": 236,
+    "sourceIntegratedLufsMono": -21.11,
+    "voiceGainDb": 0.6399999999999999,
+    "voiceIntegratedLufsStereo": -17.56,
+    "mixLoudness": {
+      "input_i": "-17.62",
+      "input_tp": "-1.80",
+      "input_lra": "3.00",
+      "input_thresh": "-28.54",
+      "output_i": "-16.22",
+      "output_tp": "-1.50",
+      "output_lra": "2.90",
+      "output_thresh": "-26.98",
+      "normalization_type": "dynamic",
+      "target_offset": "0.22"
+    },
+    "sidechain": {
+      "attackMs": 8,
+      "releaseMs": 550,
+      "ratio": 8
+    }
+  },
+  "finalAacLoudness": {
+    "integratedLufs": -17.67,
+    "truePeakDbtp": -1.71,
+    "loudnessRangeLu": 2.9
+  },
+  "alignment": {
+    "source": "local faster-whisper-base + actual silencedetect sentence onsets",
+    "sourceAudioSha256": "6e1ab1043f5bf9c4e6bb8749d65aba1c656020ed96886a996f02dd70d07f80fa",
+    "audioLeadSeconds": 0.35,
+    "sceneStarts": [
+      0,
+      6.45,
+      8.85,
+      12.94,
+      18.67,
+      26.42
+    ],
+    "subtitleCueCount": 11,
+    "approvedSubtitleCopyMatches": true
+  },
+  "visualReview": {
+    "all15Pngs": true,
+    "all6Keyframes": true,
+    "all15TransitionFrames": true,
+    "textBoundsChecked": 75,
+    "visibleSecrets": false,
+    "controlledSampleDisclosure": true,
+    "fractionalZoomPan": false
+  },
+  "humanWatchAndListen": {
+    "complete": false,
+    "reason": "Agent interface does not support audio input; cannot claim aesthetic or full human listening"
+  },
+  "remoteUpload": "owned by parent agent; not verified by this local artifact"
+}

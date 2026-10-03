@@ -1,0 +1,5 @@
+# Local documentation and component previews are not public assets.
+README.md
+_preview/
+.DS_Store
+**/.DS_Store

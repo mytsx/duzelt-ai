@@ -1,0 +1,5 @@
+AI Türkçe Metin Düzeltici. Türkçe metninizi düzeltin, değişikliklere siz karar verin.
+Uyumlu editörde Düzelt'e basın. Önerileri inceleyin; eklenen ve çıkarılan ifadeleri görün.
+Kabul ederseniz öneri metninize uygulanır. İptal ederseniz asıl metniniz korunur.
+Bulut sağlayıcınızı ya da bilgisayarınızda çalışan yerel modeli seçin. Bulut kullanımı için kendi erişim bilgileriniz gerekir.
+Düzeltin. İnceleyin. Karar verin. Chrome Web Store'da.

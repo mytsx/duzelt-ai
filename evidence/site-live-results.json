@@ -1,0 +1,65 @@
+{
+  "checkedOn": "2026-10-03",
+  "site": "https://duzelt.yerli.dev/",
+  "manualDeploymentVersion": "53596d06-d3c7-4566-bf1f-c84e16012f42",
+  "worker": "duzelt-site",
+  "allPassed": true,
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "sha256": "faa66f0127281e2f5f5ea6591da025fefcf823d8bf919990bc86dac93302733a",
+      "cspPresent": true
+    },
+    {
+      "path": "/privacy/",
+      "status": 200,
+      "sha256": "59bf2eb971e2737e70bf26f0b3997357f2038b54ca8945d235d9353683bed62f",
+      "cspPresent": true
+    },
+    {
+      "path": "/support/",
+      "status": 200,
+      "sha256": "bf63eb148b77cdcab31feaf7fce2263995c9466f90cb25a3c251e6650135ec29",
+      "cspPresent": true
+    },
+    {
+      "path": "/assets/js/config.js",
+      "status": 200,
+      "sha256": "cc66c7a477bc59d3c5f0a102adb2ab1fe4a082fea39807e0e9f7198388229fb2",
+      "cspPresent": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "sha256": "559f70663836464b500dcae55f1264ed04fe2ce19c48a1843740e27feda5c4f2",
+      "cspPresent": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "sha256": "87da7697a6145220956a0345f88746134add704c288fc0735005bc3920dd1c6d",
+      "cspPresent": true
+    },
+    {
+      "path": "/README.md",
+      "status": 404,
+      "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+      "cspPresent": true
+    },
+    {
+      "path": "/_preview/video.html",
+      "status": 404,
+      "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+      "cspPresent": true
+    },
+    {
+      "path": "/olmayan-sayfa/",
+      "status": 404,
+      "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+      "cspPresent": true
+    }
+  ],
+  "remoteBuildVerified": false,
+  "probeNote": "First urllib request returned403 immediately after deployment; subsequent curl and Chrome page load succeeded. No security setting changed."
+}

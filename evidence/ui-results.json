@@ -48,7 +48,53 @@
   "captureOffscreenSkipLinkSuppressed": true,
   "captureOffscreenSkipLinkReason": "Chromium beyond-viewport clipping can include the unfocused fixed skip-link with boundingClientRect.bottom < 0; only that offscreen element is hidden during reference capture and its original style is restored in finally.",
   "visualReviewPending": false,
-  "visualReview": {
+  "sourceSha256": {
+    "background/background.js": "040e08ec5ad5c9d98c3b198aae976c6e131958cb012069bd548bd4bca7b3a731",
+    "background/openai-provider.js": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
+    "background/provider-service.js": "b08575a2b51c53cb13360029b1519bdc2b40db0690874f9a20874800c01a062a",
+    "content/content.css": "27428c534bf8817567c24364b2ccc90ed54b36ba5053e3cbc93344834986774b",
+    "content/content.js": "bf7c73f37f77b8cc4f2843e6b6c49b1e0507b11e060a0ee7b8950eb1db35d514",
+    "content/editor-bridge.js": "a779d60bd329296cccb18df7b0b63d44f296b01253e9a2f137953e17b0bd38b1",
+    "icons/icon128.png": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
+    "icons/icon16.png": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
+    "icons/icon48.png": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
+    "lib/diff.min.js": "3a29bd9374b219bd6964550085cddf6b62fc4073893d3f251c1d61ef1ea56b7f",
+    "lib/product-config.js": "3096f8141b1e5c499cf4ec80529ba49c93d6b80b130b5e172c13fe70c400d0d1",
+    "lib/provider-catalog.js": "42a8fb3c1b7b653a7be838957b2b24c16575876de4025d031751ca64a117ebfa",
+    "manifest.json": "99095cdc1d0b47df68664b2a76236941351a4d76b5847852fa94444df727fcc0",
+    "options/options.css": "d92dd952ec5343c8ff398c698ef84da3990d5db931ea74bbba04aef362204420",
+    "options/options.html": "553bf360caaf85666a9efc562829d3ebe48ba3e492a800c7ae1208189ceea0b3",
+    "options/options.js": "366feaf40bebb62ca2f18284cd44ab90ce138eb362b6f519f8d0ff1c7c63a4c1",
+    "popup/popup.css": "317af9ae76b79e52573986abe87da826e953f0bc242195cab9883a969e4f67d1",
+    "popup/popup.html": "0bdc9abffb19996d1462adb3ea2667ed2aba5dea32ac8d8eb1bba22806739c04",
+    "popup/popup.js": "0b2787f5088ee9263d60f250249bf7d85470294129e15c5bad5f9128a5f4fb80",
+    "tests/ui-browser.cjs": "1e21169c776a6ad3b9aa2861daeadda6bd45c2cd79bc3e083e9e752ed55423d7"
+  },
+  "referenceImageSha256": {
+    "design/claude-assets/icon128.png": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
+    "design/claude-assets/icon16.png": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
+    "design/claude-assets/icon48.png": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
+    "design/claude-assets/options-desktop.png": "367a1e0aec75f63e8d88a6db930d6fdb01cc93c810c608b257ce3d21ceb24c7c",
+    "design/claude-assets/options-guide-open-dark-desktop.png": "70817e6c8ba5be13730e40da6a9c932e06f29015b9d8f37e0fff615f77987e8a",
+    "design/claude-assets/options-guide-open-dark-mobile.png": "9d2e388360e0e6379f38747e16d541320b52101783be5993729c3aa44b0c7c78",
+    "design/claude-assets/options-guide-open-light-desktop.png": "8b9260f99d0905219e88697e0bdccf6ef6b261069fb16f93034eb29f3c452f9c",
+    "design/claude-assets/options-guide-open-light-mobile.png": "a1c1153aa55ea166df677b91ee54efc9160b0014ff91b00ae987fd83ee4d5e46",
+    "design/claude-assets/options-mobile.png": "7a2e2b942f7f486d8de43618e4e7ff401ffa39affb97063df08ba8f67291fa7b",
+    "design/claude-assets/options-model-dropdown.png": "c6320cd0bbff8dcdd1d09e794e598c33f5e2ee9f0057d266c76a62fdc48193a6",
+    "design/claude-assets/options-ollama-draft.png": "9ba1f7be7ddf27b18518bfdb21aaf9c0534f6d9205167bc50c03e99c68408582",
+    "design/claude-assets/options-ollama-mobile.png": "4890133a31f92d8b16ff358cc9b7126608cd793b25b668979513f40656da08a8",
+    "design/claude-assets/options-ollama-saved.png": "b80e0a53a8154ba79d28fb86abaf9bb9375df327f664a84b0717ba0c8836826a",
+    "design/claude-assets/options-ollama.png": "6dfd8730332e40c83f800d6b8a3a9a07f47f583aa44a0224bad2eb7ffb03bb3f",
+    "design/claude-assets/options-openrouter.png": "e33d24454d3453e338905388d6023ccfe86a1b6ad3b7d390e497c694a788bcd9",
+    "design/claude-assets/options-provider-dropdown.png": "22c4a8d756aa5146fcbefc44781c8541b23469a4df1884006eabb436389f597b",
+    "design/claude-assets/popup-dark.png": "503ab0f8b883f122b3d65ca84c82ecaa71c73a9899ef27ee42fba07fead83237",
+    "design/claude-assets/popup-light.png": "d07777f95f3fc26d15870b1bdbf3d2a89d5dd5f545a56fa6cfc9b7e88642037e"
+  },
+  "changedReferenceImages": [
+    "design/claude-assets/options-ollama-saved.png"
+  ],
+  "productLinkFixtures": "Exact public PRODUCT_CONFIG website/support/privacy URLs; other HTTP/S page requests aborted.",
+  "previousVisualReview": {
     "widths": [
       320,
       390,
@@ -64,33 +110,34 @@
     "findings": "Açık Ollama rehberi beş genişlikte iki temada görsel olarak incelendi. Kod/kopyalama sütunları ve dar ekranda alt alta satırlar hizalı; uzun origin komutu taşmıyor. Açık sağlayıcı/model menüleri, kayıtlı/taslak bağlantı ve varsayılan ayarlar incelendi. İlk açılışta yalnız gerçek kayıtların kayıtlı sayıldığı metin ayrıca doğrulandı.",
     "motion": "no-preference ve reduce tercihleri gerçek tarayıcıda doğrulandı."
   },
-  "sourceSha256": {
-    "options/options.css": "d92dd952ec5343c8ff398c698ef84da3990d5db931ea74bbba04aef362204420",
-    "options/options.html": "553bf360caaf85666a9efc562829d3ebe48ba3e492a800c7ae1208189ceea0b3",
-    "options/options.js": "366feaf40bebb62ca2f18284cd44ab90ce138eb362b6f519f8d0ff1c7c63a4c1",
-    "popup/popup.css": "317af9ae76b79e52573986abe87da826e953f0bc242195cab9883a969e4f67d1",
-    "popup/popup.html": "0bdc9abffb19996d1462adb3ea2667ed2aba5dea32ac8d8eb1bba22806739c04",
-    "popup/popup.js": "0b2787f5088ee9263d60f250249bf7d85470294129e15c5bad5f9128a5f4fb80",
-    "tests/ui-browser.cjs": "072b7af8a7e60c99c62a3e5c2ceea79ff8b4f8e03a0fe6624795d2b1c7bd8cb1"
-  },
-  "referenceImageSha256": {
-    "design/claude-assets/icon128.png": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
-    "design/claude-assets/icon16.png": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
-    "design/claude-assets/icon48.png": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
-    "design/claude-assets/options-desktop.png": "367a1e0aec75f63e8d88a6db930d6fdb01cc93c810c608b257ce3d21ceb24c7c",
-    "design/claude-assets/options-guide-open-dark-desktop.png": "70817e6c8ba5be13730e40da6a9c932e06f29015b9d8f37e0fff615f77987e8a",
-    "design/claude-assets/options-guide-open-dark-mobile.png": "9d2e388360e0e6379f38747e16d541320b52101783be5993729c3aa44b0c7c78",
-    "design/claude-assets/options-guide-open-light-desktop.png": "8b9260f99d0905219e88697e0bdccf6ef6b261069fb16f93034eb29f3c452f9c",
-    "design/claude-assets/options-guide-open-light-mobile.png": "a1c1153aa55ea166df677b91ee54efc9160b0014ff91b00ae987fd83ee4d5e46",
-    "design/claude-assets/options-mobile.png": "7a2e2b942f7f486d8de43618e4e7ff401ffa39affb97063df08ba8f67291fa7b",
-    "design/claude-assets/options-model-dropdown.png": "c6320cd0bbff8dcdd1d09e794e598c33f5e2ee9f0057d266c76a62fdc48193a6",
-    "design/claude-assets/options-ollama-draft.png": "9ba1f7be7ddf27b18518bfdb21aaf9c0534f6d9205167bc50c03e99c68408582",
-    "design/claude-assets/options-ollama-mobile.png": "4890133a31f92d8b16ff358cc9b7126608cd793b25b668979513f40656da08a8",
-    "design/claude-assets/options-ollama-saved.png": "97cda24dd046552e1c98d65fb6970531e2dd3bb792d4ecfdbe65c70ecb282a5a",
-    "design/claude-assets/options-ollama.png": "77570963b8e22e3048620a657459fdc547abeda36516a9a1419f01eb55bcb160",
-    "design/claude-assets/options-openrouter.png": "4db5edb23f546f89116241073daa642eb169ffc989cd0f508beed9901a025ad7",
-    "design/claude-assets/options-provider-dropdown.png": "22c4a8d756aa5146fcbefc44781c8541b23469a4df1884006eabb436389f597b",
-    "design/claude-assets/popup-dark.png": "503ab0f8b883f122b3d65ca84c82ecaa71c73a9899ef27ee42fba07fead83237",
-    "design/claude-assets/popup-light.png": "d07777f95f3fc26d15870b1bdbf3d2a89d5dd5f545a56fa6cfc9b7e88642037e"
+  "visualReview": {
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "reviewer": "Codex root",
+    "findings": "Açık Ollama rehberi beş genişlikte iki temada görsel olarak incelendi. Kod/kopyalama sütunları ve dar ekranda alt alta satırlar hizalı; uzun origin komutu taşmıyor. Açık sağlayıcı/model menüleri, kayıtlı/taslak bağlantı ve varsayılan ayarlar incelendi. İlk açılışta yalnız gerçek kayıtların kayıtlı sayıldığı metin ayrıca doğrulandı.",
+    "motion": "no-preference ve reduce tercihleri gerçek tarayıcıda doğrulandı.",
+    "checkedOn": "2026-10-03",
+    "finalReview": {
+      "files": [
+        "design/claude-assets/options-openrouter.png",
+        "design/claude-assets/options-ollama.png",
+        "design/claude-assets/options-ollama-saved.png"
+      ],
+      "sha256": {
+        "design/claude-assets/options-openrouter.png": "e33d24454d3453e338905388d6023ccfe86a1b6ad3b7d390e497c694a788bcd9",
+        "design/claude-assets/options-ollama.png": "6dfd8730332e40c83f800d6b8a3a9a07f47f583aa44a0224bad2eb7ffb03bb3f",
+        "design/claude-assets/options-ollama-saved.png": "b80e0a53a8154ba79d28fb86abaf9bb9375df327f664a84b0717ba0c8836826a"
+      },
+      "findings": "Root son PNG dosyalarını görsel olarak inceledi: kayıtlı/etkin durum ve başarı mesajı uyumlu; hizalamalar, alanlar ve alt kaydetme düğmesi temiz; taşma veya kırpılma görülmedi."
+    }
   }
 }

@@ -11,9 +11,16 @@
     "test:editors": "node tests/editor-browser.mjs",
     "test:catalog": "python3 -m unittest discover -s tests -p 'test_provider_catalog.py'",
     "test:bootstrap": "node tests/editor-bootstrap.mjs",
-    "design:kit": "python3 tools/prepare-design-kit.py"
+    "design:kit": "python3 tools/prepare-design-kit.py",
+    "site:prepare": "python3 tools/prepare-site.py",
+    "site:preview": "npm run site:prepare && wrangler dev --config wrangler.site.jsonc --local --ip 127.0.0.1 --port 8787",
+    "site:test": "python3 -m unittest discover -s tests -p 'test_prepare_site.py'",
+    "site:test:browser": "node tests/site-browser.mjs",
+    "site:check": "npm run site:test && python3 tools/prepare-site.py --check && node --check site/assets/js/config.js && node --check site/assets/js/site.js && wrangler deploy --config wrangler.site.jsonc --dry-run",
+    "site:deploy": "npm run site:prepare && npm run site:check && wrangler deploy --config wrangler.site.jsonc"
   },
   "devDependencies": {
-    "playwright": "1.62.1"
+    "playwright": "1.62.1",
+    "wrangler": "4.147.0"
   }
 }

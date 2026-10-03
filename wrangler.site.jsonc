@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "duzelt-site",
+  "account_id": "be07ea38add164a83cc48c714ecbf9e2",
+  "compatibility_date": "2026-10-03",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "duzelt.yerli.dev", "custom_domain": true }],
+  "assets": {
+    "directory": "./site",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

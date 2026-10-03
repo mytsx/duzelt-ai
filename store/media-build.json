@@ -1,0 +1,909 @@
+{
+  "product": "AI Türkçe Metin Düzeltici",
+  "design": {
+    "palette": [
+      "#f3f4f8",
+      "#485cd0",
+      "#191d2c"
+    ],
+    "camera": "stationary",
+    "ui": "real screenshots; controlled correction response"
+  },
+  "sourceSha256": {
+    "store/video/source/editor-accepted.png": "ae4f101fe9cebece9074fbf5282cead08c6c729e46503b5726bca4793df3060f",
+    "store/video/source/editor-before.png": "d32bd04cfd569317ca4d2010c0c6af9d3fc6da8467e758ed0677c4b596c0b3f0",
+    "store/video/source/editor-preview.png": "f9d40e5b00ead1d2bb09f4d10462793b486e63c9349c0c55f035f0088250f7de",
+    "store/video/source/icon128.png": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
+    "store/video/source/options-desktop.png": "367a1e0aec75f63e8d88a6db930d6fdb01cc93c810c608b257ce3d21ceb24c7c",
+    "store/video/source/options-ollama-saved.png": "97cda24dd046552e1c98d65fb6970531e2dd3bb792d4ecfdbe65c70ecb282a5a",
+    "store/video/source/popup-light.png": "d07777f95f3fc26d15870b1bdbf3d2a89d5dd5f545a56fa6cfc9b7e88642037e"
+  },
+  "outputs": {
+    "output/video/scenes/scene-1.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGB",
+      "sha256": "5840d821b9e62cd701157c781dfb43381511824cf0a67bdee588d920029eb1e7"
+    },
+    "output/video/scenes/scene-2.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGB",
+      "sha256": "6b96946dc8a583fe51e86cd92422f33e7bc9a89d47e09c53cc9bae29eb1d6053"
+    },
+    "output/video/scenes/scene-3.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGB",
+      "sha256": "5ace29a625eeda3d5a88ff960e152fb90a68957dd30f260a3d7e17e160f1c118"
+    },
+    "output/video/scenes/scene-4.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGB",
+      "sha256": "8034d740fb1737fecb67c5af7bb5d92a33d51da27fa98ba1021bc22cb1a2cb51"
+    },
+    "output/video/scenes/scene-5.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGB",
+      "sha256": "2f7a416c4913d5e0232c5dd7e4518e5ff48a903cf90344b41f611d546bd31535"
+    },
+    "output/video/scenes/scene-6.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGB",
+      "sha256": "d644c4b30577438219127ecddba3a863011230fd4b92a6c5901ce2a74ccebfe1"
+    },
+    "store/promos/marquee-1400x560.png": {
+      "size": [
+        1400,
+        560
+      ],
+      "mode": "RGB",
+      "sha256": "2777bad9d34501f9268c34cfe55fdc00eded10ebe2535df108c8f20df882f874"
+    },
+    "store/promos/small-440x280.png": {
+      "size": [
+        440,
+        280
+      ],
+      "mode": "RGB",
+      "sha256": "5d616581ebf12932a4a980b09b889438b6a0370ce3502fdd21285127ac80344c"
+    },
+    "store/screenshots/01-duzelt.png": {
+      "size": [
+        1280,
+        800
+      ],
+      "mode": "RGB",
+      "sha256": "f8397d4eaa55043ffcf77bae6a264ceb03e45c891b877d481bb14a43b9d0320d"
+    },
+    "store/screenshots/02-incele.png": {
+      "size": [
+        1280,
+        800
+      ],
+      "mode": "RGB",
+      "sha256": "82fe2c9ea4f7d3cdada5cca5cda550cf78cd18bbb43d5bdd5e66a3557714084c"
+    },
+    "store/screenshots/03-karar-ver.png": {
+      "size": [
+        1280,
+        800
+      ],
+      "mode": "RGB",
+      "sha256": "16918c3720acd8d5212cb2a14e9c0879512424d32a25146b3308c7761777eaec"
+    },
+    "store/screenshots/04-saglayici.png": {
+      "size": [
+        1280,
+        800
+      ],
+      "mode": "RGB",
+      "sha256": "08700a44d822a961d2176e2ecd7c1f853fa80fe8e1ccf31f79c3ff6f2dafbc54"
+    },
+    "store/screenshots/05-yerel-model.png": {
+      "size": [
+        1280,
+        800
+      ],
+      "mode": "RGB",
+      "sha256": "ec85b154950469fb4a07aa6859106bb7fcc1468620f3e2bed44915eefbff89b6"
+    },
+    "store/youtube/thumbnail-1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "mode": "RGB",
+      "sha256": "f6964708280d522155b1f97f9f7a0ebcfa3a88a5a6892a8fc06c10481962a877"
+    },
+    "store/youtube/thumbnail-3840x2160.png": {
+      "size": [
+        3840,
+        2160
+      ],
+      "mode": "RGB",
+      "sha256": "5ca379afd591d3128812d6e04c9d64160cdc924c165246c9a996b9737be98d56"
+    }
+  },
+  "textBoundsChecked": 75,
+  "textBounds": [
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        176,
+        55,
+        555,
+        84
+      ],
+      "size": 32
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1560,
+        62,
+        1739,
+        80
+      ],
+      "size": 24
+    },
+    {
+      "text": "Türkçe metninizi\ndüzeltin.\nKarar sizin.",
+      "bounds": [
+        96,
+        247,
+        885,
+        538
+      ],
+      "size": 100
+    },
+    {
+      "text": "Uyumlu zengin metin editörlerinde\ndüzeltme önerileri.",
+      "bounds": [
+        100,
+        665,
+        614,
+        737
+      ],
+      "size": 34
+    },
+    {
+      "text": "Düzelt  →  İnceleyin  →  Karar verin",
+      "bounds": [
+        96,
+        1011,
+        446,
+        1034
+      ],
+      "size": 22
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        176,
+        55,
+        555,
+        84
+      ],
+      "size": 32
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1560,
+        62,
+        1739,
+        80
+      ],
+      "size": 24
+    },
+    {
+      "text": "Uyumlu editörde Düzelt’e basın.",
+      "bounds": [
+        96,
+        202,
+        1097,
+        264
+      ],
+      "size": 66
+    },
+    {
+      "text": "01  Düzelt",
+      "bounds": [
+        116,
+        934,
+        238,
+        953
+      ],
+      "size": 26
+    },
+    {
+      "text": "02  İnceleyin",
+      "bounds": [
+        690,
+        929,
+        845,
+        958
+      ],
+      "size": 26
+    },
+    {
+      "text": "03  Karar verin",
+      "bounds": [
+        1264,
+        934,
+        1445,
+        953
+      ],
+      "size": 26
+    },
+    {
+      "text": "Gerçek Quill arayüzü · Kişisel veri içermeyen örnek metin",
+      "bounds": [
+        96,
+        1014,
+        655,
+        1034
+      ],
+      "size": 22
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        176,
+        55,
+        555,
+        84
+      ],
+      "size": 32
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1560,
+        62,
+        1739,
+        80
+      ],
+      "size": 24
+    },
+    {
+      "text": "Değişiklikleri inceleyin.",
+      "bounds": [
+        96,
+        201,
+        822,
+        264
+      ],
+      "size": 66
+    },
+    {
+      "text": "01  Düzelt",
+      "bounds": [
+        116,
+        934,
+        238,
+        953
+      ],
+      "size": 26
+    },
+    {
+      "text": "02  İnceleyin",
+      "bounds": [
+        690,
+        929,
+        845,
+        958
+      ],
+      "size": 26
+    },
+    {
+      "text": "03  Karar verin",
+      "bounds": [
+        1264,
+        934,
+        1445,
+        953
+      ],
+      "size": 26
+    },
+    {
+      "text": "Gerçek arayüz · Kontrollü örnek yanıt",
+      "bounds": [
+        96,
+        1014,
+        460,
+        1034
+      ],
+      "size": 22
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        176,
+        55,
+        555,
+        84
+      ],
+      "size": 32
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1560,
+        62,
+        1739,
+        80
+      ],
+      "size": 24
+    },
+    {
+      "text": "Kabul edin ya da iptal edin.",
+      "bounds": [
+        96,
+        202,
+        947,
+        264
+      ],
+      "size": 66
+    },
+    {
+      "text": "Kabul et: öneri uygulanır.     İptal: asıl metin korunur.",
+      "bounds": [
+        100,
+        275,
+        792,
+        308
+      ],
+      "size": 30
+    },
+    {
+      "text": "01  Düzelt",
+      "bounds": [
+        116,
+        934,
+        238,
+        953
+      ],
+      "size": 26
+    },
+    {
+      "text": "02  İnceleyin",
+      "bounds": [
+        690,
+        929,
+        845,
+        958
+      ],
+      "size": 26
+    },
+    {
+      "text": "03  Karar verin",
+      "bounds": [
+        1264,
+        934,
+        1445,
+        953
+      ],
+      "size": 26
+    },
+    {
+      "text": "Kontrollü örnek yanıt · Bu örnekte kalın/italik, bağlantı ve liste korunmuştur.",
+      "bounds": [
+        96,
+        1014,
+        825,
+        1034
+      ],
+      "size": 22
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        176,
+        55,
+        555,
+        84
+      ],
+      "size": 32
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1560,
+        62,
+        1739,
+        80
+      ],
+      "size": 24
+    },
+    {
+      "text": "Bulut ya da\nyerel model.",
+      "bounds": [
+        96,
+        213,
+        610,
+        389
+      ],
+      "size": 88
+    },
+    {
+      "text": "Bağlantınızı seçin,\nmodelinizi kaydedin.",
+      "bounds": [
+        100,
+        449,
+        424,
+        531
+      ],
+      "size": 36
+    },
+    {
+      "text": "Bulut için kendi erişim\nbilgileriniz gerekir.",
+      "bounds": [
+        100,
+        644,
+        390,
+        713
+      ],
+      "size": 30
+    },
+    {
+      "text": "Yerel kullanım için çalışan\nservis ve yüklü model gerekir.",
+      "bounds": [
+        100,
+        770,
+        467,
+        834
+      ],
+      "size": 28
+    },
+    {
+      "text": "Bulut sağlayıcısının API kullanım ücreti eklentiden ayrıdır.",
+      "bounds": [
+        96,
+        1014,
+        655,
+        1034
+      ],
+      "size": 22
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        176,
+        55,
+        555,
+        84
+      ],
+      "size": 32
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1560,
+        62,
+        1739,
+        80
+      ],
+      "size": 24
+    },
+    {
+      "text": "Düzeltin.\nİnceleyin.\nKarar verin.",
+      "bounds": [
+        96,
+        243,
+        696,
+        550
+      ],
+      "size": 108
+    },
+    {
+      "text": "Chrome Web Store’da",
+      "bounds": [
+        102,
+        756,
+        519,
+        785
+      ],
+      "size": 40
+    },
+    {
+      "text": "duzelt.yerli.dev",
+      "bounds": [
+        103,
+        822,
+        297,
+        849
+      ],
+      "size": 29
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici · Mehmet Yerli",
+      "bounds": [
+        95,
+        1014,
+        486,
+        1034
+      ],
+      "size": 22
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        122,
+        33,
+        394,
+        54
+      ],
+      "size": 23
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1030,
+        38,
+        1164,
+        52
+      ],
+      "size": 18
+    },
+    {
+      "text": "Uyumlu editörde Düzelt’e basın.",
+      "bounds": [
+        64,
+        142,
+        747,
+        183
+      ],
+      "size": 45
+    },
+    {
+      "text": "Düzelt  →  İnceleyin  →  Karar verin",
+      "bounds": [
+        64,
+        690,
+        450,
+        716
+      ],
+      "size": 23
+    },
+    {
+      "text": "Gerçek Quill arayüzü · Örnek metin",
+      "bounds": [
+        64,
+        754,
+        330,
+        772
+      ],
+      "size": 17
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        122,
+        33,
+        394,
+        54
+      ],
+      "size": 23
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1030,
+        38,
+        1164,
+        52
+      ],
+      "size": 18
+    },
+    {
+      "text": "Eklenen ve çıkarılan ifadeleri görün.",
+      "bounds": [
+        64,
+        142,
+        832,
+        183
+      ],
+      "size": 45
+    },
+    {
+      "text": "Gerçek arayüz · Kontrollü örnek yanıt",
+      "bounds": [
+        64,
+        755,
+        346,
+        772
+      ],
+      "size": 17
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        122,
+        33,
+        394,
+        54
+      ],
+      "size": 23
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1030,
+        38,
+        1164,
+        52
+      ],
+      "size": 18
+    },
+    {
+      "text": "Kabul edin ya da iptal edin.",
+      "bounds": [
+        64,
+        142,
+        644,
+        183
+      ],
+      "size": 45
+    },
+    {
+      "text": "Düzelt  →  İnceleyin  →  Karar verin",
+      "bounds": [
+        64,
+        690,
+        450,
+        716
+      ],
+      "size": 23
+    },
+    {
+      "text": "Kontrollü örnek yanıt · Biçimler bu örnekte korunmuştur.",
+      "bounds": [
+        64,
+        755,
+        483,
+        772
+      ],
+      "size": 17
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        122,
+        33,
+        394,
+        54
+      ],
+      "size": 23
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1030,
+        38,
+        1164,
+        52
+      ],
+      "size": 18
+    },
+    {
+      "text": "Sağlayıcınızı\nve modelinizi\nseçin.",
+      "bounds": [
+        64,
+        149,
+        403,
+        321
+      ],
+      "size": 54
+    },
+    {
+      "text": "Bulut hizmetleri ve\nyerel modeller.",
+      "bounds": [
+        64,
+        383,
+        285,
+        443
+      ],
+      "size": 27
+    },
+    {
+      "text": "Kendi erişim bilgileriniz\ngerekir. Bulut API\nücreti ayrıdır.",
+      "bounds": [
+        64,
+        570,
+        318,
+        659
+      ],
+      "size": 25
+    },
+    {
+      "text": "Gerçek ayarlar arayüzü · API anahtarı gösterilmez.",
+      "bounds": [
+        64,
+        755,
+        446,
+        772
+      ],
+      "size": 17
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        122,
+        33,
+        394,
+        54
+      ],
+      "size": 23
+    },
+    {
+      "text": "Chrome eklentisi",
+      "bounds": [
+        1030,
+        38,
+        1164,
+        52
+      ],
+      "size": 18
+    },
+    {
+      "text": "Yerel modelle\nbağlanın.",
+      "bounds": [
+        63,
+        154,
+        399,
+        263
+      ],
+      "size": 52
+    },
+    {
+      "text": "Ollama veya llama.cpp:\nçalışan servis ve\nyüklü model gerekir.",
+      "bounds": [
+        64,
+        345,
+        334,
+        441
+      ],
+      "size": 26
+    },
+    {
+      "text": "Adres → model seçimi\n→ Kaydet ve kullan",
+      "bounds": [
+        64,
+        554,
+        332,
+        612
+      ],
+      "size": 25
+    },
+    {
+      "text": "Gerçek yerel bağlantı arayüzü · Örnek model seçimi",
+      "bounds": [
+        64,
+        754,
+        456,
+        772
+      ],
+      "size": 17
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        159,
+        67,
+        526,
+        95
+      ],
+      "size": 31
+    },
+    {
+      "text": "Düzeltin. İnceleyin.\nKarar verin.",
+      "bounds": [
+        64,
+        193,
+        730,
+        343
+      ],
+      "size": 74
+    },
+    {
+      "text": "Türkçe metninize öneri. Son karar size.",
+      "bounds": [
+        66,
+        474,
+        500,
+        496
+      ],
+      "size": 25
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        144,
+        54,
+        475,
+        79
+      ],
+      "size": 28
+    },
+    {
+      "text": "Düzeltin.\nİnceleyin.\nKarar verin.",
+      "bounds": [
+        56,
+        198,
+        523,
+        441
+      ],
+      "size": 84
+    },
+    {
+      "text": "Tanıtımı izle",
+      "bounds": [
+        58,
+        639,
+        205,
+        658
+      ],
+      "size": 26
+    },
+    {
+      "text": "AI Türkçe Metin Düzeltici",
+      "bounds": [
+        432,
+        161,
+        1426,
+        236
+      ],
+      "size": 84
+    },
+    {
+      "text": "Düzeltin.\nİnceleyin.\nKarar verin.",
+      "bounds": [
+        168,
+        591,
+        1569,
+        1317
+      ],
+      "size": 252
+    },
+    {
+      "text": "Tanıtımı izle",
+      "bounds": [
+        174,
+        1917,
+        615,
+        1974
+      ],
+      "size": 78
+    }
+  ],
+  "visualReview": "completed: all 15 PNGs inspected; 6 decoded keyframes and all 15 transition frames inspected; no visible secrets or UI/text overlap",
+  "voice": "licensed v1 selected, aligned to actual word/sentence timing; see store/video/voice-release.json",
+  "checks": {
+    "opaqueRGB": true,
+    "outputCount": 15,
+    "storeScreenshotCount": 5,
+    "sourceImageCount": 7,
+    "textBoundsChecked": 75,
+    "noExif": true,
+    "subtitleCopyMatchesApprovedText": true,
+    "currentSceneHashesMatchFinalRender": true,
+    "thumbnailsUnder2MB": true
+  }
+}

@@ -23,10 +23,32 @@
     "popup/popup.html",
     "popup/popup.js"
   ],
-  "sha256": "22727bbdcd4cbd3a162aa5a17806b6f73880dff02cbcad8056e1c5f6c63f16c4",
+  "sha256": "974ae8d6008fc75289796521a2800936ff81d0004d19a360e3b852de9f01223b",
   "rootManifestVerified": true,
   "crcVerified": true,
   "fileBytesMatchSource": true,
   "deterministicRepeatMatched": true,
-  "regressionTests": 7
+  "regressionTests": 7,
+  "sourceSha256": {
+    "background/background.js": "040e08ec5ad5c9d98c3b198aae976c6e131958cb012069bd548bd4bca7b3a731",
+    "background/openai-provider.js": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
+    "background/provider-service.js": "b08575a2b51c53cb13360029b1519bdc2b40db0690874f9a20874800c01a062a",
+    "content/content.css": "27428c534bf8817567c24364b2ccc90ed54b36ba5053e3cbc93344834986774b",
+    "content/content.js": "bf7c73f37f77b8cc4f2843e6b6c49b1e0507b11e060a0ee7b8950eb1db35d514",
+    "content/editor-bridge.js": "a779d60bd329296cccb18df7b0b63d44f296b01253e9a2f137953e17b0bd38b1",
+    "icons/icon128.png": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
+    "icons/icon16.png": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
+    "icons/icon48.png": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
+    "lib/diff.min.js": "3a29bd9374b219bd6964550085cddf6b62fc4073893d3f251c1d61ef1ea56b7f",
+    "lib/product-config.js": "3096f8141b1e5c499cf4ec80529ba49c93d6b80b130b5e172c13fe70c400d0d1",
+    "lib/provider-catalog.js": "42a8fb3c1b7b653a7be838957b2b24c16575876de4025d031751ca64a117ebfa",
+    "manifest.json": "99095cdc1d0b47df68664b2a76236941351a4d76b5847852fa94444df727fcc0",
+    "options/options.css": "d92dd952ec5343c8ff398c698ef84da3990d5db931ea74bbba04aef362204420",
+    "options/options.html": "553bf360caaf85666a9efc562829d3ebe48ba3e492a800c7ae1208189ceea0b3",
+    "options/options.js": "366feaf40bebb62ca2f18284cd44ab90ce138eb362b6f519f8d0ff1c7c63a4c1",
+    "popup/popup.css": "317af9ae76b79e52573986abe87da826e953f0bc242195cab9883a969e4f67d1",
+    "popup/popup.html": "0bdc9abffb19996d1462adb3ea2667ed2aba5dea32ac8d8eb1bba22806739c04",
+    "popup/popup.js": "0b2787f5088ee9263d60f250249bf7d85470294129e15c5bad5f9128a5f4fb80"
+  },
+  "siteExcluded": true
 }

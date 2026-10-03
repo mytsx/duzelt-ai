@@ -1,0 +1,69 @@
+{
+  "product": "AI Türkçe Metin Düzeltici",
+  "status": "aligned-to-selected-licensed-narration",
+  "size": [
+    1920,
+    1080
+  ],
+  "fps": 30,
+  "camera": "stationary",
+  "transition": {
+    "type": "fade",
+    "seconds": 0.4
+  },
+  "sceneStarts": [
+    0,
+    6.45,
+    8.85,
+    12.94,
+    18.67,
+    26.42
+  ],
+  "scenes": [
+    {
+      "id": 1,
+      "anchor": "AI Türkçe Metin Düzeltici",
+      "title": "Türkçe metninizi düzeltin. Karar sizin.",
+      "source": "source/popup-light.png",
+      "purpose": "İlk saniyelerde marka ve somut fayda; gerçek aç/kapa arayüzü."
+    },
+    {
+      "id": 2,
+      "anchor": "Uyumlu editörde Düzelt'e basın",
+      "title": "Düzelt",
+      "source": "source/editor-before.png",
+      "purpose": "Gerçek Quill araç çubuğu ve örnek metin."
+    },
+    {
+      "id": 3,
+      "anchor": "Önerileri inceleyin",
+      "title": "Değişiklikleri inceleyin",
+      "source": "source/editor-preview.png",
+      "purpose": "Eklenen/çıkarılan metin ve Kabul et / İptal seçimi."
+    },
+    {
+      "id": 4,
+      "anchor": "Kabul ederseniz",
+      "title": "Kabul edin ya da iptal edin",
+      "source": "source/editor-accepted.png",
+      "purpose": "Kabul edilmiş örnek; bağlantı, kalın/italik ve liste görünür."
+    },
+    {
+      "id": 5,
+      "anchor": "Bulut sağlayıcınızı",
+      "title": "Bulut ya da yerel model",
+      "source": "source/options-desktop.png",
+      "purpose": "Gerçek sağlayıcı kartları, Ollama ve llama.cpp seçenekleri; bulut ücretinin ayrı olduğu kısa dipnot."
+    },
+    {
+      "id": 6,
+      "anchor": "Düzeltin. İnceleyin. Karar verin",
+      "title": "Düzeltin. İnceleyin. Karar verin.",
+      "source": "source/editor-preview.png",
+      "purpose": "Marka, üç adım ve gerçek mağaza çağrısı."
+    }
+  ],
+  "sampleDisclosure": "Gerçek arayüz · Kontrollü örnek yanıt",
+  "alignment": "Source words and sentence pauses, with 0.35 second audio lead; see voice-release.json.",
+  "durationSeconds": 32.0
+}

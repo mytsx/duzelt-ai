@@ -50,9 +50,19 @@ yarn-error.log*
 
 # Node modules (eğer gelecekte kullanılırsa)
 node_modules/
-package-lock.json
 yarn.lock
 
 # Build outputs
 dist/
 build/
+
+# Yerel tarayıcı kanıtları; seçilmiş tasarım referansları design/ altında sürümlenir.
+output/
+.playwright-cli/
+__pycache__/
+*.pyc
+
+# Yerel sır ve Cloudflare çalışma verisi
+.env
+.env.*
+.wrangler/

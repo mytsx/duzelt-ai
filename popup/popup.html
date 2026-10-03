@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Metin Düzeltici</title>
+    <meta name="color-scheme" content="light dark">
+    <title>AI Türkçe Metin Düzeltici</title>
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <div class="popup-container">
-        <h2>🤖 AI Metin Düzeltici</h2>
-
-        <div class="toggle-section">
-            <label class="switch">
-                <input type="checkbox" id="enabled-toggle">
-                <span class="slider"></span>
-            </label>
-            <span id="status-text">Etkin</span>
-        </div>
-
-        <div class="info">
-            <p id="provider-info">Provider: OpenAI</p>
-        </div>
-
-        <button id="open-settings" class="btn-settings">⚙️ Ayarlar</button>
-    </div>
-
+    <main class="popup-container">
+        <header class="brand"><img src="../icons/icon48.png" alt="" width="42" height="42"><div><h1>AI Türkçe<span>Metin Düzeltici</span></h1><p>Son karar sizde.</p></div><span id="version-label" class="version-label"></span></header>
+        <section class="control-card" aria-label="Düzeltme durumu"><div class="toggle-section"><div><label class="toggle-label" for="enabled-toggle">Düzeltme asistanı</label><p id="status-text" class="status-text" aria-live="polite">Durum yükleniyor…</p></div><label class="switch"><input type="checkbox" id="enabled-toggle" aria-label="Editörlerde Düzelt düğmesini etkinleştir" disabled><span class="slider" aria-hidden="true"></span></label></div><p class="control-hint">Uyumlu editörlerde Düzelt düğmesini gösterir.</p></section>
+        <section class="provider-card" aria-label="Etkin bağlantı"><div class="provider-icon" aria-hidden="true">◈</div><div class="provider-details"><p class="eyebrow">Etkin sağlayıcı</p><strong id="provider-name">Yükleniyor…</strong><p id="provider-model">Model kontrol ediliyor</p></div><span id="provider-state" class="state-dot" aria-label="Ayarlar kontrol ediliyor"></span></section>
+        <p id="provider-info" class="provider-info">Bağlantı bilgileri kontrol ediliyor…</p>
+        <div class="mini-flow" aria-label="Düzeltme akışı"><span><b>1</b>Düzelt</span><span aria-hidden="true">→</span><span><b>2</b>İncele</span><span aria-hidden="true">→</span><span><b>3</b>Kabul et</span></div>
+        <button id="open-settings" class="btn-settings" type="button">Sağlayıcı ve ayarları yönet <span aria-hidden="true">↗</span></button>
+        <p class="hint">Bulut sağlayıcısının API ücretleri geçerlidir.<br>Yerel modeller için çalışan bir yerel servis gerekir.</p>
+        <p id="popup-error" role="alert" hidden></p>
+        <nav class="footer-links" aria-label="Ürün bağlantıları"><a data-product-link="website" target="_blank" rel="noopener noreferrer">Web sitesi</a><span aria-hidden="true">·</span><a data-product-link="support" target="_blank" rel="noopener noreferrer">Destek</a><span aria-hidden="true">·</span><a data-product-link="privacy" target="_blank" rel="noopener noreferrer">Gizlilik</a></nav>
+    </main>
+    <script src="../lib/product-config.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>

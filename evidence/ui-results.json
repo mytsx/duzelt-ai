@@ -1,0 +1,64 @@
+{
+  "checkedOn": "2026-10-03",
+  "extensionVersion": "3.4.0",
+  "browser": "151.0.7922.34",
+  "checkCount": 19,
+  "checks": [
+    "Eksik anahtar, ağ isteği yapılmadan gösteriliyor; katalog yerel olarak yükleniyor.",
+    "Geçersiz anahtar depoya yazılmıyor.",
+    "Eski OpenAI anahtarı ve gpt-4o, merkezi yapılandırmaya kayıpsız taşınıyor.",
+    "OpenRouter için belirli alan izni; izin reddi aktif seçimi koruyor, izin sonrası ayrı profiller kaydediliyor.",
+    "Test yalnız kaydedilmiş sağlayıcı/modeli ve kısa örnek metni kullanıyor.",
+    "Model yenileme kullanıcı tıklamasıyla kayıtlı bağlantıdan alınıyor.",
+    "Bağlantı hatası güvenli metinle gösteriliyor; sağlayıcının ham mesajı açığa çıkmıyor.",
+    "Özel ürün girişi ve çalışma ortamı isteyen kayıtlar açıklamalarıyla görünür; yanlış API anahtarı yoluyla etkinleştirilemiyor.",
+    "Kurumsal alanlar katalogdan oluşuyor; Ollama anahtarsız yerel profil olarak kaydediliyor.",
+    "IBM IAM ve inference adresleri için ayrı izinler isteniyor; API anahtarıyla belirteç alıp yerel fixture düzeltmesi tamamlanıyor.",
+    "SAP giriş alanları ve orkestrasyon seçimi merkezi formda çalışıyor; iki adres izinli, alınan belirteç ve profiller Sync depoya yazılmıyor.",
+    "Güvensiz uzak HTTP ve anahtar içerebilecek sorgulu adresler kaydedilmiyor.",
+    "Ortak özel kurallar local alanda korunuyor; boş kaydetmek varsayılana dönüyor.",
+    "Anahtar silme eski kaydı da temizliyor; başka sağlayıcıya gizli geçiş yapılmıyor.",
+    "Açık/koyu tema, 320/390/768/1024/1440 px taşmasız; azaltılmış hareket tercihiyle animasyon yok.",
+    "Popup aç/kapa sync alanda korunuyor; aktif sağlayıcı ve eksik bağlantı durumu gösteriliyor.",
+    "Klavye odağı görünür; ana kontroller Tab ile erişilebilir.",
+    "Ürün bağlantısı ve Ayarları yönet düğmesi gerçek tıklamayla doğru sayfayı açıyor; kendiliğinden sekme yok.",
+    "Gerçek eklenti sayfalarında JavaScript hatası yok; ekranlar sır içermeden alındı."
+  ],
+  "realProviderCall": false,
+  "permissionDialogFixture": true,
+  "visualReviewPending": false,
+  "visualReview": {
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "reviewer": "Codex",
+    "findings": "Başlıklar, sağlayıcı alanları, uzun Türkçe açıklamalar, düğmeler ve footer görsel olarak incelendi. 320px etkin model satırı için daralma giderildi. Son OpenRouter, mobil ve iki popup referansı yeniden incelendi. Popup yüksekliği 522px; boş alt alan yok.",
+    "motion": "no-preference giriş animasyonu ve reduce tercihi gerçek tarayıcıda doğrulandı."
+  },
+  "sourceSha256": {
+    "options/options.css": "531674503c51ce092ff0d0874e8c0d28fa64e9e61c7a854ec855bbe1cbac5d46",
+    "options/options.html": "be5621153a6c12cfb2b3adc8c916285b5de9458f5116101d80fd3239c30f70ee",
+    "options/options.js": "bea6f8cf842bbfc46bccf685071c9c70625ef9375ba22af265c68311f6c62883",
+    "popup/popup.css": "317af9ae76b79e52573986abe87da826e953f0bc242195cab9883a969e4f67d1",
+    "popup/popup.html": "0bdc9abffb19996d1462adb3ea2667ed2aba5dea32ac8d8eb1bba22806739c04",
+    "popup/popup.js": "0b2787f5088ee9263d60f250249bf7d85470294129e15c5bad5f9128a5f4fb80"
+  },
+  "referenceImageSha256": {
+    "design/claude-assets/icon128.png": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
+    "design/claude-assets/icon16.png": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
+    "design/claude-assets/icon48.png": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
+    "design/claude-assets/options-desktop.png": "2887a1842db2f5e9bcb5316ace69ada8b330ca3fb9840246a028f9d0e76819e5",
+    "design/claude-assets/options-mobile.png": "e6b90b1e26d679d07030c5f5b7f9cff76e78f7b045ee8f5b506dd5dea6dd13bd",
+    "design/claude-assets/options-openrouter.png": "442f5314323b4ee1e3a9594b91df3e0a8116cb747e9b680802167d363e3f472e",
+    "design/claude-assets/popup-dark.png": "503ab0f8b883f122b3d65ca84c82ecaa71c73a9899ef27ee42fba07fead83237",
+    "design/claude-assets/popup-light.png": "d07777f95f3fc26d15870b1bdbf3d2a89d5dd5f545a56fa6cfc9b7e88642037e"
+  }
+}

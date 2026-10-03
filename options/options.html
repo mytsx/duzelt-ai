@@ -3,47 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Metin Düzeltici - Ayarlar</title>
+    <meta name="color-scheme" content="light dark">
+    <title>AI Türkçe Metin Düzeltici — Ayarlar</title>
     <link rel="stylesheet" href="options.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🤖 AI Türkçe Metin Düzeltici</h1>
-            <p>Ayarlarınızı yapılandırın</p>
-        </header>
-
-        <main>
-            <section class="settings-section">
-                <h2>OpenAI API Ayarları</h2>
-                <div class="form-group">
-                    <label for="openai-key">API Key</label>
-                    <input type="password" id="openai-key" placeholder="sk-proj-...">
-                    <small>OpenAI API key'iniz güvenli olarak saklanır</small>
-                </div>
-                <div class="actions compact">
-                    <button id="save-api-btn" class="btn-primary">API Key Kaydet</button>
-                    <button id="test-btn" class="btn-secondary">API Bağlantısını Test Et</button>
-                </div>
+    <a href="#main" class="skip-link">Ayarlara geç</a>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="#overview" aria-label="AI Türkçe Metin Düzeltici ayarları">
+                <img src="../icons/icon48.png" alt="" width="42" height="42">
+                <span><strong>AI Türkçe</strong><span>Metin Düzeltici</span></span>
+            </a>
+            <p class="sidebar-intro">Daha iyi metin.<br>Son karar sizde.</p>
+            <nav aria-label="Ayar bölümleri">
+                <a href="#connection" class="nav-link"><span aria-hidden="true">◈</span> Sağlayıcı ve model</a>
+                <a href="#rules" class="nav-link"><span aria-hidden="true">≋</span> Düzeltme kuralları</a>
+                <a href="#guide" class="nav-link"><span aria-hidden="true">✓</span> Kullanım rehberi</a>
+            </nav>
+            <div class="sidebar-footer">
+                <p class="version-label" id="version-label">Sürüm yükleniyor</p>
+                <nav class="footer-links" aria-label="Ürün bağlantıları">
+                    <a data-product-link="website" target="_blank" rel="noopener noreferrer">Web sitesi</a>
+                    <a data-product-link="support" target="_blank" rel="noopener noreferrer">Destek</a>
+                    <a data-product-link="privacy" target="_blank" rel="noopener noreferrer">Gizlilik</a>
+                </nav>
+            </div>
+        </aside>
+        <main id="main" class="main-content">
+            <header id="overview" class="page-header">
+                <div><p class="eyebrow">Çalışma alanınız</p><h1>Metninize uygun<br>bir düzeltme deneyimi.</h1><p class="page-subtitle">Sağlayıcınızı seçin, kurallarınızı belirleyin.<br>Değişiklikleri uygulamadan önce siz inceleyin.</p></div>
+                <div class="flow-visual" aria-hidden="true"><span>yanlis</span><span class="flow-arrow">→</span><strong>yanlış</strong><span class="review-mark">✓</span></div>
+            </header>
+            <section class="active-summary" aria-labelledby="active-title">
+                <div class="summary-icon" aria-hidden="true">◈</div>
+                <div class="summary-text"><h2 id="active-title">Etkin bağlantı</h2><p><strong id="active-provider">OpenAI</strong><span class="separator" aria-hidden="true">/</span><span id="active-model">gpt-4o</span></p></div>
+                <span class="connection-pill" id="connection-state">Kontrol ediliyor</span>
             </section>
-
-            <section class="settings-section">
-                <h2>Sistem Prompt Ayarları</h2>
-                <div class="form-group">
-                    <label for="system-prompt">Özelleştirilmiş Prompt</label>
-                    <textarea id="system-prompt" rows="10" placeholder="Varsayılan prompt kullanılacak..."></textarea>
-                    <div class="prompt-actions">
-                        <button id="save-prompt-btn" class="btn-primary small">Promptu Kaydet</button>
-                        <button id="reset-prompt-btn" class="btn-secondary small">Varsayılanı Yükle</button>
-                    </div>
-                    <small>AI'ın nasıl davranacağını özelleştirebilirsiniz. Boş bırakırsanız varsayılan resmi yazışma promptu kullanılır.</small>
+            <section id="connection" class="settings-card">
+                <div class="section-heading"><div><p class="step-label">1. Bağlantı</p><h2>Sağlayıcı ve model</h2><p>Bulut hizmetleri ve yerel modeller, aynı düzeltme akışında.</p></div><span id="catalog-count" class="quiet-badge">Merkezi katalog</span></div>
+                <div class="popular-providers" role="group" aria-label="Sık kullanılan sağlayıcılar">
+                    <button type="button" data-provider="openai"><span class="provider-mark" aria-hidden="true">O</span>OpenAI</button>
+                    <button type="button" data-provider="openrouter"><span class="provider-mark" aria-hidden="true">↗</span>OpenRouter</button>
+                    <button type="button" data-provider="anthropic"><span class="provider-mark" aria-hidden="true">A</span>Anthropic</button>
+                    <button type="button" data-provider="google"><span class="provider-mark" aria-hidden="true">G</span>Gemini</button>
                 </div>
+                <div class="field-grid">
+                    <div class="form-group"><label for="provider-search">Sağlayıcı ara</label><input type="search" id="provider-search" placeholder="OpenRouter, Groq, Ollama…" autocomplete="off"></div>
+                    <div class="form-group"><label for="provider-select">Sağlayıcı</label><select id="provider-select" aria-describedby="provider-note"></select></div>
+                </div>
+                <p id="provider-note" class="context-note"></p>
+                <div class="form-group model-field"><label for="provider-model">Model</label><div class="input-action"><input type="text" id="provider-model" list="model-options" autocomplete="off" spellcheck="false" placeholder="Model adı seçin veya girin" aria-describedby="model-help"><button type="button" id="refresh-models" class="icon-button" aria-label="Sağlayıcıdan model listesini getir">↻</button></div><datalist id="model-options"></datalist><small id="model-help">Model adını yazmaya başlayın. Katalog önerileri gösterilir; kendi model adınızı da girebilirsiniz.</small><p id="model-cost" class="model-cost" hidden></p></div>
+                <div class="form-group" id="provider-key-group"><div class="label-row"><label for="openai-key" id="key-label">API anahtarı</label><button type="button" id="toggle-key" class="text-button" aria-controls="openai-key" aria-pressed="false">Göster</button></div><input type="password" id="openai-key" autocomplete="off" spellcheck="false" placeholder="Sağlayıcınızın API anahtarı" aria-describedby="key-help"><small id="key-help">Anahtar bu Chrome profilinde tutulur. Metniniz ve düzeltme kurallarınız yalnız seçtiğiniz sağlayıcıya gönderilir.</small></div>
+                <div id="provider-fields" class="field-grid"></div>
+                <details class="advanced-settings" id="advanced-settings"><summary>Gelişmiş bağlantı ayarları</summary><div class="advanced-body"><div class="form-group"><label for="base-url">API adresi</label><input type="url" id="base-url" placeholder="https://…/v1" autocomplete="off" spellcheck="false" aria-describedby="endpoint-help"><small id="endpoint-help">Boş bırakmak sağlayıcının adresini kullanır. Özel ağ geçitleri için HTTPS, yerel modeller için localhost veya 127.0.0.1 kullanın. İzin yalnız seçilen alan için istenir.</small></div><div class="form-group" id="protocol-group" hidden><label for="provider-protocol">API biçimi</label><select id="provider-protocol"><option value="openai-chat">OpenAI Chat uyumlu</option><option value="openai-responses">OpenAI Responses</option><option value="anthropic-messages">Anthropic Messages</option><option value="gemini">Google Gemini</option><option value="cohere-v2">Cohere Chat</option></select><label for="provider-auth">Kimlik doğrulama</label><select id="provider-auth"><option value="bearer">Bearer anahtarı / erişim belirteci</option><option value="api-key">Protokolün API anahtarı</option><option value="none">Anahtarsız yerel servis</option></select></div></div></details>
+                <div class="privacy-callout"><span aria-hidden="true">↗</span><p id="destination-note">Düzeltme bir API isteğidir. Sağlayıcınızın kullanım ücretleri ve veri işleme koşulları geçerlidir.</p></div>
+                <div class="actions"><button type="button" id="save-api-btn" class="btn-primary">Kaydet ve bu sağlayıcıyı kullan <span aria-hidden="true">→</span></button><button type="button" id="test-btn" class="btn-secondary">Bağlantıyı test et</button></div>
+                <p class="usage-note">Test, kaydedilmiş bağlantıya kısa bir örnek metin gönderir ve kullanım ücreti doğurabilir. Kaydedilmemiş değişiklikler kullanılmaz.</p>
+                <div id="connection-status" class="inline-status" role="status" aria-live="polite" aria-atomic="true" hidden></div>
             </section>
-
-            <div id="status" class="status"></div>
+            <section id="rules" class="settings-card">
+                <div class="section-heading"><div><p class="step-label">2. Kurallar</p><h2>Düzeltmenin dilini belirleyin</h2><p>Varsayılan kuralları kullanın veya kendi yazım yaklaşımınızı ekleyin.</p></div><span class="quiet-badge">Tüm sağlayıcılarda ortak</span></div>
+                <div class="rule-pills" aria-label="Varsayılan düzeltme kapsamı"><span>İmla ve noktalama</span><span>Türkçe dilbilgisi</span><span>Resmî üslup</span></div>
+                <div class="form-group"><label for="system-prompt">Özel sistem promptu</label><textarea id="system-prompt" rows="9" placeholder="Varsayılan düzeltme kuralları…" aria-describedby="prompt-help"></textarea><small id="prompt-help">Bu kurallar, düzeltilecek metinle birlikte seçtiğiniz sağlayıcıya gönderilir. Boş kaydetmek varsayılan kurallara döner.</small></div>
+                <div class="actions"><button type="button" id="save-prompt-btn" class="btn-primary">Kuralları kaydet</button><button type="button" id="reset-prompt-btn" class="btn-secondary">Varsayılanı yükle</button></div>
+                <div id="status" class="inline-status status" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+            </section>
+            <section id="guide" class="guide-card" aria-labelledby="guide-title"><div><p class="step-label">3. Kullanım</p><h2 id="guide-title">Son karar her zaman sizde.</h2></div><ol class="guide-steps"><li><span aria-hidden="true">1</span><div><strong>Düzelt</strong><p>Uyumlu zengin metin editöründeki düğmeye basın.</p></div></li><li><span aria-hidden="true">2</span><div><strong>İnceleyin</strong><p>Eklenen ve çıkarılan ifadeleri önizlemede görün.</p></div></li><li><span aria-hidden="true">3</span><div><strong>Karar verin</strong><p>Kabul edin veya asıl metni koruyarak iptal edin.</p></div></li></ol><p class="guide-limit">Normal metin kutuları desteklenmez. Her öneriyi kabul etmeden önce anlam ve biçim açısından kontrol edin.</p></section>
+            <footer class="page-footer"><span>Mehmet Yerli tarafından geliştirildi.</span><a href="https://yerli.dev/" target="_blank" rel="noopener noreferrer">Yerli.dev</a></footer>
         </main>
     </div>
-
+    <script src="../lib/product-config.js"></script>
+    <script src="../lib/provider-catalog.js"></script>
+    <script src="../background/openai-provider.js"></script>
+    <script src="../background/provider-service.js"></script>
     <script src="options.js"></script>
 </body>
 </html>

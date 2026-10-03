@@ -1,0 +1,19 @@
+{
+  "name": "duzelt-ai",
+  "private": true,
+  "version": "3.4.0",
+  "description": "AI Türkçe Metin Düzeltici bakım ve paketleme araçları",
+  "scripts": {
+    "package:store": "python3 tools/package-store.py",
+    "test:provider": "node --test tests/provider-*.test.cjs",
+    "test:ui": "node tests/ui-browser.cjs",
+    "test:package": "python3 -m unittest discover -s tests -p 'test_package_store.py'",
+    "test:editors": "node tests/editor-browser.mjs",
+    "test:catalog": "python3 -m unittest discover -s tests -p 'test_provider_catalog.py'",
+    "test:bootstrap": "node tests/editor-bootstrap.mjs",
+    "design:kit": "python3 tools/prepare-design-kit.py"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

@@ -44,12 +44,17 @@ let activeContexts = [];
 
 function turnstileFixture(options) {
     return `(() => {
-        const fixture = window.feedbackFixture = { renders: 0, resets: 0, generation: 0, options: null };
+        const fixture = window.feedbackFixture = { renders: 0, resets: 0, generation: 0, readyCalls: 0, options: null };
         const complete = () => {
             if (${JSON.stringify(options.autoToken !== false)}) setTimeout(() => fixture.options.callback('fixture-token-' + (++fixture.generation)), 20);
         };
         window.turnstile = {
-            ready: callback => callback(),
+            ready: callback => {
+                fixture.readyCalls++;
+                const script = document.querySelector('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]');
+                if (script && (script.async || script.defer)) throw new Error('Remove async/defer from the Turnstile api.js script tag before using turnstile.ready().');
+                callback();
+            },
             render: (selector, config) => {
                 fixture.options = config; fixture.renders++;
                 const frame = document.createElement('iframe');
@@ -148,6 +153,7 @@ try {
             assert.equal(await s.page.locator('#feedback-panel').isVisible(), false);
             assert.equal(await s.page.locator('#feedback-email-fallback').isVisible(), true);
             await s.open();
+            assert.equal(await s.page.evaluate(() => window.feedbackFixture.readyCalls), 0, 'Async-loaded SDK is rendered after onload without turnstile.ready()');
             await completeMessage(s.page);
             await s.page.locator('.feedback-details summary').click();
             assert.equal(await s.page.locator('#feedback-version').inputValue(), '');
@@ -175,6 +181,7 @@ try {
         await s.page.locator('#feedback-open').focus();
         await s.page.keyboard.press('Enter');
         await s.page.waitForFunction(() => !document.getElementById('feedback-submit').disabled);
+        assert.equal(await s.page.evaluate(() => window.feedbackFixture.readyCalls), 0);
         assert.equal(await s.page.evaluate(() => document.activeElement.id), 'feedback-type');
         assert.equal(await s.page.locator('#feedback-open').getAttribute('aria-expanded'), 'true');
         assert.equal(await s.page.getByRole('combobox', { name: 'Bildirim türü' }).count(), 1);
@@ -188,7 +195,7 @@ try {
         await s.page.keyboard.press('Tab');
         assert.equal(await s.page.evaluate(() => document.activeElement.id), 'feedback-version');
         assert.equal(await s.page.locator('#feedback-submit').evaluate(node => getComputedStyle(node).transitionDuration), '1e-05s');
-        checks.push('Trusted keyboard opening, focus placement, computed accessible names, native disclosure and reduced motion work; synthetic opening sends nothing.');
+        checks.push('Trusted keyboard opening, async SDK onload without ready(), focus placement, computed accessible names, native disclosure and reduced motion work; synthetic opening sends nothing.');
         await s.finish();
     }
 

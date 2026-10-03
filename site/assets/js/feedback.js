@@ -84,8 +84,7 @@
             script.async = true;
             script.onload = function () {
                 if (!window.turnstile || typeof window.turnstile.render !== 'function') { finish(true); return; }
-                if (typeof window.turnstile.ready === 'function') window.turnstile.ready(function () { finish(false); });
-                else finish(false);
+                finish(false);
             };
             script.onerror = function () { finish(true); };
             timeout = window.setTimeout(function () { finish(true); }, 15000);

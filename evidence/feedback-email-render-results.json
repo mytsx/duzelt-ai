@@ -1,0 +1,50 @@
+{
+  "checkedOn": "2026-10-03T20:49:57.796Z",
+  "browser": "151.0.7922.34",
+  "localFixtureOnly": true,
+  "realExternalCalls": 0,
+  "actualMailboxVerified": false,
+  "checkCount": 4,
+  "checks": [
+    {
+      "file": "email-with-reply.html",
+      "width": 390,
+      "noOverflow": true,
+      "noExecutableScript": true,
+      "noReplacementGlyph": true,
+      "screenshot": "output/feedback/email-with-reply-390.png"
+    },
+    {
+      "file": "email-with-reply.html",
+      "width": 768,
+      "noOverflow": true,
+      "noExecutableScript": true,
+      "noReplacementGlyph": true,
+      "screenshot": "output/feedback/email-with-reply-768.png"
+    },
+    {
+      "file": "email-anonymous.html",
+      "width": 390,
+      "noOverflow": true,
+      "noExecutableScript": true,
+      "noReplacementGlyph": true,
+      "screenshot": "output/feedback/email-anonymous-390.png"
+    },
+    {
+      "file": "email-anonymous.html",
+      "width": 768,
+      "noOverflow": true,
+      "noExecutableScript": true,
+      "noReplacementGlyph": true,
+      "screenshot": "output/feedback/email-anonymous-768.png"
+    }
+  ],
+  "visualReview": {
+    "reviewedScreenshotCount": 4,
+    "notes": [
+      "Both static sample emails at 390 and 768 pixels were inspected. Blue identity, literal Turkish characters, message block, optional reply action and anonymous no-reply note are readable.",
+      "No horizontal overflow, executable script, replacement glyph, remote asset or real message delivery occurred.",
+      "This is Chromium rendering of HTML examples, not Gmail/mobile inbox or SMTP delivery evidence."
+    ]
+  }
+}

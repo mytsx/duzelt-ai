@@ -65,4 +65,6 @@ __pycache__/
 # Yerel sır ve Cloudflare çalışma verisi
 .env
 .env.*
+# Yalnız gerçek sır içermeyen kurulum şablonu sürümlenebilir.
+!.env.example
 .wrangler/

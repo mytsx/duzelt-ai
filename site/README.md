@@ -1,6 +1,6 @@
-# AI Türkçe Metin Düzeltici — statik site
+# AI Türkçe Metin Düzeltici — web sitesi
 
-Cloudflare Workers Static Assets için sade statik site. Çerçeve, paket bağımlılığı, sunucu, dış font, analitik veya CDN JavaScript yoktur. JavaScript kapalıyken bütün metinler ve mağaza/destek/gizlilik bağlantıları çalışır.
+Cloudflare Workers Static Assets üzerinde sade site. Dış font ve analitik yoktur. Geri bildirim API'si aynı `duzelt-site` Worker'ında uygulanır; e-posta teslimi sunucu tarafında Nodemailer `10.0.14` kullanır. Canlı geri bildirim teslimi aşağıdaki durum kaydıyla ayrıca doğrulanır. Form doğrulaması için Cloudflare Turnstile betiği yüklenir. JavaScript kapalıyken metinler, mağaza/destek/gizlilik bağlantıları ve e-posta/GitHub seçenekleri çalışır; form gönderimi JavaScript gerektirir.
 
 ## Dosyalar
 
@@ -13,9 +13,11 @@ Cloudflare Workers Static Assets için sade statik site. Çerçeve, paket bağı
 | `assets/css/site.css` | Tek stil dosyası; tasarım değişkenleri en üstte. |
 | `assets/js/config.js` | Bağlantılar, sürümler ve video alanları. **`lib/product-config.js` + `manifest.json` kaynağından üretilir.** |
 | `assets/js/site.js` | Bağlantı eşitleme, mobil menü, örnek etkileşimi, video (yalnız tıklamayla), içindekiler. |
+| `assets/js/feedback.js` | Geri bildirim formu, kullanıcı açınca Turnstile doğrulaması ve gönderim durumları. |
+| `../worker/` | Geri bildirim doğrulaması, kuyruk tüketimi ve SMTP/HTML e-posta; eklenti ZIP'ine girmez. |
 | `assets/img/` | Gerçek ekranlar, ikonlar, yerel video kapağı, paylaşım görseli. |
 | `_preview/video.html` | `video: null` iken video bileşeninin yayımlanmayan önizlemesi. |
-| `_headers` | Güvenlik başlıkları (CSP: yalnız `self`; çerçeve yalnız `youtube-nocookie.com`) ve önbellek. |
+| `_headers` | Güvenlik başlıkları ve önbellek; YouTube çerçevesi tıklama sonrasında, Turnstile doğrulaması form kullanılırken yüklenir. |
 | `.assetsignore` | `README.md` ve `_preview/` yayına alınmaz. |
 | `robots.txt`, `sitemap.xml` | `https://duzelt.yerli.dev/` hedefli. |
 
@@ -79,3 +81,72 @@ Hareket: menü açılışı, örnekteki Kabul et/İptal geçişi, SSS işareti v
 - 320, 390, 768, 1024, 1440 px; açık ve koyu tema.
 - Klavye: atlama bağlantısı, menü (Escape kapatır), SSS, örnek düğmeleri, görünür odak halkası.
 - JavaScript kapalı: menü bağlantıları satır olarak görünür, örnek statik kalır, video gizli kalır.
+
+
+## Geri bildirim kurulumu ve işletimi
+
+**Bu değişikliğin durumu:** Form/sunucu kaynakları hazır; 31/31 sunucu birim testi, site hazırlık kontrolü ve Worker dry-run geçti. Yalnız `duzelt.yerli.dev` alanına bağlı managed Turnstile widget'ı oluşturuldu. Yerel `transporter.verify()` ön kontrolü, TLS sertifikası ve SMTP kimlik doğrulamasını başarılı doğruladı; e-posta gönderilmedi. Canlı form/Queue kabulü, Cloudflare Worker'ında SMTP işlemi, alıcı gelen kutusu ve yeni main push sonrası yayın henüz bekliyor. Önceki statik site yayını yeni API'nin çalıştığını kanıtlamaz.
+
+Mevcut `duzelt-site` Worker'ı korunur. `/api/*` istekleri `worker/` koduna, diğer istekler `ASSETS` binding'ine gider. `nodejs_compat` sunucudaki SMTP istemcisi içindir. Eklentinin model API akışı bu sunucuya taşınmaz. Kalbur Worker'ı, widget'ı ve kuyrukları değiştirilmez; yeni kaynak adları Düzelt'e aittir.
+
+### Yerel alanlar ve secret aktarımı
+
+Proje kökündeki `.env` yalnız sahibinin okuyabildiği `0600` izinli ve Git dışında bir dosyadır. `.env.example` gerçek şifre içermez. SMTP sunucusu, kullanıcı ve şifre servis sağlayıcının verdiği bilgilerle doldurulur; tahmin edilmez. Mevcut alanlar kullanıcının değerleriyle korunur. Turnstile alanları ilk hazırlık aşamasında boş kalabilir; üretim widget'ı yalnız `duzelt.yerli.dev` alanına bağlandıktan sonra doldurulur.
+
+| Alan | Anlam |
+| --- | --- |
+| `SMTP_HOST` | Sertifika adıyla uyumlu SMTP sunucu hostname'i. |
+| `SMTP_PORT` | Sağlayıcının söylediği port. |
+| `SMTP_SECURE` | `465` için doğrudan TLS: `true`; `587` için STARTTLS: `false`. Sağlayıcının talimatı esas alınır. |
+| `SMTP_REQUIRE_TLS` | `true`; şifreli bağlantı zorunlu, bu alan TLS'yi kapatma seçeneği değildir. |
+| `SMTP_USER`, `SMTP_PASSWORD` | SMTP kimlik bilgileri; kullanıcı adı gönderenden farklı olabilir. |
+| `MAIL_FROM`, `MAIL_TO` | Sunucudaki sabit gönderen/alıcı. Kullanıcının değişiklikleri korunur. |
+| `TURNSTILE_SITE_KEY` | Widget'ın herkese açık site anahtarı. |
+| `TURNSTILE_SECRET_KEY` | Yalnız sunucudaki doğrulama sırrı. |
+
+Gerçek değerleri komut argümanına, kabuk geçmişine, ekran görüntüsüne, loga veya Git'e yazmayın. Mevcut Worker'ın Cloudflare secret mekanizmasını kullanın; [Wrangler secret aktarımı](https://developers.cloudflare.com/workers/configuration/secrets/) için yalnız gerekli alanları standart girişten veren ve hiçbir değeri yazdırmayan yöntem seçin. Toplu aktarıma ilgisiz `.env` alanları eklenmez. `.env` site varlıklarına, Worker derleme çıktısına ve eklenti ZIP'ine kopyalanmaz. Secret'lar kurulunca sonraki yayınların mevcut secret binding'lerini koruduğunu doğrulayın; sırları build-time HTML/JS değişkenlerine dönüştürmeyin.
+
+`SMTP_SECURE=false` şifresiz e-posta demek değildir: STARTTLS zorunludur. SMTP istemcisi `requireTLS: true`, `rejectUnauthorized: true` ve SMTP hostname'ini koruyan bağlantı kullanır. Sertifika kontrolünü kapatmak çözüm değildir. [Nodemailer TLS/STARTTLS seçenekleri](https://nodemailer.com/smtp).
+
+`FEEDBACK_IP_HASH_KEY`, operatör tarafından güvenli rastgele üretilen en az 32 karakterlik ayrı Worker secret'ıdır; kullanıcının SMTP alanı değildir. IP rate-limit anahtarı bu sırla HMAC olarak üretilir. Anahtarı kaynağa veya tarayıcıya taşımayın.
+
+### Worker, Turnstile ve kuyruk ayarları
+
+`SITE_ORIGIN=https://duzelt.yerli.dev`, `worker/feedback.mjs` içindeki sunucu sabitidir; `FEEDBACK_ENABLED` Wrangler yapılandırmasındaki etkinlik anahtarıdır. Form yalnız gerekli alanlar, Queue ve rate-limit binding'leri hazırken açılır. `/api/feedback/config` yalnız etkinlik durumu ve public sitekey döndürür; SMTP/Turnstile secret'ı istemciye verilmez. Üretim action'ı istemci ve sunucuda `feedback` değeridir. Turnstile Siteverify sonucu `success`, tam hostname ve action ile doğrulanır. Token tek kullanımlıktır; hata veya süresi dolma sonrasında yenilenir. [Sunucu doğrulaması](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/).
+
+- Ana kuyruk: `duzelt-feedback`; binding `FEEDBACK_QUEUE`.
+- Başarısız kuyruk: `duzelt-feedback-dlq`; ana tüketicide `dead_letter_queue`.
+- Tüketici: `duzelt-site`; SMTP başarısından sonra ACK, hata halinde sınırlı gecikmeyle retry; `max_retries: 3`.
+- Her kuyruk: ayrı ayrı `86.400` saniye mesaj saklaması. Free planda kuyruk saklaması 24 saattir; Paid planda değiştirilebilir. DLQ'nun varsayılanını kullanmak yerine onun ayarını da doğrulayın. [Queues sınırları](https://developers.cloudflare.com/queues/platform/limits/), [başarısız mesaj kuyruğu](https://developers.cloudflare.com/queues/configuration/dead-letter-queues/).
+- `FEEDBACK_RATE_LIMITER`: IP özeti için dakikada 5 deneme. `FEEDBACK_GLOBAL_LIMITER`: uygulama anahtarı için dakikada 60 gönderim. Düzelt namespace'leri `2026100303` / `2026100304` olup Kalbur'dan ayrıdır. Sayaçlar Cloudflare konumu bazlı ve yaklaşık çalışır; bunlar kesin küresel kota değildir. Ortak IP kullanan ziyaretçiler aynı IP sınırını paylaşabilir. [Rate Limiting API](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
+
+Origin, JSON içerik tipi, gerçek akışta 16 KiB gövde, 4.000 karakter mesaj ve gizli tuzak alanı kontrol edilir. Yanıt e-postası, sürüm ve tarayıcı isteğe bağlı, elle girilen alanlardır. Keyfî alıcı alanı kabul edilmez. E-posta başlıkları kullanıcı girdisinden türetilmez; e-posta yalnız Reply-To olarak kullanılır.
+
+### Kabul, SMTP ve gelen kutusu kanıtı
+
+API alanları `type`, `message`, `replyEmail`, `appVersion`, `browser`, `website` (tuzak alanı) ve `turnstileToken` ile sınırlıdır. `GET /api/feedback/config`, `{ enabled, siteKey, action }` döndürür. `POST /api/feedback` için `202 { accepted: true, id, message }`, mesajın ana kuyruğa yazıldığını gösterir. Token ve IP kuyruk kaydına eklenmez; kayda UUID ve tarih eklenir. SMTP işlemi başarılı olmadan ACK verilmez. SMTP sunucusunun kabul etmesi de tek başına gelen kutusunda görünme kanıtı değildir. [En az bir kez teslim](https://developers.cloudflare.com/queues/reference/delivery-guarantees/) nedeniyle aynı kayıt tekrar işlenebilir; e-postadaki tam kayıt kimliği ve Message-ID ile eşleştirin. Kuyruk kabulünü “e-posta teslim edildi” diye göstermeyin. Oluşturulmasının üzerinden 24 saat geçen kayıt SMTP'ye tekrar gönderilmez; tüketici kaydı ACK ile kapatır. Ana ve DLQ bağımsız süreleri nedeniyle toplam kuyruk saklaması en çok 48 saate çıkabilir.
+
+Kontrollü testler açıkça test olarak işaretlenmiş, az sayıda bildirimle ve sunucudaki sabit `MAIL_TO` hedefine yapılır. Testte üç sonuç ayrı kaydedilir: form/kuyruk kabulü, SMTP sunucusu kabulü ve erişilebiliyorsa gelen kutusunda okunaklı görünüm. Gelen kutusuna erişilmediyse bunu bekleyen doğrulama olarak bırakın. HTML kaçışı, düz metin alternatifi, boş alanların gizlenmesi, Europe/Istanbul tarih ve Reply-To davranışı ayrıca kontrol edilir; mesajda uzak font, izleme pikseli veya dış görsel yoktur.
+
+### Arıza ve silme işlemleri
+
+`feedback_accept_failed` / `feedback_delivery_failed` olaylarını ve kuyruk birikimini kontrol edin. `feedback_smtp_accepted` yalnız SMTP sunucusu kabulünü gösterir. Uygulama loguna yalnız olay adı, kayıt kimliği ve sınırlandırılmış hata sınıfı yazılır; mesaj/e-posta/ham IP/token/şifre yazılmaz. `invocation_logs:false`, `redact_query_string:true` ve trace kapalı ayarı, otomatik istek URL/header/IP kaydını bu uygulamanın log/trace çıktısına eklemez; allowlist console olayları tutulur. Workers Logs saklaması hesap planına bağlıdır: resmî tabloda Free 3 gün, Paid 7 gün; hesabın fiilî ayarını yayın kanıtında ayrıca kaydedin. Kuyruk saklamasıyla log saklaması farklıdır. [Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/).
+
+SMTP sorunu varsa 24 saatlik DLQ süresi dolmadan giderin. Başarısız kayıtları açmak veya yeniden göndermek kişisel veri erişimidir; içeriği açık loga dökmeyin. Hata kuyruğunda tekrar gönderme otomatik sınırsız döngüye dönüştürülmez. Ana ve DLQ'daki süre dolan mesajlar otomatik silinir; kuyruğun süresinin dolması posta kutusundaki e-postayı silmez.
+
+Geliştiricinin posta kutusundaki bildirim ve yanıtları talep kapandıktan sonra en geç 30 gün içinde elle silin. Aylık kontrol yapın; silinmişler/çöp kutusu ve destek yazışmasının ek kopyalarını da gözden geçirin. Bu bir otomatik posta silme görevi değildir. Bir silme talebini tam kayıt kimliğiyle eşleştirin; kullanıcıya uygulanan işlemi ve kalan sağlayıcı sınırlarını açıkça bildirin.
+
+Turnstile/SMTP arızasında `FEEDBACK_ENABLED=false` ile yeni gönderimleri durdurun. E-posta ve GitHub alternatifleri görünür kalır. Worker sürümüne geri dönmek, kuyrukta bekleyen mesajları veya posta kopyalarını kendiliğinden silmez; gizlilik ve form durumu fiilî veri akışıyla uyumlu tutulur. Mevcut `main` → Workers Builds düzeniyle yayın yapılır; ikinci bir CI/yayın düzeni kurulmaz.
+
+### Yeni form için kontrol listesi
+
+Yerel Chromium form turu **37/37** geçti: dört genişlik × iki tema, klavye/etiket/durum, çevrimdışı mesaj koruma ve eş zamanlı gönderim engeli. İzole fixture kullanılır; gerçek CAPTCHA/SMTP çağrısı yoktur. Mevcut site akışı58 kontrolle geçti; yeni kayıt `evidence/feedback-site-ui-results.json` içindedir. HTML e-posta örnekleri390/768 px'de taşmadan render edildi. Kuyruk panellerinde ana ve DLQ saklaması ayrı ayrı86400 saniye olarak doğrulandı; henüz tüketici teslim kanıtı değildir.
+
+Sunucu birim testleri: `node --test tests/feedback.test.mjs` — **31/31 geçti**, bağımsız tekrar da başarılı. Doğrulama/stream gövde sınırı/Origin, HMAC, Turnstile yanıtları, rate-limit reddi, kuyruğu bekleyen 202 yanıtı, sabit alıcı/Reply-To, HTML kaçışı, ACK/retry, özel veri içermeyen log ve 24 saatlik job sınırı kapsanır. Testler taklit SMTP/Turnstile/Queue kullanır; gerçek TLS el sıkışması, gerçek token tekrar kullanımı, Cloudflare DLQ yönlendirmesi veya gelen kutusu kanıtı değildir. SMTP bağlantı zaman aşımı kaynakta ayarlanır; sürenin gerçekten dolması bu birim turunda denenmez.
+
+- 320, 390, 768 ve 1440 px; klavye odağı, etiketler, teknik bilgiler açılır alanı ve erişilebilir durum mesajları.
+- E-postasız gönderim, hata/ağ kesintisinde mesajın korunması, yinelenen gönderimin engellenmesi ve görünür e-posta alternatifi.
+- Doğrulama/boyut/Origin/içerik tipi, Turnstile hostname/action/süre ve hız sınırı.
+- Queue arızası, SMTP retry/ACK, sabit alıcı, Reply-To, HTML kaçışı ve düz metin e-posta.
+- `.env`/secret'ların Git, site varlıkları, dry-run çıktısı ve eklenti ZIP'i dışında kaldığı.
+- Canlı form kabulü, SMTP kabulü, varsa gelen kutusu; gerçek main push sonrası uzak build ve yayın.

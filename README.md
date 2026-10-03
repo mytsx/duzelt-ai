@@ -4,7 +4,7 @@ Chrome'daki uyumlu zengin metin editörlerine Türkçe düzeltme düğmesi ekler
 
 Eklenti yazım, noktalama ve resmî yazışma üslubu için seçtiğiniz yapay zekâ sağlayıcısından öneri alır. Sonucu kullanmadan önce gözden geçirin; kusursuz doğruluk, resmî kurum onayı veya mevzuata uyum garantisi verilmez.
 
-**Yerel bakım sürümü: 3.4.0.** 3 Ekim 2026'da doğrulanan [mevcut Chrome Web Store öğesi](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) **3.3.0** sunuyor. Yeni paket henüz mağazaya gönderilmedi; [durum kaydı](docs/current-state.json) bu iki sürümü ayrı tutar.
+**Yerel bakım sürümü: 3.4.0.** 3 Ekim 2026'da doğrulanan [mevcut Chrome Web Store öğesi](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) **3.3.0** sunuyor. 3.4.0 incelemeye gönderildi; [durum kaydı](docs/current-state.json) kamu sürümü ile incelemedeki sürümü ayrı tutar.
 
 ## Gereksinimler ve ücret
 
@@ -103,7 +103,7 @@ Katalog hazırlama aracı `tools/update-provider-catalog.py` yalnız yerel geli�
 
 ## Web sitesi ve yayın
 
-Claude Design kaynakları `site/` altında entegre edildi. [duzelt.yerli.dev](https://duzelt.yerli.dev/), [destek](https://duzelt.yerli.dev/support/) ve [gizlilik](https://duzelt.yerli.dev/privacy/) 3 Ekim 2026'da canlı HTTPS ile doğrulandı. Site yalnız statik varlık sunan ayrı `duzelt-site` Worker'ıdır; eklenti API isteği veya kullanıcı anahtarı bu siteye gönderilmez.
+Claude Design kaynakları `site/` altında entegre edildi. [duzelt.yerli.dev](https://duzelt.yerli.dev/), [destek](https://duzelt.yerli.dev/support/) ve [gizlilik](https://duzelt.yerli.dev/privacy/) 3 Ekim 2026'da canlı HTTPS ile doğrulandı. Site, statik varlıkları sunan `duzelt-site` Worker'ını kullanır. Geri bildirim için aynı Worker'a `/api/feedback` yolu eklenir; eklentinin düzeltme API istekleri veya kullanıcı anahtarları siteye gönderilmez.
 
 Bağlantılar `lib/product-config.js`, sürüm/ikonlar `manifest.json`, politika `PRIVACY.md` kaynağından hazırlanır. `site/assets/js/config.js` ve sitedeki politika kopyası elle düzenlenmez. İkon, güncel popup/ayar ekranları, HTML bağlantıları, favicon, robots ve sitemap aynı hazırlık adımında eşitlenir.
 
@@ -117,6 +117,18 @@ npm run site:deploy
 ```
 
 Önizleme yalnız `127.0.0.1:8787` adresinde çalışır. Dağıtım yapılandırması `wrangler.site.jsonc` dosyasındadır. Cloudflare Workers Builds mevcut `mytsx/duzelt-ai` deposunun `main` dalına bağlıdır; kök `/`, kontrol `npm run site:check`, yayın `npm run site:deploy`, preview build kapalıdır. `f635ca2` kod tesliminin gerçek main push'ı, başarılı uzak build/deploy ve canlı site ayrı ayrı doğrulandı; sonuçlar [teslim kaydında](evidence/delivery-results.json) tutulur.
+
+## Site üzerinden geri bildirim
+
+[Destek sayfasına](https://duzelt.yerli.dev/support/) hata bildirimi, öneri ve özellik isteği formu ekleniyor; mevcut GitHub bağlantısı ve doğrudan e-posta seçeneği korunur. Mesaj zorunlu, yanıt e-postası ve elle girilen sürüm/tarayıcı alanları isteğe bağlıdır. E-posta vermeden gönderim yapılabilir. Form eklentideki özel metni, API anahtarını veya promptu otomatik toplamaz; hata durumunda yazılan mesaj korunur.
+
+Sunucu düzeni mevcut `duzelt-site` Worker'ı, yalnız Düzelt alan adına ait Turnstile widget'ı ve ayrı `duzelt-feedback` / `duzelt-feedback-dlq` kuyruklarıdır. Kuyruğa kabul edilen mesaj için **Alındı** gösterilir; bu durum SMTP veya gelen kutusu teslimini kanıtlamaz. Sabit gönderen/alıcı, TLS doğrulamalı SMTP, üç yeniden deneme ve kayıt kimliğiyle izleme kullanılır. Kullanıcı e-postası yalnız Reply-To olur.
+
+Yerel `.env` ve `.env.example` alanları, secret aktarımı, hız/saklama sınırları ve arıza işlemleri [site işletim rehberinde](site/README.md#geri-bildirim-kurulumu-ve-isletimi) açıklanır. Gerçek `.env` Git'e, site varlıklarına veya eklenti paketine girmez. Saklama politikasının tek kaynağı [PRIVACY.md](PRIVACY.md#web-sitesi-uzerinden-geri-bildirim) dosyasıdır.
+
+**Doğrulama durumu:** Form ve sunucu kaynakları hazır; `node --test tests/feedback.test.mjs` ile **31/31 yerel test** geçti. Testler taklit SMTP/Turnstile/Queue kullanır. Worker dry-run ve mevcut site hazırlık kontrolleri geçti. Düzelt için yalnız `duzelt.yerli.dev` alanına bağlı Turnstile widget'ı oluşturuldu. Yerel SMTP ön kontrolünde TLS sertifikası ve kimlik doğrulaması başarılı; bu kontrolde e-posta gönderilmedi. Canlı form/kuyruk kabulü, Cloudflare Worker'ından SMTP teslimi ve alıcı gelen kutusu görünümü henüz doğrulanmadı. Tamamlanan kontroller ve kalanlar [TODO.md](TODO.md#4-site-uzerinden-e-posta-geri-bildirimi) içinde izlenir.
+
+Yeni form için **37/37 Chromium kontrolü** geçti: dört genişlikte açık/koyu tema, klavye, ağ hatasında mesaj koruma ve tek gönderim. Mevcut site akışı da **58 kontrolle** doğrulandı; yeni rapor [feedback site kanıtında](evidence/feedback-site-ui-results.json), önceki yayın kanıtı kendi dosyasında korunur. İki örnek e-posta 390/768 px'de taşma olmadan render edildi. Bu kontroller gerçek CAPTCHA veya e-posta göndermez.
 
 ## Video ve mağaza gönderimi
 
@@ -134,6 +146,6 @@ Mevcut mağaza öğesine 3.4.0 paketi, beş yeni ekran görüntüsü, iki promos
 
 Geliştirici: **Mehmet Yerli** · [iletisim@mehmetyerli.com](mailto:iletisim@mehmetyerli.com) · [Yerli.dev](https://yerli.dev/)
 
-[Sorun bildir](https://github.com/mytsx/duzelt-ai/issues) · [Kaynak kod](https://github.com/mytsx/duzelt-ai)
+[Site üzerinden geri bildirim](https://duzelt.yerli.dev/support/) · [GitHub'da sorun bildir](https://github.com/mytsx/duzelt-ai/issues) · [Kaynak kod](https://github.com/mytsx/duzelt-ai)
 
 Sorun bildirirken Chrome/eklenti/editör sürümünü ve kişisel bilgi içermeyen yeniden üretme adımlarını paylaşın. API anahtarınızı, özel promptunuzu veya gerçek özel metninizi paylaşmayın.

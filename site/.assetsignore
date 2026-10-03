@@ -1,5 +1,13 @@
-# Local documentation and component previews are not public assets.
+# Local documentation, secrets and component previews are not public assets.
 README.md
 _preview/
+.env
+.env.*
+**/.env
+**/.env.*
+.dev.vars
+.dev.vars.*
+**/.dev.vars
+**/.dev.vars.*
 .DS_Store
 **/.DS_Store

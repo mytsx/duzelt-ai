@@ -67,6 +67,27 @@
 - [x] Mağaza incelemesine gönder; otomatik yayın seçeneğini final gönderim ekranında doğrula. Panel: İncelenmeyi bekliyor; 3.4.0 henüz yayımlanmış değildir.
 - [x] Geçici sekmeleri/sunucuları temizle; canlı site, video ve mağaza gönderimini teslim et. Kullanıcının mevcut sekmeleri ve yerel model servisi korunur.
 
+## 4. Site üzerinden e-posta geri bildirimi
+
+- [x] Kalbur'un Worker, form ve test kaynaklarını salt okunur incele; `.env` ve credential dosyalarını açma.
+- [x] İki aşamalı kurulum sınırını ve gerekli SMTP/Turnstile alanlarını belirle; ilk aşamada uygulama/yayın yapmadan dur.
+- [x] Gizlilik ve işletim belgelerine manuel alanlar, Cloudflare/SMTP veri akışı, kuyruk kabulü/teslim ayrımı ve saklama-silme düzenini ekle.
+- [x] Mevcut destek sayfası ve GitHub bağlantısını koruyarak formu, e-posta alternatifini ve erişilebilir durum mesajlarını ekle; API alanlarıyla kaynak sözleşmesi eşleşti.
+- [x] Mesajı hata halinde koru; yinelenen gönderim, boş isteğe bağlı alanlar, 320/390/768/1440 px ve klavye davranışlarını doğrula; 37/37 izole Chromium kontrolü, 8 tema/genişlik birleşimi.
+- [x] Düzelt için yalnız `duzelt.yerli.dev` alanına bağlı managed Turnstile widget'ı oluştur.
+- [x] `duzelt-feedback` / `duzelt-feedback-dlq` canlı kuyruklarını ve her birinde 86.400 saniye saklamayı ayrı doğrula; her iki panelde 86400 seconds görüldü.
+- [x] Sunucu kaynaklarında Origin/içerik tipi, 16 KiB gövde, 4.000 karakter mesaj, tuzak alanı, HMAC IP özeti ve Turnstile token/hostname/action kontrollerini uygula; kaynak salt okunur gözden geçirildi.
+- [x] Sunucu kontrollerini `node --test tests/feedback.test.mjs` ile doğrula; 31/31 ve bağımsız tekrar başarılı.
+- [ ] Canlı kaynak/Turnstile/Queue ve Worker SMTP davranışını yerel testten ayrı doğrula.
+- [ ] IP başına 5/dk ve uygulama anahtarına 60/dk yaklaşık, Cloudflare konumu bazlı sınırı doğrula; kesin küresel kota diye sunma.
+- [x] Yerel testlerde sabit gönderen/alıcı, yalnız Reply-To, TLS seçenekleri, retry/ACK ve kayıt kimliğiyle izleme akışını doğrula. Gerçek DLQ yönlendirmesi bekliyor.
+- [x] Yerel SMTP ön kontrolü (`transporter.verify()`): TLS sertifikası ve kimlik doğrulaması başarılı; e-posta gönderilmedi.
+- [ ] Secret'ları değerlerini göstermeden mevcut Worker'a aktar; `.env` izinlerini ve Git/site/ZIP dışlama kontrollerini tamamla.
+- [x] Doğrulama, boyut/Origin, taklit Turnstile hataları, hız sınırı, kuyruk arızası, SMTP retry, HTML kaçışı ve sabit alıcı testlerini çalıştır; 31/31.
+- [ ] Az sayıda açıkça test olarak işaretli bildirimle gerçek form kabulünü, SMTP sunucusunun kabulünü ve mümkünse alıcı gelen kutusu görünümünü ayrı doğrula.
+- [ ] Mevcut main → Workers Builds düzeniyle commit/push/yayın ve canlı form kontrolünü tamamla; eski site teslim kanıtını yeni form kanıtıyla karıştırma.
+- [ ] 24 saatlik hata kuyruğunu arıza halinde izle; kapanan talebin posta yazışmalarını en geç 30 gün içinde sil ve aylık kontrolü işlet.
+
 ## Kanıt sınırları
 - Anahtar gerektirmeyen deterministik API testleri gerçek sağlayıcı/model erişimi veya düzeltme kalitesini kanıtlamaz. Gerçek hesapla API çağrısı yapılmadı.
 - Seçici veya DOM maketi testi, belirli CMS/platform desteği ya da gerçek editör veri modeli kanıtı değildir.

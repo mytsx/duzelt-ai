@@ -1,14 +1,34 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "duzelt-site",
+  "main": "worker/index.mjs",
   "account_id": "be07ea38add164a83cc48c714ecbf9e2",
   "compatibility_date": "2026-10-03",
+  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
   "preview_urls": false,
   "routes": [{ "pattern": "duzelt.yerli.dev", "custom_domain": true }],
   "assets": {
     "directory": "./site",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
+  },
+  "vars": { "FEEDBACK_ENABLED": "true" },
+  "ratelimits": [
+    { "name": "FEEDBACK_RATE_LIMITER", "namespace_id": "2026100303", "simple": { "limit": 5, "period": 60 } },
+    { "name": "FEEDBACK_GLOBAL_LIMITER", "namespace_id": "2026100304", "simple": { "limit": 60, "period": 60 } }
+  ],
+  "queues": {
+    "producers": [{ "binding": "FEEDBACK_QUEUE", "queue": "duzelt-feedback" }],
+    "consumers": [{ "queue": "duzelt-feedback", "max_batch_size": 1, "max_batch_timeout": 1,
+      "max_retries": 3, "dead_letter_queue": "duzelt-feedback-dlq" }]
+  },
+  "observability": {
+    "enabled": true,
+    "redact_query_string": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": false },
+    "traces": { "enabled": false }
   }
 }

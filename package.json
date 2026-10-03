@@ -16,11 +16,16 @@
     "site:preview": "npm run site:prepare && wrangler dev --config wrangler.site.jsonc --local --ip 127.0.0.1 --port 8787",
     "site:test": "python3 -m unittest discover -s tests -p 'test_prepare_site.py'",
     "site:test:browser": "node tests/site-browser.mjs",
-    "site:check": "npm run site:test && python3 tools/prepare-site.py --check && node --check site/assets/js/config.js && node --check site/assets/js/site.js && wrangler deploy --config wrangler.site.jsonc --dry-run",
-    "site:deploy": "npm run site:prepare && npm run site:check && wrangler deploy --config wrangler.site.jsonc"
+    "site:check": "npm run site:test && npm run test:feedback && python3 tools/prepare-site.py --check && node --check site/assets/js/config.js && node --check site/assets/js/site.js && node --check site/assets/js/feedback.js && node --check worker/index.mjs && wrangler deploy --config wrangler.site.jsonc --dry-run",
+    "site:deploy": "npm run site:prepare && npm run site:check && wrangler deploy --config wrangler.site.jsonc",
+    "test:feedback": "node --test tests/feedback.test.mjs",
+    "test:feedback:browser": "node tests/feedback-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",
     "wrangler": "4.147.0"
+  },
+  "dependencies": {
+    "nodemailer": "10.0.14"
   }
 }

@@ -25,8 +25,10 @@
 <link rel="icon" type="image/png" sizes="48x48" href="../assets/img/icon48.png">
 <link rel="apple-touch-icon" href="../assets/img/icon128.png">
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/feedback.css">
 <script src="../assets/js/config.js"></script>
 <script src="../assets/js/site.js"></script>
+<script src="../assets/js/feedback.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#icerik">İçeriğe geç</a>
@@ -61,9 +63,10 @@
     <div class="wrap">
       <p class="kicker">Destek</p>
       <h1 class="display">Kurulum ve sorun giderme</h1>
-      <p class="lead">Adımlar en sık karşılaşılan durumlardan başlar. Çözüm bulamazsanız e-posta veya GitHub Issues üzerinden bildirin.</p>
+      <p class="lead">Adımlar en sık karşılaşılan durumlardan başlar. Çözüm bulamazsanız site üzerinden, e-posta veya GitHub Issues ile bildirin.</p>
       <div class="btn-row">
-        <a class="btn btn-primary" data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues">Sorun bildir <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        <a class="btn btn-primary" id="feedback-open" href="#geri-bildirim" data-feedback-open aria-expanded="false" aria-controls="feedback-panel">Geri bildirim gönder</a>
+        <a class="btn btn-secondary" data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues">GitHub Issues <svg class="icon icon-ne" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
         <a class="btn btn-secondary break" data-link="email" href="mailto:iletisim@mehmetyerli.com">iletisim@mehmetyerli.com</a>
       </div>
     </div>
@@ -74,6 +77,76 @@
       <nav class="toc" data-toc aria-label="Destek bölümleri" hidden><p class="kicker">Bu sayfada</p></nav>
     </aside>
     <div data-toc-source>
+
+      <section class="issue feedback" id="geri-bildirim" aria-labelledby="h-geri-bildirim">
+        <h2 id="h-geri-bildirim">Site üzerinden geri bildirim</h2>
+        <p>Bir hatayı, önerinizi veya istediğiniz bir özelliği paylaşın. Yanıt e-postası bırakmak isteğe bağlıdır.</p>
+        <div class="feedback-entry">
+          <button class="btn btn-primary" id="feedback-open-inline" type="button" data-feedback-open aria-expanded="false" aria-controls="feedback-panel" hidden>Geri bildirim gönder</button>
+          <p class="fine">Formu açtığınızda spam koruması için Cloudflare Turnstile yüklenir. Ayrıntılar <a href="../privacy/">gizlilik politikasında</a>.</p>
+        </div>
+        <noscript><p class="callout mt-4">Site formu için JavaScript gerekir. Aşağıdaki e-posta adresini veya GitHub Issues seçeneğini kullanabilirsiniz.</p></noscript>
+        <div id="feedback-panel" hidden>
+          <form id="feedback-form" class="feedback-form" aria-label="Geri bildirim formu" aria-describedby="feedback-privacy" aria-busy="false">
+            <fieldset id="feedback-fields" class="feedback-fields">
+              <legend class="sr-only">Geri bildiriminiz</legend>
+              <div class="feedback-field">
+                <label for="feedback-type">Bildirim türü</label>
+                <select id="feedback-type" name="type" required>
+                  <option value="bug">Hata bildirimi</option>
+                  <option value="suggestion">Öneri</option>
+                  <option value="feature">Özellik isteği</option>
+                </select>
+              </div>
+              <div class="feedback-field">
+                <label for="feedback-message">Mesajınız <span>(zorunlu)</span></label>
+                <textarea id="feedback-message" name="message" rows="6" required maxlength="4000" aria-describedby="feedback-message-help feedback-count"></textarea>
+                <div class="feedback-message-meta">
+                  <p id="feedback-message-help" class="fine">Ne oldu, ne bekliyordunuz? API anahtarı veya kişisel metin paylaşmayın.</p>
+                  <p id="feedback-count" class="fine">0 / 4000 karakter</p>
+                </div>
+              </div>
+              <div class="feedback-field">
+                <label for="feedback-email">Yanıt e-postası <span>(isteğe bağlı)</span></label>
+                <input id="feedback-email" name="replyEmail" type="email" maxlength="254" autocomplete="email" inputmode="email" aria-describedby="feedback-email-help">
+                <p id="feedback-email-help" class="fine">E-posta paylaşmazsanız size dönüş yapamayız.</p>
+              </div>
+              <details class="feedback-details">
+                <summary>Teknik bilgiler <span>(isteğe bağlı)</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+                <p class="fine">Bu bilgiler otomatik alınmaz. İsterseniz kendiniz yazabilirsiniz.</p>
+                <div class="feedback-technical-grid">
+                  <div class="feedback-field">
+                    <label for="feedback-version">Uygulama sürümü</label>
+                    <input id="feedback-version" name="appVersion" type="text" maxlength="64" autocomplete="off">
+                  </div>
+                  <div class="feedback-field">
+                    <label for="feedback-browser">Tarayıcı ve sürümü</label>
+                    <input id="feedback-browser" name="browser" type="text" maxlength="120" autocomplete="off">
+                  </div>
+                </div>
+              </details>
+              <div class="feedback-trap" aria-hidden="true">
+                <label for="feedback-website">Web sitesi</label>
+                <input id="feedback-website" name="website" type="text" tabindex="-1" autocomplete="off">
+              </div>
+            </fieldset>
+            <p id="feedback-privacy" class="fine">Yalnız bu forma yazdığınız bilgiler gönderilir; eklentideki metniniz ve ayarlarınız alınmaz. Yanıt adresi verirseniz bildiriminizle birlikte iletilir.</p>
+            <div class="feedback-verification" aria-busy="false">
+              <div id="feedback-turnstile"></div>
+              <div class="feedback-verification-copy">
+                <p id="feedback-verification-status" class="fine" role="status" aria-live="polite" aria-atomic="true">Göndermek için spam korumasının tamamlanmasını bekleyin.</p>
+                <button class="btn btn-secondary" id="feedback-retry" type="button" hidden>Doğrulamayı yeniden dene</button>
+              </div>
+            </div>
+            <div class="feedback-submit-row">
+              <button class="btn btn-primary" id="feedback-submit" type="submit" disabled>Geri bildirimi gönder</button>
+              <p class="fine">Yalnız mesaj alanı zorunludur.</p>
+            </div>
+            <p id="feedback-status" class="feedback-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1" hidden></p>
+          </form>
+        </div>
+        <p class="feedback-fallback">İsterseniz doğrudan e-posta gönderin: <a class="break" id="feedback-email-fallback" data-link="email" href="mailto:iletisim@mehmetyerli.com">iletisim@mehmetyerli.com</a>. <a data-link="issues" href="https://github.com/mytsx/duzelt-ai/issues">GitHub Issues</a> ayrı bir seçenektir ve herkese açıktır.</p>
+      </section>
 
       <section class="issue" id="kurulum" aria-labelledby="h-kurulum">
         <h2 id="h-kurulum">Kısa kurulum rehberi</h2>

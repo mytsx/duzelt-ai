@@ -15,7 +15,7 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = {'index.html': '', 'privacy/index.html': 'privacy/', 'support/index.html': 'support/'}
 SCREENSHOTS = ('popup-light.png', 'popup-dark.png', 'options-desktop.png', 'options-openrouter.png')
-IGNORE = '# Local documentation and component previews are not public assets.\nREADME.md\n_preview/\n.DS_Store\n**/.DS_Store\n'
+IGNORE = '# Local documentation, secrets and component previews are not public assets.\nREADME.md\n_preview/\n.env\n.env.*\n**/.env\n**/.env.*\n.dev.vars\n.dev.vars.*\n**/.dev.vars\n**/.dev.vars.*\n.DS_Store\n**/.DS_Store\n'
 
 
 def read_product(source):

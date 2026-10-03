@@ -1,16 +1,35 @@
-importScripts('openai-provider.js');
+importScripts('../lib/provider-catalog.js', 'openai-provider.js', 'provider-service.js');
 
-const STORAGE_KEYS = {
-    OPENAI_KEY: 'openai_api_key',
-    ENABLED: 'ai_corrector_enabled',
-    CUSTOM_PROMPT: 'custom_system_prompt'
-};
+// İçerik betiği anahtar veya özel prompt okumaz; erişimi eklenti sayfalarıyla sınırla.
+if (typeof chrome.storage.local.setAccessLevel === 'function') {
+    chrome.storage.local.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' }, () => {
+        // lastError okunarak Chrome'un ham hata mesajını konsola yazması engellenir.
+        const storageError = chrome.runtime.lastError;
+        if (storageError) return;
+    });
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'correctText') {
-        handleCorrectText(request.text)
-            .then(correctedText => sendResponse({ correctedText }))
-            .catch(error => sendResponse({ error: error.message }));
+    if (sender.id !== chrome.runtime.id || !request || typeof request !== 'object') return false;
+
+    const privilegedActions = ['testProvider', 'listProviderModels', 'getProviderStatus'];
+    const isExtensionPage = typeof sender.url === 'string' && sender.url.startsWith(chrome.runtime.getURL(''));
+    if (privilegedActions.includes(request.action) && !isExtensionPage) return false;
+
+    if (request.action === 'correctText' || request.action === 'testProvider' || request.action === 'listProviderModels' || request.action === 'getProviderStatus') {
+        let operation;
+        if (request.action === 'correctText') operation = ProviderService.correctText(request.text).then(correctedText => ({ correctedText }));
+        if (request.action === 'testProvider') operation = ProviderService.correctText('Bu bir test metnidir.', request.providerId).then(() => ({ success: true }));
+        if (request.action === 'listProviderModels') operation = ProviderService.listProviderModels(request.providerId);
+        if (request.action === 'getProviderStatus') operation = ProviderService.getProviderStatus();
+        operation
+            .then(sendResponse)
+            .catch(error => sendResponse({
+                error: error instanceof OpenAIProviderError
+                    ? error.message
+                    : 'Düzeltme tamamlanamadı. Lütfen eklentiyi yeniden yükleyip tekrar deneyin.',
+                errorCode: error instanceof OpenAIProviderError ? error.code : 'extension'
+            }));
         return true;
     }
 
@@ -19,26 +38,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true;
     }
 });
-
-async function handleCorrectText(text) {
-    const config = await loadConfig();
-
-    if (!config.openaiKey) {
-        throw new Error('OpenAI API key girilmemiş. Lütfen ayarlardan API key girin.');
-    }
-
-    return await OpenAIProvider.correctText(text, config.openaiKey, config.systemPrompt);
-}
-
-async function loadConfig() {
-    return new Promise((resolve) => {
-        // Tüm ayarları local storage'dan oku
-        // Not: Prompt boyutu sync storage limitini (8KB) aşabildiği için local storage kullanıyoruz.
-        chrome.storage.local.get([STORAGE_KEYS.OPENAI_KEY, STORAGE_KEYS.CUSTOM_PROMPT], (result) => {
-            resolve({
-                openaiKey: result[STORAGE_KEYS.OPENAI_KEY] || null,
-                systemPrompt: result[STORAGE_KEYS.CUSTOM_PROMPT] || null
-            });
-        });
-    });
-}

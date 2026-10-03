@@ -1,0 +1,15 @@
+{
+  "checkedOn": "2026-10-03",
+  "extensionVersion": "3.4.0",
+  "command": "node --test tests/provider-*.test.cjs",
+  "tests": 155,
+  "passed": 155,
+  "failed": 0,
+  "realProviderCall": false,
+  "sourceSha256": {
+    "background/background.js": "42a063786ce1f722851e9bb24724979c4007ad65930d453ad044fb63be9ded38",
+    "background/openai-provider.js": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
+    "background/provider-service.js": "48fe603b63903e28c7c15e9423492c1d60a4719288976ad33f7f0f8c9a74f51f",
+    "lib/provider-catalog.js": "7c974e7488d452828c0ce51f1cbc9756ce35d9075d6c1e91cdb20a7262ce1f32"
+  }
+}

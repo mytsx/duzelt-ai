@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-10-03T15:06:33.562Z",
+  "scope": "Independent catalog request builder sweep and mocked IBM/SAP authentication, permission and privacy contract review; no live provider inference",
+  "command": "node tests/provider-edge-evidence.cjs",
+  "catalogSource": {
+    "url": "https://models.dev/api.json",
+    "fetchedOn": "2026-10-03",
+    "sha256": "fc09da34f9fb8e13c77bde9d57fb723b99c5215855ec631592beff74f7ef9295",
+    "license": "MIT",
+    "licenseURL": "https://raw.githubusercontent.com/anomalyco/models.dev/036a4f1d6ee01a0ed3f156077375a15087dd322f/LICENSE",
+    "modelsRepositoryRevision": "036a4f1d6ee01a0ed3f156077375a15087dd322f",
+    "opencodeRepositoryRevision": "907b3bc518fa48e90e8ec24dd327d13eee71c36c",
+    "opencodeDocs": "https://opencode.ai/docs/providers/",
+    "opencodeV2Docs": "https://opencode.ai/v2/docs/providers",
+    "note": "API içerik SHA-256 ayrı anlık görüntüdür; depo revision ile yayın uç noktasının birebir eşitliği iddia edilmez."
+  },
+  "sourceSHA256": {
+    "background/openai-provider.js": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
+    "lib/provider-catalog.js": "7c974e7488d452828c0ce51f1cbc9756ce35d9075d6c1e91cdb20a7262ce1f32",
+    "background/provider-service.js": "48fe603b63903e28c7c15e9423492c1d60a4719288976ad33f7f0f8c9a74f51f"
+  },
+  "networkCalls": 0,
+  "liveProviderInferenceVerified": false,
+  "providerCount": 228,
+  "selectableProviders": 225,
+  "selectableModelRecords": 7804,
+  "manualLocalModelFixtures": 2,
+  "successfulRequests": 7806,
+  "protocols": {
+    "openai-chat": 7055,
+    "anthropic-messages": 157,
+    "bedrock-converse": 171,
+    "openai-responses": 164,
+    "azure-openai": 117,
+    "cohere-v2": 16,
+    "gemini": 31,
+    "vertex-anthropic": 32,
+    "vertex-gemini": 15,
+    "sap-orchestration-v2": 43,
+    "watsonx-chat": 5
+  },
+  "unresolvedPlaceholderErrors": [],
+  "duplicateProjectPaths": [],
+  "unsupportedAuthBypasses": [],
+  "authenticationReview": {
+    "command": "node --test tests/provider-edge-review.test.cjs",
+    "tests": 40,
+    "passed": 40,
+    "realNetworkCalls": 0
+  },
+  "extraChecks": [
+    "all-origins-required-before-token-exchange",
+    "iam-and-oauth-encoded-form-separate-from-native-inference",
+    "invalid-expired-token-and-redirect-stop-before-inference",
+    "key-client-secret-and-access-token-url-guards",
+    "provider-error-and-transport-error-secret-safe",
+    "token-not-persisted-or-logged",
+    "watsonx-system-string-and-user-parts",
+    "sap-orchestration-final-result-and-ibm-incomplete-response"
+  ],
+  "limitations": [
+    "Account authorization, regional model availability, provider response quality and OAuth/subscription runtime are not established by mocked authentication or request construction.",
+    "SAP X.509/mTLS service keys and IBM software/deployment/gateway products are outside the tested authentication contract.",
+    "Browser/editor integration uses deterministic mocked OpenAI transport, documented separately in editor-results.json."
+  ]
+}

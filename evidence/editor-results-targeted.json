@@ -1,0 +1,87 @@
+{
+  "scope": "targeted:quill,quill1",
+  "generatedAt": "2026-10-03T14:32:45.509Z",
+  "extensionVersion": "3.4.0",
+  "browser": "151.0.7922.34",
+  "api": "Actual background/provider; deterministic fetch fixture, fake local-profile key. No paid API requests or quality evaluation.",
+  "testBoundary": "Upstream local classic editors only; no claim about WordPress, Notion, Drupal, CMS frameworks, cross-origin embedded editors, CKEditor multi-root or collaboration.",
+  "results": [
+    {
+      "editor": "quill",
+      "package": [
+        "quill",
+        "2.0.3"
+      ],
+      "checks": [
+        "editor-css-visible-button",
+        "script-triggered-correction-blocked",
+        "script-triggered-accept-blocked",
+        "real-unpacked-MAIN-ISOLATED",
+        "native-model-accept",
+        "turkish-paragraph-list-bold-italic-link",
+        "one-button",
+        "plain-fields-excluded",
+        "undo-restores-original",
+        "insert-delete-retains-format",
+        "cancel-preserves-original",
+        "keyboard-focus-and-Escape",
+        "in-flight-edit-protected",
+        "accept-time-edit-protected",
+        "model-html-not-executed",
+        "paragraph-change-warning",
+        "broken-response-preserves-original",
+        "disable-drops-pending-response",
+        "toggle-restores-one-button",
+        "read-only-transition"
+      ]
+    },
+    {
+      "editor": "quill1",
+      "package": [
+        "quill",
+        "1.3.7"
+      ],
+      "checks": [
+        "editor-css-visible-button",
+        "script-triggered-correction-blocked",
+        "script-triggered-accept-blocked",
+        "real-unpacked-MAIN-ISOLATED",
+        "native-model-accept",
+        "turkish-paragraph-list-bold-italic-link",
+        "one-button",
+        "plain-fields-excluded",
+        "undo-restores-original",
+        "insert-delete-retains-format",
+        "cancel-preserves-original",
+        "keyboard-focus-and-Escape",
+        "in-flight-edit-protected",
+        "accept-time-edit-protected",
+        "model-html-not-executed",
+        "paragraph-change-warning",
+        "broken-response-preserves-original",
+        "disable-drops-pending-response",
+        "toggle-restores-one-button",
+        "read-only-transition"
+      ]
+    },
+    {
+      "editor": "html-safety",
+      "checks": [
+        "source-script-svg-event-url-css-removed",
+        "safe-link-preserved",
+        "no-script-execution"
+      ]
+    },
+    {
+      "editor": "dynamic-quill",
+      "checks": [
+        "nested-list-text-boundaries",
+        "late-initialization",
+        "remove-instance",
+        "reinsert-instance",
+        "no-duplicate"
+      ]
+    }
+  ],
+  "pageErrors": []
+}

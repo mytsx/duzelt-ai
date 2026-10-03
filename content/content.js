@@ -1,641 +1,438 @@
 (function() {
     'use strict';
 
-    const STORAGE_KEYS = {
-        OPENAI_KEY: 'openai_api_key',
-        ENABLED: 'ai_corrector_enabled'
-    };
+    const ENABLED_KEY = 'ai_corrector_enabled';
+    const BUTTON_CLASS = 'ai-text-corrector-button';
+    const MODAL_ID = 'ai-text-corrector-modal';
+    const EDITOR_SELECTOR = '.cke, .ck-editor, .ck-editor__editable, .note-editor, .tox-tinymce, .mce-tinymce, .ql-container, .ql-toolbar';
+    const MAX_TEXT_LENGTH = 100000;
+    const entries = new Map();
+    const pendingBridge = new Map();
+    let isEnabled = false;
+    let domObserver;
+    let discoveryTimer;
+    let discovering = false;
+    let activeOperation;
+    let closeModal;
+    let storageGeneration = 0;
 
-    const CONFIG = {
-        BUTTON_CLASS: 'ai-text-corrector-button',
-        MODAL_ID: 'ai-text-corrector-modal',
-        // Timing constants (milliseconds)
-        INIT_DELAY: 1000,           // Initial delay for editor detection
-        DEBOUNCE_DELAY: 500,        // Debounce delay for DOM mutations
-        // Text validation
-        MIN_TEXT_LENGTH: 10         // Minimum characters for correction
-    };
-
-    let isEnabled = true;
-    let buttonCounter = 0;
-    let domObserver = null;
-    // WeakSet yerine Set kullan - clear() metodu var
-    const processedFields = new Set();
-
-    chrome.storage.sync.get([STORAGE_KEYS.ENABLED], function(result) {
-        isEnabled = result[STORAGE_KEYS.ENABLED] !== false;
-        if (isEnabled) {
-            init();
+    document.addEventListener('duzelt-ai:editor-response', event => {
+        if (typeof event.detail !== 'string') return;
+        let response;
+        try { response = JSON.parse(event.detail); } catch { return; }
+        const pending = pendingBridge.get(response.requestId);
+        if (!pending) return;
+        pendingBridge.delete(response.requestId);
+        clearTimeout(pending.timer);
+        if (response.error) {
+            pending.reject(new Error(response.error === 'changed'
+                ? 'Metin düzeltme sırasında değişti. Yeni metin korunuyor; yeniden Düzelt seçeneğini kullanın.'
+                : 'Editöre erişilemiyor. Editörün açık ve düzenlenebilir olduğundan emin olun.'));
+        } else {
+            pending.resolve(response.result);
         }
     });
 
-    function init() {
-        // İlk yüklemede biraz bekle (editörler yüklensin)
-        setTimeout(() => {
-            addButtonsToExistingFields();
-            observeDOMChanges();
-        }, CONFIG.INIT_DELAY);
-    }
-
-    function addButtonsToExistingFields() {
-        // isEnabled kontrolü - devre dışıysa hiç buton ekleme
-        if (!isEnabled) return;
-
-        // SADECE Rich text editörleri tespit et
-        // Normal textarea/input alanlarına buton ekleme - sadece rich editörlere
-        detectRichTextEditors();
-    }
-
-    function detectRichTextEditors() {
-        // CKEditor 4.x ve 5.x
-        detectCKEditor();
-
-        // Summernote
-        detectSummernote();
-
-        // TinyMCE
-        detectTinyMCE();
-
-        // Quill
-        detectQuill();
-    }
-
-    function detectCKEditor() {
-        // CKEditor 4.x
-        if (window.CKEDITOR && window.CKEDITOR.instances) {
-            Object.keys(window.CKEDITOR.instances).forEach(instanceName => {
-                const editor = window.CKEDITOR.instances[instanceName];
-                const editorElement = editor.container.$;
-
-                if (editorElement && !processedFields.has(editorElement)) {
-                    addButtonToRichEditor(editorElement, 'ckeditor4', editor);
-                }
-            });
-        }
-
-        // CKEditor 5.x (class-based detection)
-        document.querySelectorAll('.ck-editor').forEach(editorElement => {
-            if (!processedFields.has(editorElement)) {
-                const editableElement = editorElement.querySelector('.ck-content[contenteditable="true"]');
-                if (editableElement) {
-                    addButtonToRichEditor(editorElement, 'ckeditor5', editableElement);
-                }
-            }
+    function editorRequest(action, data = {}) {
+        return new Promise((resolve, reject) => {
+            const requestId = crypto.randomUUID();
+            const timer = setTimeout(() => {
+                pendingBridge.delete(requestId);
+                reject(new Error('Editör yanıt vermedi. Sayfayı yenileyip yeniden deneyin.'));
+            }, 5000);
+            pendingBridge.set(requestId, { resolve, reject, timer });
+            document.dispatchEvent(new CustomEvent('duzelt-ai:editor-request', {
+                detail: JSON.stringify({ requestId, action, ...data })
+            }));
         });
     }
 
-    function detectSummernote() {
-        document.querySelectorAll('.note-editor').forEach(editorElement => {
-            if (!processedFields.has(editorElement)) {
-                const editableElement = editorElement.querySelector('.note-editable');
-                if (editableElement) {
-                    addButtonToRichEditor(editorElement, 'summernote', editableElement);
+    async function discoverEditors() {
+        if (!isEnabled || discovering) return;
+        discovering = true;
+        try {
+            const discovered = await editorRequest('discover');
+            if (!isEnabled || !Array.isArray(discovered)) return;
+            const liveIds = new Set();
+            discovered.forEach(item => {
+                if (!item || !/^[a-z0-9-]{36}$/i.test(item.id)) return;
+                const container = document.querySelector(`[data-duzelt-editor="${item.id}"]`);
+                const target = document.querySelector(`[data-duzelt-toolbar="${item.id}"]`);
+                if (!container || !target) return;
+                liveIds.add(item.id);
+                let entry = entries.get(item.id);
+                if (!entry) {
+                    entry = { id: item.id, type: item.type, container, button: createButton(item.id) };
+                    entries.set(item.id, entry);
+                    entry.button.addEventListener('click', event => {
+                        if (event.isTrusted) correctEditor(entry);
+                    });
                 }
-            }
-        });
-    }
-
-    function detectTinyMCE() {
-        if (window.tinymce && window.tinymce.editors) {
-            window.tinymce.editors.forEach(editor => {
-                const editorElement = editor.getContainer();
-                if (editorElement && !processedFields.has(editorElement)) {
-                    addButtonToRichEditor(editorElement, 'tinymce', editor);
+                entry.container = container;
+                if (!entry.button.isConnected || entry.button.parentElement !== target) {
+                    target.appendChild(entry.button);
                 }
             });
+            entries.forEach((entry, id) => {
+                if (!liveIds.has(id)) {
+                    entry.button.remove();
+                    entries.delete(id);
+                    if (activeOperation && activeOperation.entry === entry) cancelOperation();
+                }
+            });
+        } catch {
+            // Unsupported integrations stay unchanged, without repeated alerts.
+        } finally {
+            discovering = false;
         }
     }
 
-    function detectQuill() {
-        document.querySelectorAll('.ql-container').forEach(container => {
-            if (!processedFields.has(container)) {
-                const editableElement = container.querySelector('.ql-editor');
-                if (editableElement) {
-                    const toolbar = container.previousElementSibling;
-                    if (toolbar && toolbar.classList.contains('ql-toolbar')) {
-                        addButtonToRichEditor(toolbar, 'quill', editableElement);
-                        // Container'ı processed olarak işaretle (toolbar'a buton ekledik ama container'ı kontrol ediyoruz)
-                        processedFields.add(container);
-                    } else {
-                        addButtonToRichEditor(container, 'quill', editableElement);
-                    }
-                }
-            }
-        });
-    }
-
-    // isFieldEligible ve addButtonToField fonksiyonları kaldırıldı
-    // v3.1.0: Sadece rich text editörlere buton ekleniyor, normal input/textarea'lara eklenmiyor
-
-    function addButtonToRichEditor(containerElement, editorType, editorInstance) {
-        const fieldId = `ai-richeditor-${buttonCounter++}`;
-        const button = createButton(fieldId, editorInstance, editorType);
-
-        // Rich editörler için butonu daha iyi konumlandır
-        insertButtonForRichEditor(containerElement, button, editorType);
-        processedFields.add(containerElement);
-    }
-
-    function createButton(fieldId, fieldOrEditor, editorType = null) {
+    function createButton(id) {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = CONFIG.BUTTON_CLASS;
-        button.dataset.aiFieldId = fieldId;
+        button.className = BUTTON_CLASS;
         button.dataset.aiCorrectorButton = 'true';
-        if (editorType) {
-            button.dataset.editorType = editorType;
-        }
-        button.innerHTML = '🤖 Düzelt';
-        button.title = 'AI ile Türkçe düzeltme yap';
-
-        button.addEventListener('click', (event) => handleButtonClick(event, fieldOrEditor, editorType));
-
+        button.dataset.aiFieldId = id;
+        button.textContent = 'Düzelt';
+        button.title = 'Metni AI ile düzelt ve değişiklikleri incele';
         return button;
     }
 
-    // insertButtonNearField fonksiyonu kaldırıldı
-    // v3.1.0: Sadece rich text editörlere buton ekleniyor
-
-    function insertButtonForRichEditor(editorElement, button, editorType) {
-        // Rich editörler için toolbar'a veya container'a ekle
-        let targetElement = editorElement;
-
-        if (editorType === 'summernote') {
-            // Summernote için toolbar'ı bul
-            const toolbar = editorElement.querySelector('.note-toolbar');
-            if (toolbar) {
-                const btnGroup = document.createElement('div');
-                btnGroup.className = 'note-btn-group btn-group';
-                button.style.position = 'relative';
-                button.style.margin = '5px';
-                btnGroup.appendChild(button);
-                toolbar.appendChild(btnGroup);
-                return;
-            }
-        } else if (editorType === 'quill') {
-            // Quill için toolbar sonuna ekle
-            if (editorElement.classList.contains('ql-toolbar')) {
-                button.style.position = 'relative';
-                button.style.margin = '0 5px';
-                editorElement.appendChild(button);
-                return;
-            }
-        } else if (editorType === 'ckeditor5') {
-            // CKEditor 5 için toolbar bul
-            const toolbar = editorElement.querySelector('.ck-toolbar');
-            if (toolbar) {
-                button.style.position = 'relative';
-                button.style.margin = '0 5px';
-                toolbar.appendChild(button);
-                return;
-            }
-        }
-
-        // Varsayılan: container'a ekle
-        const parentPosition = window.getComputedStyle(targetElement).position;
-        if (parentPosition === 'static') {
-            targetElement.style.position = 'relative';
-        }
-        targetElement.appendChild(button);
+    function resetButton(button) {
+        button.disabled = false;
+        button.textContent = 'Düzelt';
+        button.removeAttribute('aria-busy');
     }
 
-    async function handleButtonClick(event, fieldOrEditor, editorType = null) {
-        event.preventDefault();
-        const button = event.currentTarget;
-
-        const editorData = getEditorValue(fieldOrEditor, editorType);
-        const originalText = editorData.text;
-
-        if (!originalText || originalText.trim().length < CONFIG.MIN_TEXT_LENGTH) {
-            alert(`Lütfen düzeltilecek metin girin (en az ${CONFIG.MIN_TEXT_LENGTH} karakter)`);
-            return;
+    function cancelOperation() {
+        if (activeOperation) {
+            activeOperation.cancelled = true;
+            resetButton(activeOperation.entry.button);
+            activeOperation = null;
         }
+        if (closeModal) closeModal();
+    }
 
-        button.disabled = true;
-        button.innerHTML = '⏳ Düzeltiliyor...';
-
+    async function correctEditor(entry) {
+        cancelOperation();
+        const operation = { entry, cancelled: false };
+        activeOperation = operation;
         try {
-            const correctedText = await requestCorrection(originalText);
-            showDiffModal(originalText, correctedText, fieldOrEditor, button, editorType, editorData);
+            const data = await editorRequest('read', { editorId: entry.id });
+            if (!isCurrent(operation)) return;
+            if (!data || typeof data.html !== 'string' || data.html.length > 1000000) {
+                throw new Error('Editör içeriği okunamadı veya çok uzun. Daha kısa bir metinle yeniden deneyin.');
+            }
+            const documentData = parseSafeHTML(data.html);
+            const projection = projectText(documentData.body);
+            const original = projection.text;
+            if (original.trim().length < 10) throw new Error('Lütfen en az 10 karakter içeren bir metin girin.');
+            if (original.length > MAX_TEXT_LENGTH) throw new Error('Metin çok uzun. Lütfen 100.000 karakterden kısa bir metinle deneyin.');
+            entry.button.disabled = true;
+            entry.button.textContent = 'Düzeltiliyor…';
+            entry.button.setAttribute('aria-busy', 'true');
+            const corrected = await requestCorrection(original);
+            if (!isCurrent(operation)) return;
+            const current = await editorRequest('read', { editorId: entry.id });
+            if (!isCurrent(operation)) return;
+            if (current.html !== data.html) throw new Error('Metin düzeltme sırasında değişti. Yeni metin korunuyor; yeniden Düzelt seçeneğini kullanın.');
+            const mapped = mapTextToHTML(documentData, projection, corrected);
+            showDiff(operation, original, corrected, data.html, mapped);
         } catch (error) {
-            alert('Hata: ' + error.message);
-            button.disabled = false;
-            button.innerHTML = '🤖 Düzelt';
-        }
-    }
-
-    function getEditorValue(fieldOrEditor, editorType) {
-        if (!editorType) {
-            // Normal field - düz metin
-            if (fieldOrEditor.isContentEditable) {
-                return {
-                    text: fieldOrEditor.innerText || fieldOrEditor.textContent,
-                    html: null,
-                    isPlainText: true
-                };
-            }
-            return {
-                text: fieldOrEditor.value,
-                html: null,
-                isPlainText: true
-            };
-        }
-
-        // Rich text editörler - HTML ile birlikte
-        let html = '';
-        let text = '';
-
-        switch (editorType) {
-            case 'ckeditor4':
-                html = fieldOrEditor.getData();
-                text = extractTextFromHTML(html);
-                break;
-
-            case 'ckeditor5':
-                html = fieldOrEditor.innerHTML;
-                text = fieldOrEditor.innerText || fieldOrEditor.textContent;
-                break;
-
-            case 'summernote':
-                html = fieldOrEditor.innerHTML;
-                text = fieldOrEditor.innerText || fieldOrEditor.textContent;
-                break;
-
-            case 'tinymce':
-                html = fieldOrEditor.getContent();
-                text = fieldOrEditor.getContent({ format: 'text' });
-                break;
-
-            case 'quill':
-                html = fieldOrEditor.innerHTML;
-                text = fieldOrEditor.innerText || fieldOrEditor.textContent;
-                break;
-
-            default:
-                html = fieldOrEditor.innerHTML || '';
-                text = fieldOrEditor.innerText || fieldOrEditor.textContent || '';
-        }
-
-        return {
-            text: text,
-            html: html,
-            isPlainText: false,
-            editorInstance: fieldOrEditor
-        };
-    }
-
-    function extractTextFromHTML(html) {
-        const temp = document.createElement('div');
-        temp.innerHTML = html;
-        return temp.innerText || temp.textContent || '';
-    }
-
-    function setEditorValue(fieldOrEditor, correctedText, editorType, originalData) {
-        if (!editorType) {
-            // Normal field - düz metin
-            if (fieldOrEditor.isContentEditable) {
-                fieldOrEditor.innerText = correctedText;
-            } else {
-                fieldOrEditor.value = correctedText;
-            }
-            fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
-            fieldOrEditor.dispatchEvent(new Event('change', { bubbles: true }));
-            return;
-        }
-
-        // Rich text editörler - HTML formatını koru
-        const correctedHTML = mapTextToHTML(originalData.html, originalData.text, correctedText);
-
-        // If word count changed, mapping failed to preserve formatting
-        // Fall back to plain text with user warning (already shown in modal)
-        if (correctedHTML === null) {
-            // Apply as plain text - formatting will be lost
-            const plainHTML = escapeHtmlSafe(correctedText);
-
-            switch (editorType) {
-                case 'ckeditor4':
-                    fieldOrEditor.setData(plainHTML);
-                    break;
-                case 'ckeditor5':
-                case 'summernote':
-                case 'quill':
-                    fieldOrEditor.innerHTML = plainHTML;
-                    fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
-                    break;
-                case 'tinymce':
-                    fieldOrEditor.setContent(plainHTML);
-                    break;
-            }
-            return;
-        }
-
-        // Normal case: formatting preserved
-        switch (editorType) {
-            case 'ckeditor4':
-                fieldOrEditor.setData(correctedHTML);
-                break;
-
-            case 'ckeditor5':
-                fieldOrEditor.innerHTML = correctedHTML;
-                fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
-                break;
-
-            case 'summernote':
-                fieldOrEditor.innerHTML = correctedHTML;
-                fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
-                break;
-
-            case 'tinymce':
-                fieldOrEditor.setContent(correctedHTML);
-                break;
-
-            case 'quill':
-                fieldOrEditor.innerHTML = correctedHTML;
-                fieldOrEditor.dispatchEvent(new Event('input', { bubbles: true }));
-                break;
-        }
-    }
-
-    function mapTextToHTML(originalHTML, originalText, correctedText) {
-        // SECURITY FIX: Position-aware replacement with proper escaping
-        // Fixes: XSS vulnerability and word mapping corruption
-
-        const originalWords = originalText.split(/\s+/).filter(w => w.length > 0);
-        const correctedWords = correctedText.split(/\s+/).filter(w => w.length > 0);
-
-        // FIX: If word counts differ, preserve original formatting
-        // Insertions/deletions cannot be reliably mapped with position-only strategy
-        // Rather than destroying all rich-text formatting (bold, italic, links, lists),
-        // we preserve the original HTML and let the user decide via modal
-        if (originalWords.length !== correctedWords.length) {
-            // Return null to signal "cannot map safely"
-            // The caller (showDiffModal) will show a warning to the user
-            return null;
-        }
-
-        // SECURITY: Use DOMParser to safely parse HTML without executing scripts
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(originalHTML, 'text/html');
-        const tempDiv = doc.body;
-
-        // Build position-indexed replacement map
-        // Key: global word position, Value: replacement text
-        const positionMap = new Map();
-        for (let i = 0; i < originalWords.length; i++) {
-            if (originalWords[i] !== correctedWords[i]) {
-                // SECURITY: textContent insertion (line 401) prevents HTML injection
-                // No need for sanitization - textContent auto-escapes
-                positionMap.set(i, correctedWords[i]);
+            if (isCurrent(operation)) {
+                cancelOperation();
+                alert(error.message);
             }
         }
-
-        // Walk DOM tree and replace text nodes using global position counter
-        const context = { globalPosition: 0 };
-        replaceTextNodesInDOM(tempDiv, positionMap, context);
-
-        return tempDiv.innerHTML;
     }
 
-    function replaceTextNodesInDOM(node, positionMap, context) {
-        // Recursively walk DOM tree and replace text content
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent || '';
-            const words = text.split(/(\s+)/); // Keep whitespace
-
-            let modified = false;
-            const newWords = words.map(word => {
-                if (word.trim().length === 0) {
-                    return word; // Keep whitespace as-is
-                }
-
-                // Check if this position needs replacement
-                if (positionMap.has(context.globalPosition)) {
-                    modified = true;
-                    const replacement = positionMap.get(context.globalPosition);
-                    context.globalPosition++;
-                    return replacement;
-                }
-
-                context.globalPosition++;
-                return word;
-            });
-
-            if (modified) {
-                // SECURITY: textContent auto-escapes HTML, preventing XSS
-                // Special chars like < > & are displayed correctly without double-escaping
-                node.textContent = newWords.join('');
-            }
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-            // Skip script and style tags for security
-            if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE') {
-                return;
-            }
-
-            // Recursively process child nodes
-            const children = Array.from(node.childNodes);
-            children.forEach(child => replaceTextNodesInDOM(child, positionMap, context));
-        }
+    function isCurrent(operation) {
+        return isEnabled && !operation.cancelled && activeOperation === operation && operation.entry.container.isConnected;
     }
-
-    function escapeHtmlSafe(text) {
-        // Safe fallback: escape all HTML and preserve line breaks
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML.replace(/\n/g, '<br>');
-    }
-
 
     function requestCorrection(text) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage(
-                { action: 'correctText', text: text },
-                response => {
-                    if (chrome.runtime.lastError) {
-                        reject(new Error(chrome.runtime.lastError.message));
-                    } else if (response.error) {
-                        reject(new Error(response.error));
-                    } else {
-                        resolve(response.correctedText);
-                    }
+            const timer = setTimeout(() => reject(new Error('Düzeltme isteği zaman aşımına uğradı. Lütfen yeniden deneyin.')), 90000);
+            chrome.runtime.sendMessage({ action: 'correctText', text }, response => {
+                clearTimeout(timer);
+                if (chrome.runtime.lastError) {
+                    reject(new Error('Eklenti bağlantısı kesildi. Sayfayı yenileyip yeniden deneyin.'));
+                } else if (!response || typeof response !== 'object') {
+                    reject(new Error('Düzeltme hizmetinden geçerli bir yanıt alınamadı. Lütfen yeniden deneyin.'));
+                } else if (response.error) {
+                    reject(new Error(typeof response.error === 'string' ? response.error : 'Düzeltme tamamlanamadı.'));
+                } else if (typeof response.correctedText !== 'string' || !response.correctedText.trim() || response.correctedText.length > MAX_TEXT_LENGTH) {
+                    reject(new Error('Düzeltme hizmeti boş veya geçersiz bir metin döndürdü. Asıl metin korunuyor.'));
+                } else {
+                    resolve(response.correctedText);
                 }
-            );
+            });
         });
     }
 
-    function showDiffModal(original, corrected, fieldOrEditor, button, editorType, originalData) {
-        // FIX: Clean up existing modal if present
-        const existingModal = document.getElementById(CONFIG.MODAL_ID);
-        if (existingModal) {
-            // The cleanup handler is responsible for removing the modal and re-enabling the button
-            if (existingModal._cleanupHandler) {
-                existingModal._cleanupHandler();
-            } else {
-                // Fallback for modals created without a cleanup handler
-                const previousButton = existingModal._associatedButton;
-                if (previousButton) {
-                    previousButton.disabled = false;
-                    previousButton.innerHTML = '🤖 Düzelt';
+    // Keep the text formatting vocabulary; remove executable elements, event
+    // handlers, unsafe URLs and CSS before applying even the original HTML.
+    function parseSafeHTML(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const allowedTags = new Set('P DIV SPAN STRONG B EM I U S STRIKE DEL INS A UL OL LI BR BLOCKQUOTE H1 H2 H3 H4 H5 H6 PRE CODE SUB SUP TABLE TBODY THEAD TFOOT TR TD TH HR IMG'.split(' '));
+        const forbiddenTags = new Set('SCRIPT STYLE IFRAME OBJECT EMBED SVG MATH FORM INPUT BUTTON TEXTAREA SELECT VIDEO AUDIO CANVAS TEMPLATE'.split(' '));
+        const styleProperties = new Set('color background-color font-weight font-style font-size font-family text-decoration text-align line-height margin-left padding-left vertical-align white-space'.split(' '));
+        Array.from(doc.body.querySelectorAll('*')).forEach(element => {
+            if (forbiddenTags.has(element.tagName)) {
+                element.remove();
+                return;
+            }
+            if (!allowedTags.has(element.tagName)) {
+                element.replaceWith(...element.childNodes);
+                return;
+            }
+            Array.from(element.attributes).forEach(attribute => {
+                const name = attribute.name.toLowerCase();
+                const value = attribute.value;
+                let allowed = false;
+                if (name === 'href' && element.tagName === 'A') allowed = safeURL(value, false);
+                if (name === 'src' && element.tagName === 'IMG') allowed = safeURL(value, true);
+                if (['title', 'alt', 'lang'].includes(name)) allowed = true;
+                if (name === 'dir') allowed = ['ltr', 'rtl', 'auto'].includes(value);
+                if (['width', 'height', 'colspan', 'rowspan', 'start'].includes(name)) allowed = /^\d{1,4}$/.test(value);
+                if (name === 'data-list') allowed = ['bullet', 'ordered', 'checked', 'unchecked'].includes(value);
+                if (name === 'class') allowed = /^(?:ql-(?:align-(?:center|right|justify)|indent-[0-8]|direction-rtl|size-(?:small|large|huge)|font-(?:serif|monospace))(?:\s+|$))+$/.test(value);
+                if (name === 'style') {
+                    const styles = [];
+                    for (const property of element.style) {
+                        const styleValue = element.style.getPropertyValue(property);
+                        if (styleProperties.has(property) && !/url\s*\(|expression\s*\(|[<>]/i.test(styleValue)) {
+                            styles.push(`${property}: ${styleValue}`);
+                        }
+                    }
+                    element.removeAttribute('style');
+                    if (styles.length) element.setAttribute('style', styles.join('; '));
+                    return;
                 }
-                existingModal.remove();
+                if (!allowed) element.removeAttribute(attribute.name);
+            });
+            if (element.tagName === 'IMG' && !element.hasAttribute('src')) element.remove();
+        });
+        return doc;
+    }
+
+    function safeURL(value, image) {
+        const cleaned = value.replace(/[\u0000-\u0020\u007f]/g, '');
+        if (image && /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=]+$/i.test(cleaned)) return true;
+        const scheme = cleaned.match(/^([^/:?#]+):/);
+        return !scheme || (image ? /^(https?)$/i : /^(https?|mailto|tel)$/i).test(scheme[1]);
+    }
+
+    function projectText(root) {
+        let text = '';
+        const positions = [];
+        const textNodes = [];
+        const blockTags = new Set('P DIV LI BLOCKQUOTE H1 H2 H3 H4 H5 H6 PRE TR TD TH'.split(' '));
+        function append(value, node) {
+            text += value;
+            for (let index = 0; index < value.length; index++) positions.push(node);
+        }
+        function visit(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                if (/^[\t\r\n ]*$/.test(node.textContent) && ['BODY', 'UL', 'OL', 'TABLE', 'TBODY', 'THEAD', 'TFOOT', 'TR'].includes(node.parentElement.tagName)) return;
+                textNodes.push(node);
+                append(node.textContent, node);
+                return;
+            }
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+            if (node.tagName === 'BR') {
+                append('\n', null);
+                return;
+            }
+            if (blockTags.has(node.tagName) && text && !text.endsWith('\n')) append('\n', null);
+            const start = text.length;
+            Array.from(node.childNodes).forEach(visit);
+            if (blockTags.has(node.tagName) && text.length > start && !text.endsWith('\n')) append('\n', null);
+        }
+        visit(root);
+        while (text.endsWith('\n')) {
+            text = text.slice(0, -1);
+            positions.pop();
+        }
+        return { text, positions, textNodes };
+    }
+
+    function mapTextToHTML(doc, projection, corrected) {
+        const outputs = new Map(projection.textNodes.map(node => [node, '']));
+        const wordParts = Diff.diffWordsWithSpace(projection.text, corrected);
+        const parts = [];
+        for (let index = 0; index < wordParts.length; index++) {
+            const part = wordParts[index];
+            const next = wordParts[index + 1];
+            if (part.removed && next && next.added) {
+                // Refine replacements to characters so normalizing spaces next
+                // to a link does not move the corrected word outside the link.
+                const refined = Diff.diffChars(part.value, next.value, { maxEditLength: 2000 });
+                if (!refined) return null;
+                parts.push(...refined);
+                index++;
+            } else {
+                parts.push(part);
             }
         }
+        let offset = 0;
+        let structuralChange = false;
+        let removedTarget = null;
+        for (const part of parts) {
+            if (part.added) {
+                if (/[\r\n]/.test(part.value)) structuralChange = true;
+                let target = removedTarget || projection.positions[offset];
+                removedTarget = null;
+                if (!target) target = projection.positions[offset - 1];
+                if (!target) structuralChange = true;
+                if (target) outputs.set(target, outputs.get(target) + part.value);
+            } else if (part.removed) {
+                removedTarget = projection.positions[offset];
+                for (let index = 0; index < part.value.length; index++) {
+                    if (projection.positions[offset + index] === null) structuralChange = true;
+                }
+                offset += part.value.length;
+            } else {
+                removedTarget = null;
+                for (let index = 0; index < part.value.length; index++) {
+                    const node = projection.positions[offset++];
+                    if (node) outputs.set(node, outputs.get(node) + part.value[index]);
+                }
+            }
+        }
+        if (structuralChange) return null;
+        outputs.forEach((value, node) => { node.textContent = value; });
+        // Reject a mapping that fails to reproduce the exact accepted text.
+        return projectText(doc.body).text === corrected ? doc.body.innerHTML : null;
+    }
 
-        // Check if word count changed (formatting cannot be preserved)
-        const originalWords = original.split(/\s+/).filter(w => w.length > 0);
-        const correctedWords = corrected.split(/\s+/).filter(w => w.length > 0);
-        const wordCountChanged = originalWords.length !== correctedWords.length;
+    function plainHTML(text) {
+        const root = document.createElement('div');
+        text.split('\n').forEach(line => {
+            const paragraph = document.createElement('p');
+            if (line) paragraph.textContent = line;
+            else paragraph.appendChild(document.createElement('br'));
+            root.appendChild(paragraph);
+        });
+        return root.innerHTML;
+    }
 
-        const modal = createDiffModal(original, corrected, wordCountChanged);
-        // Store button reference on modal for cleanup
-        modal._associatedButton = button;
+    function showDiff(operation, original, corrected, expectedHTML, mapped) {
+        const modal = document.createElement('div');
+        modal.id = MODAL_ID;
+        modal.className = 'ai-corrector-modal';
+        modal.innerHTML = '<section class="ai-corrector-modal-content" role="dialog" aria-modal="true" aria-labelledby="ai-corrector-title" tabindex="-1"><header class="ai-corrector-modal-header"><h3 id="ai-corrector-title">Düzeltmeleri inceleyin</h3></header><div class="ai-corrector-modal-body"><p class="ai-corrector-warning" hidden>Bu değişiklikte biçimler güvenle eşleştirilemedi. Sonuç düz metin olarak uygulanacak; biçimler ve bağlantılar kaldırılacak. Kabul etmeden önce kontrol edin.</p><div class="ai-corrector-diff"></div><p class="ai-corrector-legend"><span class="ai-corrector-added">Eklenen</span><span class="ai-corrector-removed">Çıkarılan</span></p><p class="ai-corrector-error" role="alert" hidden></p></div><footer class="ai-corrector-modal-footer"><button type="button" data-action="reject" class="ai-corrector-btn-secondary">İptal</button><button type="button" data-action="accept" class="ai-corrector-btn-primary">Kabul et</button></footer></section>';
+        modal.querySelector('.ai-corrector-warning').hidden = mapped !== null;
+        const diff = modal.querySelector('.ai-corrector-diff');
+        Diff.diffWordsWithSpace(original, corrected).forEach(part => {
+            const span = document.createElement('span');
+            span.textContent = part.value;
+            if (part.added) span.className = 'ai-corrector-added';
+            if (part.removed) span.className = 'ai-corrector-removed';
+            diff.appendChild(span);
+        });
         document.body.appendChild(modal);
-
-        const acceptBtn = modal.querySelector('[data-action="accept"]');
-        const rejectBtn = modal.querySelector('[data-action="reject"]');
-
-        // Use function declarations to avoid temporal dead zone
-        function handleEscape(e) {
-            if (e.key === 'Escape') {
-                cleanup();
-            }
-        }
-
+        const accept = modal.querySelector('[data-action="accept"]');
+        const reject = modal.querySelector('[data-action="reject"]');
+        const dialog = modal.querySelector('[role="dialog"]');
+        const previousFocus = document.activeElement;
         function cleanup() {
             modal.remove();
-            button.disabled = false;
-            button.innerHTML = '🤖 Düzelt';
-            // FIX: Always remove event listener to prevent memory leak
-            document.removeEventListener('keydown', handleEscape);
+            document.removeEventListener('keydown', onKeydown, true);
+            closeModal = null;
+            if (previousFocus && previousFocus.isConnected) previousFocus.focus();
         }
-
-        // Store cleanup handler for proper cleanup of existing modals
-        modal._cleanupHandler = cleanup;
-
-        acceptBtn.addEventListener('click', () => {
-            setEditorValue(fieldOrEditor, corrected, editorType, originalData);
-            cleanup();
+        closeModal = cleanup;
+        function onKeydown(event) {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                event.stopPropagation();
+                cancelOperation();
+            } else if (event.key === 'Tab') {
+                const focusable = Array.from(dialog.querySelectorAll('button:not(:disabled)'));
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            }
+        }
+        document.addEventListener('keydown', onKeydown, true);
+        reject.addEventListener('click', cancelOperation);
+        accept.addEventListener('click', async event => {
+            if (!event.isTrusted) return;
+            if (!isCurrent(operation)) { cancelOperation(); return; }
+            accept.disabled = true;
+            try {
+                await editorRequest('write', { editorId: operation.entry.id, html: mapped === null ? plainHTML(corrected) : mapped, expectedHTML });
+                if (isCurrent(operation)) cancelOperation();
+            } catch (error) {
+                if (!isCurrent(operation)) return;
+                const message = modal.querySelector('.ai-corrector-error');
+                message.textContent = error.message;
+                message.hidden = false;
+                // A changed document needs a new correction, not another accept.
+                reject.focus();
+            }
         });
-
-        rejectBtn.addEventListener('click', cleanup);
-
-        // Allow ESC key to close modal (accessibility)
-        document.addEventListener('keydown', handleEscape);
+        reject.focus();
     }
 
-    function createDiffModal(original, corrected, wordCountChanged = false) {
-        const modal = document.createElement('div');
-        modal.id = CONFIG.MODAL_ID;
-        modal.className = 'ai-corrector-modal';
-
-        const diff = Diff.diffWords(original, corrected);
-        const diffHtml = diff.map(part => {
-            const color = part.added ? 'green' : part.removed ? 'red' : 'gray';
-            const decoration = part.added ? 'underline' : part.removed ? 'line-through' : 'none';
-            return `<span style="color: ${color}; text-decoration: ${decoration};">${escapeHtml(part.value)}</span>`;
-        }).join('');
-
-        // Warning message if formatting will be lost
-        const warningHtml = wordCountChanged ? `
-            <div class="ai-corrector-warning">
-                <strong>⚠️ Uyarı:</strong> Düzeltme kelime sayısını değiştirdi.
-                <br>Formatlar (kalın, italik, linkler) korunmayabilir.
-            </div>
-        ` : '';
-
-        modal.innerHTML = `
-            <div class="ai-corrector-modal-content">
-                <div class="ai-corrector-modal-header">
-                    <h3>AI Metin Düzeltme Sonucu</h3>
-                </div>
-                <div class="ai-corrector-modal-body">
-                    ${warningHtml}
-                    <div class="ai-corrector-diff">
-                        ${diffHtml}
-                    </div>
-                    <div class="ai-corrector-legend">
-                        <span style="color: green;">✓ Eklenen</span>
-                        <span style="color: red;">✗ Çıkarılan</span>
-                    </div>
-                </div>
-                <div class="ai-corrector-modal-footer">
-                    <button data-action="reject" class="ai-corrector-btn-secondary">İptal</button>
-                    <button data-action="accept" class="ai-corrector-btn-primary">Kabul Et</button>
-                </div>
-            </div>
-        `;
-
-        return modal;
+    function scheduleDiscovery() {
+        if (!isEnabled || discoveryTimer) return;
+        discoveryTimer = setTimeout(() => {
+            discoveryTimer = null;
+            discoverEditors();
+        }, 150);
     }
 
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    document.addEventListener('duzelt-ai:editors-ready', scheduleDiscovery);
 
-    function observeDOMChanges() {
-        // isEnabled kontrolü - devre dışıysa observer başlatma
-        if (!isEnabled) return;
-
-        // Eski observer varsa disconnect et
-        if (domObserver) {
-            domObserver.disconnect();
-        }
-
+    function enable() {
+        if (domObserver) return;
+        scheduleDiscovery();
         domObserver = new MutationObserver(mutations => {
-            // Her mutation'da isEnabled kontrolü
-            if (!isEnabled) return;
-
-            let needsUpdate = false;
-
-            mutations.forEach(mutation => {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        needsUpdate = true;
-                    }
+            const relevant = mutations.some(mutation => {
+                if (mutation.target.nodeType !== Node.ELEMENT_NODE) return false;
+                if (mutation.type === 'attributes') {
+                    return mutation.target.matches('.ck-editor__editable, .note-editable, .ql-editor, .note-editor');
+                }
+                if (mutation.target.closest(`#${MODAL_ID}, .ck-content, .note-editable, .ql-editor`)) return false;
+                return [...mutation.addedNodes, ...mutation.removedNodes].some(node => {
+                    if (node.nodeType !== Node.ELEMENT_NODE || node.matches(`.${BUTTON_CLASS}, #${MODAL_ID}`)) return false;
+                    return node.matches(EDITOR_SELECTOR) || node.querySelector(EDITOR_SELECTOR) || mutation.target.closest(EDITOR_SELECTOR);
                 });
             });
-
-            if (needsUpdate) {
-                // Debounce: DOM değişikliklerini topla
-                clearTimeout(observeDOMChanges.timer);
-                observeDOMChanges.timer = setTimeout(() => {
-                    if (isEnabled) {
-                        addButtonsToExistingFields();
-                    }
-                }, CONFIG.DEBOUNCE_DELAY);
-            }
+            if (relevant) scheduleDiscovery();
         });
-
-        domObserver.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        domObserver.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['contenteditable', 'class'] });
     }
 
-    chrome.storage.onChanged.addListener((changes, namespace) => {
-        if (namespace === 'sync' && changes[STORAGE_KEYS.ENABLED]) {
-            isEnabled = changes[STORAGE_KEYS.ENABLED].newValue !== false;
-            if (isEnabled) {
-                init();
-            } else {
-                removeAllButtons();
-                disconnectObserver();
-            }
-        }
+    function disable() {
+        cancelOperation();
+        clearTimeout(discoveryTimer);
+        discoveryTimer = null;
+        if (domObserver) domObserver.disconnect();
+        domObserver = null;
+        entries.forEach(entry => entry.button.remove());
+        entries.clear();
+    }
+
+    chrome.storage.sync.get([ENABLED_KEY], result => {
+        const storageError = chrome.runtime.lastError;
+        if (storageError || !result || storageGeneration !== 0) return;
+        isEnabled = result[ENABLED_KEY] !== false;
+        if (isEnabled) enable();
     });
-
-    function removeAllButtons() {
-        const buttons = document.querySelectorAll(`.${CONFIG.BUTTON_CLASS}`);
-        buttons.forEach(btn => btn.remove());
-        processedFields.clear();
-    }
-
-    function disconnectObserver() {
-        if (domObserver) {
-            domObserver.disconnect();
-            domObserver = null;
-        }
-    }
-
+    chrome.storage.onChanged.addListener((changes, namespace) => {
+        if (namespace !== 'sync' || !changes[ENABLED_KEY]) return;
+        storageGeneration++;
+        isEnabled = changes[ENABLED_KEY].newValue !== false;
+        if (isEnabled) enable();
+        else disable();
+    });
 })();

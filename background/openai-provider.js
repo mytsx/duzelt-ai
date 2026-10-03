@@ -1,7 +1,13 @@
+class OpenAIProviderError extends Error {
+    constructor(code, message) {
+        super(message);
+        this.name = 'OpenAIProviderError';
+        this.code = code;
+    }
+}
+
 const OpenAIProvider = {
-    API_BASE_URL: 'https://api.openai.com/v1',
     MODEL: 'gpt-4o',
-    TEMPERATURE: 0.3,  // Low temperature for consistency in corrections
 
     DEFAULT_SYSTEM_PROMPT: `Sen, Türkçe RESMÎ YAZIŞMALAR için özelleştirilmiş bir metin düzeltme asistanısın.
 
@@ -222,48 +228,10 @@ Kurallar:
 - Kullanıcı metni tamamen boşsa, yine JSON döndür ama "corrected_text" değeri boş string olabilir:
   {"corrected_text":""}`,
 
+    // Eski çağrı imzası korunur; taşıma, izin ve yanıt doğrulaması merkezî servistedir.
     async correctText(text, apiKey, systemPrompt = null) {
-        const requestBody = JSON.stringify({
-            model: this.MODEL,
-            messages: [
-                {
-                    role: 'system',
-                    content: systemPrompt || this.DEFAULT_SYSTEM_PROMPT
-                },
-                {
-                    role: 'user',
-                    content: text
-                }
-            ],
-            response_format: { type: 'json_object' },
-            temperature: this.TEMPERATURE
-        });
-
-        // Headers'ı ayrı oluştur (Chrome Service Worker uyumluluğu için)
-        const headers = new Headers();
-        headers.append('Content-Type', 'application/json; charset=utf-8');
-        headers.append('Authorization', 'Bearer ' + apiKey);
-
-        const response = await fetch(`${this.API_BASE_URL}/chat/completions`, {
-            method: 'POST',
-            headers: headers,
-            body: requestBody
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `OpenAI API hatası: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const content = data.choices[0].message.content;
-
-        try {
-            const jsonResponse = JSON.parse(content);
-            return jsonResponse.corrected_text || jsonResponse.metin || jsonResponse.text || content;
-        } catch (e) {
-            console.error('JSON parse failed:', e);
-            return content;
-        }
+        const resolved = ProviderService.resolveProfile('openai', { model: this.MODEL, apiKey });
+        const request = ProviderService.buildCorrectionRequest(resolved, text, systemPrompt);
+        return ProviderService.readOutput(resolved, await ProviderService.fetchJSON(resolved, request.url, request.body));
     }
 };

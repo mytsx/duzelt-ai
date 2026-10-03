@@ -1,0 +1,20 @@
+{
+  "verified_on": "2026-10-03",
+  "public_store_url": "https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl",
+  "item_id": "gnkhgnhdokinbamhokpljgafapfjhjhl",
+  "published_version": "3.3.0",
+  "public_http_status": 200,
+  "developer_name_found": true,
+  "repository_link_found": true,
+  "downloadable_from_google_update_service": true,
+  "developer_dashboard_verified": false,
+  "new_submission_made": false,
+  "local_maintenance_version": "3.4.0",
+  "website_dns_answer": null,
+  "website_https_verified": false,
+  "github_default_branch": "main",
+  "github_release_list": "empty",
+  "browser_account_blocker": "New Chrome session/tab creation returned Not allowed twice; no dashboard changes made.",
+  "published_updated_on": "2025-11-27",
+  "published_manifest_verified_from_google_crx": true
+}

@@ -1,333 +1,99 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Proje ve kapsam
 
-## Project Overview
+AI Türkçe Metin Düzeltici, Manifest V3 kullanan bir Chrome eklentisidir. Yerel bakım sürümü **3.4.0**, asgari Chrome sürümü **111**; sürümün asıl kaynağı `manifest.json` dosyasıdır. Mağazadaki yayın sürümü yerel sürümle aynı kabul edilmez; doğrulama kaydı `docs/current-state.json` içinde tutulur.
 
-Chrome Extension (Manifest V3) that adds AI-powered Turkish text correction buttons **ONLY to rich text editors** (CKEditor, Summernote, TinyMCE, Quill). Uses OpenAI GPT-4o to correct text according to TDK (Turkish Language Association) standards and official correspondence regulations.
+Yalnız CKEditor 4/5, Summernote, TinyMCE ve Quill gibi **zengin metin editörleri** kapsam içindedir. Normal input/textarea desteği veya yeni ürün özellikleri kullanıcı istemeden eklenmez. WordPress, Drupal, Joomla ve Notion için genel destek iddiası yapılmaz. Test edilen gerçek editör sürümleri ve sonuçları `docs/testing.md` içinde kaydedilir; bir DOM maketi veya editör testi bütün CMS'lerin desteklendiğini göstermez.
 
-**Current Version:** 3.3.0
+## Çalışma mimarisi
 
-## Build & Development Commands
+1. `content/editor-bridge.js`, manifestin `world: MAIN` alanıyla sayfa bağlamında çalışır. Gerçek editör nesnelerini bulur ve editörlerin okuma/yazma API'lerini kullanır.
+2. `content/content.js`, izole içerik betiğinde düğmeleri, metin çıkarma/HTML temizleme, diff önizlemesini ve kullanıcı kabulünü yönetir. Köprüyle `duzelt-ai:editor-request` / `duzelt-ai:editor-response` olayları üzerinden yalnız editör işlemleri için haberleşir.
+3. Düzeltilecek düz metin `chrome.runtime.sendMessage` ile servis işçisine gider.
+4. `background/background.js`, `ProviderService` üzerinden kaydedilmiş etkin sağlayıcı profilini okur. **Etkin API ve kimlik ağı yalnız `background/provider-service.js` üzerinden yürür.** Genel `fetchJSON` izin/kimlik/model akışını, özel `requestJSON` ortak HTTP güvenlik ve zaman aşımı sınırını yönetir. `background/openai-provider.js` varsayılan promptu, ortak hata tipini ve eski OpenAI giriş noktasının uyumlu sarmalayıcısını tutar.
+5. Yanıt önizlemeden sonra kullanıcı kabul ederse editörün kendi API'siyle uygulanır. Köprü anahtarı, özel promptu veya sağlayıcı isteğini içermez.
 
-**No build step required** - this is vanilla JavaScript with no dependencies or build process.
+Sağlayıcı kataloğu `lib/provider-catalog.js` ile paketlenir; `tools/update-provider-catalog.py` yalnız yerel hazırlıkta public metadata'dan deterministik çıktı üretir. SDK adları kaynak metadata'dır; npm/CLI paketi veya uzak JavaScript eklentide çalıştırılmaz. Ayarlar yalnız saf profil/izin resolver'ını kullanır, düzeltme ve model yenileme mesajlarını servis işçisine gönderir. Ayrıntılar `docs/providers-research.md` ve `docs/provider-edge-notes.md` dosyalarındadır.
 
-**Development workflow:**
-1. Make code changes
-2. Reload extension: `chrome://extensions/` → Click reload icon
-3. Refresh test webpage (F5)
+Editör yazma yöntemleri: CKEditor 4 `setData/updateElement`, CKEditor 5 `editor.data.set`, Summernote `summernote('code')`, TinyMCE `setContent/save` ve undo transaction, Quill `clipboard.convert/setContents`. Doğrudan `innerHTML + input` yazmak editör veri modelinin yerine kullanılmaz. Quill 1 ve 2'nin clipboard arayüzleri farklıdır. CKEditor 5 çok köklü/işbirlikçi kurulumları ayrıca test edilmeden desteklenmez.
 
-**Package for distribution:**
-```bash
-zip -r dist.zip manifest.json background content popup options lib icons
+## Metin güvenliği ve kabul davranışı
+
+- İzole içerik betiği HTML'i `DOMParser` ile ayrıştırır; çalıştırılabilir öğeleri, olay özniteliklerini, tehlikeli URL'leri ve izin verilmeyen stilleri kaldırır.
+- Model çıktısı HTML olarak yorumlanmaz. Diff ve metin düğümleri `textContent` ile yazılır.
+- Biçim eşlemesi, metin düğümleri ve karakter konumları üzerinden yapılır. Kelime ekleme/çıkarma tek başına tüm biçimleri kaldırma gerekçesi değildir.
+- Paragraf/diğer yapısal değişiklikler güvenle eşlenemiyorsa önizleme **düz metin dönüşümü uyarısı** gösterir. Kullanıcı kabul etmeden hiçbir dönüşüm uygulanmaz.
+- İstekten sonra editör yeniden okunur; kabul sırasında köprü de beklenen HTML'i karşılaştırır. Yeni metin eski yanıttan dolayı ezilmez.
+- İptal, Escape, yeni işlem veya eklentiyi kapatma bekleyen sonucun uygulanmasını engeller. Ağ isteği gönderilmişse yerelde iptal etmek sağlayıcıya aktarımı geri almaz.
+- Editör ve bekleyen köprü işlemleri `Map` ile takip edilir. Kaldırılmış editörler temizlenir; kapatma sırasında gözlemci ve zamanlayıcı durdurulur, düğmeler kaldırılır.
+- Gözlemci yalnız ilgili editör ekleme/kaldırmalarını işler ve keşfi birleştirir. Her DOM değişikliğinde tüm sayfayı gereksiz taramayın.
+
+## Ayar anahtarları ve sırlar
+
+Mevcut kurulu kullanıcıların anahtarlarını ve güncelleme yolunu koruyun:
+
+| Değer | Anahtar | Depo |
+| --- | --- | --- |
+| OpenAI API anahtarı | `openai_api_key` | `chrome.storage.local` |
+| Etkin sağlayıcı ve ayrı bağlantı profilleri | `ai_provider_config` (`version: 1`) | `chrome.storage.local` |
+| Özel sistem promptu | `custom_system_prompt` | `chrome.storage.local` |
+| Açma/kapatma | `ai_corrector_enabled` | `chrome.storage.sync` |
+
+Anahtarı, erişim belirtecini, SAP Client ID/secret değerlerini, sağlayıcı profilini ve özel promptu Sync'e taşımayın. Yeni profil yoksa eski OpenAI anahtarını ve `gpt-4o` varsayılanını okuyun; mevcut kullanıcı kaydını silmeyin. Kanonik profil/katalog alanları `baseURL`, `authType`, `protocol`, `model` ve `apiKey` biçimindedir. IBM/SAP özel kimlik/deployment alanları aynı yerel profilde tutulur. Yeni profil varken eski anahtar etkin sağlayıcıyı ezmemeli. IAM/OAuth değişiminden dönen kısa ömürlü belirteci depolamayın veya loglamayın.
+
+Yerel depo erişimi destekleyen Chrome sürümlerinde `TRUSTED_CONTEXTS` ile sınırlandırılır. Sırları MAIN-world köprüsüne, sayfa olaylarına, URL'lere, hata çıktılarına veya loglara taşımayın. Mevcut API host izni `https://api.openai.com/*` adresidir; diğer HTTPS ve yerel loopback adresleri manifestin **optional** izinleridir. Kullanıcı eylemiyle `getPermissionOrigins` üzerinden çözümlenmiş API ve gerekiyorsa belirteç origin'leri için izin isteyin, ağ çağrısından önce hepsini denetleyin. IBM IAM adresi sabittir; SAP OAuth adresi servis anahtarından alınır. Profil anahtarını başka origin'e yönlendirmeyin; `redirect: 'error'`, `credentials: 'omit'`, `referrerPolicy: 'no-referrer'` korunur. Yeni gereksiz izin eklemeyin. HTTP/HTTPS sayfalarındaki editör algılama içerik betikleriyle yapılır; kullanılmayan `activeTab` izni geri eklenmez.
+
+Boş anahtar kaydı seçili profilin anahtar değerini temizler; sağlayıcı değiştirmek diğer profilleri silmez. Varsayılanı yüklemek yalnız formu değiştirir; **Promptu kaydet** olmadan kayıtlı özel prompt silinmez. Boş/varsayılan promptu kaydetmek yerel özel prompt değerini kaldırır. Bağlantı testi kaydedilmiş değerleri kullanır, gerçek API çağrısıdır ve ayrıca ücret doğurabilir. Model-listesi isteği yalnız kullanıcı tıklamasıyla yapılır; model-listesi yolu uygulanmamışsa açıkça katalog sonucu döner, `/models` tahmin edilmez.
+
+## Sağlayıcı sözleşmesi
+
+Mevcut OpenAI varsayılanı `gpt-4o`, sıcaklığı `0.3`, endpoint `/v1/chat/completions` ve JSON modu korunur. Diğer sağlayıcılarda katalog ve modelin protokol metadata'sını esas alın: OpenAI chat/Responses, Anthropic Messages, Gemini, Cohere v2, Azure, Bedrock Converse, Vertex Gemini/Anthropic, watsonx chat ve SAP native OpenAI/Orchestration V2 toplam 12 ayrı gövde/yanıt sözleşmesidir. Modelin özel protokol/adres bilgisi genel sağlayıcı varsayılanı tarafından ezilmemeli; kimlik ailesi için yasak override'lar kabul edilmez. Azure model metadata'sı ile deployment alias'ı ayrı alanlardır.
+
+IBM `iam` akışı anahtarı sabit IAM token adresine URL-encoded form gövdesinde gönderir; `projectId` veya `spaceId` değerlerinden yalnız biri gerekir. SAP `oauth-client-credentials` akışı `clientId`/`clientSecret` değerlerini OAuth token adresine form gövdesinde gönderir. İki akış da her işlemde yeni Bearer token alır; cache, kalıcı token veya otomatik refresh oluşturmayın. SAP'nin varsayılan `sap-orchestration-v2` yolu farklı model aileleri için `/v2/completion`, `config.modules.prompt_templating` ve `final_result` kullanır. Kullanıcı girdilerini literal şablona gömmeyin; `placeholder_values` üzerinden taşıyın. `sapMode: openai` yalnız native OpenAI deployment içindir; bilinen başka aile sessizce o yola gönderilmez. V1 Orchestration yolu eklemeyin.
+
+Özel promptun sonuna zorunlu JSON çıktı talimatı eklenir; başarı yalnız tamamlanmış, geçerli ve boş olmayan `corrected_text` alanıyla kabul edilir. JSON modu/formatı sağlayıcının desteklediği alanlara göre gönderilir; OpenAI Responses için kaynakta yapılandırılmış çıktı desteği bulunmayan modele zorunlu format alanı gönderilmez. Bozuk, boş, reddedilmiş veya kesilmiş yanıt kullanıcı metni olarak uygulanmaz. Girdi ve çıktı sınırı 100.000 JavaScript karakteridir.
+
+Her HTTP isteğinin zaman aşımı **25 saniye**, fetch ve gövde okumasını kapsar. IBM/SAP token isteği ile sonraki inference isteği ayrı sınır kullanır; toplam süre yaklaşık 50 saniyeye çıkabilir. API anahtarı eksik/geçersiz, kota, rate limit, kimlik doğrulama, bağlantı, zaman aşımı ve bozuk yanıt hataları sabit Türkçe mesajlarla açıklanır. Ham sağlayıcı mesajlarını veya JSON parse hata nesnelerini loglamayın. OpenAI sağlayıcısına chat ve bütün Responses istekleri `store: false` içerir; diğer chat/ailelere belgelenmemiş alan eklenmez. Bu, her servis/gateway için güvenlik kayıtlarını kapatma veya sıfır saklama garantisi değildir.
+
+Katalogdaki 228 kayıt canlı doğrulanmış 228 bağlantı değildir. 226 Models.dev sağlayıcısı eksiksiz taşınır, iki yerel örnek eklenir; 225 kaydın protokol/kimlik yolu uygulanır. GitHub Copilot, GitLab Duo ve v0 doğrudan seçilemez. Özel abonelik OAuth/CLI, ADC ve SigV4 uygulanmış sayılmaz; IBM IAM ve SAP client-credentials bu sınırdan ayrı uygulanmış akışlardır. `selectable: false`, modelin özel akış sınırlaması ve `supportNote` korunur. Model keşfinde katalog metadata'sını kaybetmeyin. QVAC için kullanıcı tarafından başlatılmış HTTP server ve gerçek alias gerekir. Cloudflare gateway tek-token yolu saklanmış BYOK/Unified Billing içindir; request-BYOK iki anahtar akışı yerine geçmez.
+
+Modeli yalnız daha yeni olduğu için değiştirmeyin. Değişiklik gerekiyorsa resmî belgeler, maliyet, mevcut uyumluluk ve karşılaştırmalı Türkçe kalite kanıtını birlikte kaydedin. Taklit API testlerini gerçek model kalite testi olarak sunmayın.
+
+## Geliştirme ve test
+
+Eklenti düz JavaScript ES2020 ve sade CSS kullanır; çalışma dosyalarında build veya modül sistemi yoktur. Node/Python araçları yalnız test ve paketleme içindir.
+
+```sh
+npm ci
+npx playwright install chromium
+npm run test:provider
+npm run test:ui
+node tests/editor-bootstrap.mjs
+node tests/editor-browser.mjs
+python3 -m unittest discover -s tests -p 'test_package_store.py'
+python3 -m unittest discover -s tests -p 'test_provider_catalog.py'
+npm run package:store
 ```
 
-**Debugging:**
-- Background script: `chrome://extensions/` → "Inspect views: service worker"
-- Content script: F12 on any webpage → Console tab
-- Popup: Right-click extension icon → "Inspect popup"
+Gerçek editör testleri Playwright ile geçici Chrome profili kullanır; API taşıması taklit edilir, kişisel anahtar veya ücretli API çağrısı kullanılmaz. Tarayıcı fixture'ı resmî editör paketlerini geçici alana indirir; bunun çalışması gerçek üretim sitesi testi değildir. Sonuçlar ve gerçek ekran görüntüleri `output/playwright/` altında tutulur.
 
-## Architecture
+Değişiklik sonrası yerel eklentiyi `chrome://extensions/` üzerinden yeniden yükleyin ve test sayfasını yenileyin. Manuel kabul kontrolü `docs/testing.md` dosyasındadır. Yerel test, uzak build, canlı site, gerçek API kalitesi ve mağaza incelemesi ayrı raporlanır.
 
-### Message Flow
-```
-Content Script (content.js)
-    ↓ chrome.runtime.sendMessage({ action: 'correctText', text })
-Background Script (background.js)
-    ↓ OpenAIProvider.correctText(text, apiKey)
-OpenAI API (GPT-4o with JSON mode)
-    ↓ { "corrected_text": "..." }
-Background Script
-    ↓ sendResponse({ correctedText })
-Content Script → Shows diff modal with accept/reject
-```
+## Dosyalar ve yayın
 
-### Storage Architecture (CRITICAL)
+- `popup/` ve `options/`: aç/kapa, etkin sağlayıcı/model, ayrı bağlantı profilleri ve özel prompt arayüzü.
+- `lib/provider-catalog.js`: tarih/SHA-256/lisansı kayıtlı statik sağlayıcı ve model metadata'sı; canlı erişim/kalite kanıtı değildir.
+- `lib/product-config.js`: mağaza, destek, gizlilik, site ve video bağlantıları. Kullanıcı verileri URL'lere eklenmez.
+- `PRIVACY.md`: politikanın tek kaynağı; web kopyası hazırlık adımında üretilir.
+- `tools/package-store.py`: manifest referansları ve yerel bağımlılıklarıyla dar izin listesine göre deterministik ZIP. Manifest kökte, referanslar/CRC/içerik doğrulanmış; yalnız çalışma dosyaları pakete girer.
+- `TODO.md`: yetkilendirilmiş işlerin takibi.
+- Web tasarımı kullanıcı tarafından Claude Design'da yaptırılacaktır. Tasarım dosyaları gelmeden site tasarlamayın/yayınlamayın; video ve mağaza görsel dili de bu teslimi bekler.
 
-**Security fix in v2.1.0+:** API keys MUST use `chrome.storage.local` (not sync)
+`site/`, testler, video/ses kaynakları, `.git`, `node_modules`, kullanıcı ayarları ve kullanılmayan kütüphaneler ZIP'e alınmaz. Yeni mağaza öğesi oluşturmayın; doğrulanmış mevcut kimlik korunur. İnceleme bekleyen paket “yayınlandı” diye raporlanmaz.
 
-```javascript
-// API key - chrome.storage.local (device-specific, NOT synced)
-STORAGE_KEYS.OPENAI_KEY = 'openai_api_key'
+## Kod ve commit kuralları
 
-// Settings - chrome.storage.sync (synced across devices)
-STORAGE_KEYS.ENABLED = 'ai_corrector_enabled'
-```
+4 boşluk girinti, tek tırnak, `camelCase` değişkenler, `UPPER_SNAKE_CASE` sabitler ve küçük harf/tireli dosya adları kullanın. `AGENTS.md` talimatları geçerlidir. Türkçe conventional commit biçimi: `type: açıklama (version)` (`feat`, `fix`, `chore`, `docs`).
 
-**Rationale:** API keys in `chrome.storage.sync` would sync across all user devices via Google account, creating security risk. Always use `local` for secrets.
-
-### Rich Text Editor Support (v3.1.0: ONLY Rich Editors)
-
-**Important:** As of v3.1.0, buttons appear **ONLY** in rich text editors (CKEditor, Summernote, TinyMCE, Quill). Normal textarea/input fields are **NOT** supported.
-
-**Rationale:** Users requested to limit the extension to professional rich text editors only, not all text fields.
-
-**Detection functions** (each runs on init and via MutationObserver):
-- `detectCKEditor()`: Checks `window.CKEDITOR.instances` + `.ck-editor` class for CKEditor 4.x/5.x
-- `detectSummernote()`: Checks `.note-editor` container
-- `detectTinyMCE()`: Checks `window.tinymce.editors`
-- `detectQuill()`: Checks `.ql-container`
-
-**Button placement:**
-- **Rich editors:** Button added to toolbar (integrated into editor UI)
-- **Plain textarea/input:** NOT supported (removed in v3.1.0)
-
-### HTML Format Preservation (v3.0.0+, Enhanced in v3.2.1)
-
-**Critical feature:** When correcting rich text, preserve HTML formatting (bold, italic, links, lists).
-
-**Implementation (v3.2.1 - Security Enhanced):**
-```javascript
-// getEditorValue returns object with both text and HTML
-{ text: "plain text", html: "<b>formatted</b> text", isPlainText: false }
-
-// mapTextToHTML does position-aware replacement (content.js:337-369)
-correctedHTML = mapTextToHTML(originalHTML, originalText, correctedText)
-
-// SECURITY: textContent insertion prevents XSS (content.js:410-415)
-function sanitizeTextForDisplay(text) {
-    return text;  // Direct return - textContent handles escaping
-}
-// Insertion via node.textContent (line 396) auto-escapes HTML
-
-// setEditorValue uses correctedHTML for rich editors
-editor.setData(correctedHTML)  // CKEditor
-editor.innerHTML = correctedHTML  // Others
-```
-
-**Algorithm (v3.2.1 - Position-Indexed):**
-- Position-indexed Map (key: word position, value: replacement text)
-- Global position counter during DOM tree walking
-- Correctly handles repeated words ("Ali Ali" → "Ali Veli")
-- textContent insertion prevents XSS (auto-escapes HTML entities)
-- Skips SCRIPT and STYLE tags for security
-- Falls back to plain text if word count differs by >50%
-
-### Enable/Disable Mechanism (v2.1.0+)
-
-**Problem:** MutationObserver continued running after disable, causing buttons to reappear.
-
-**Solution:** Robust enable/disable mechanism using three guards and observer disconnect:
-```javascript
-// Guard 1: Check before adding buttons (line 33)
-function addButtonsToExistingFields() {
-    if (!isEnabled) return;
-}
-
-// Guard 2: Check before starting observer (line 458)
-function observeDOMChanges() {
-    if (!isEnabled) return;
-}
-
-// Guard 3: Check inside observer callback (line 467)
-domObserver = new MutationObserver(mutations => {
-    if (!isEnabled) return;
-});
-
-// Guard 4: Disconnect observer when disabled (line 514)
-function disconnectObserver() {
-    if (domObserver) {
-        domObserver.disconnect();
-        domObserver = null;
-    }
-}
-```
-
-### Processed Fields Tracking (v2.1.1+)
-
-**Critical fix:** Changed from `WeakSet` to `Set` because WeakSet doesn't have `.clear()` method.
-
-```javascript
-const processedFields = new Set();  // line 14
-
-// Clear when disabled
-function removeAllButtons() {
-    processedFields.clear();  // Works with Set, not WeakSet
-}
-```
-
-### Chrome Service Worker Fetch Quirk (v3.0.1)
-
-**Problem:** Manifest V3 service workers throw "non ISO-8859-1 code point" error when headers contain Turkish characters or are improperly constructed.
-
-**Solution:** Use `Headers` constructor instead of object literal:
-```javascript
-// CORRECT (v3.0.1+):
-const headers = new Headers();
-headers.append('Content-Type', 'application/json; charset=utf-8');
-headers.append('Authorization', 'Bearer ' + apiKey);
-
-// INCORRECT (causes errors):
-headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${apiKey}`
-}
-```
-
-## File Organization
-
-```
-manifest.json          - Extension config (v3.1.0)
-background/
-  ├── background.js         - Message handler, loads config from storage
-  └── openai-provider.js    - OpenAI API client with Headers fix (v3.0.1)
-content/
-  ├── content.js            - Button injection, rich editor detection, HTML preservation
-  └── content.css           - Button styles, modal styles
-options/
-  ├── options.html/js/css   - Settings page with 4-layer error handling
-popup/
-  ├── popup.html/js/css     - Quick enable/disable toggle
-lib/
-  └── diff.min.js           - jsdiff library for preview modal
-prompts/
-  └── turkish-official.txt  - TDK + official correspondence rules (embedded in code)
-```
-
-## Coding Conventions
-
-**Style:**
-- Vanilla JavaScript ES2020, no modules or transpilation
-- 4 spaces indentation, single quotes
-- Variables: `camelCase`, Constants: `UPPER_SNAKE_CASE`
-- Files: lowercase with hyphens (`openai-provider.js`, `popup.html`)
-
-**Commit messages:** Follow conventional commits pattern:
-```
-type: summary (version)
-
-Examples:
-feat: HTML format preservation in rich text editors (v3.0.0)
-fix: Chrome Service Worker fetch header encoding issue (v3.0.1)
-chore: Bump version to 2.1.1
-```
-
-## Testing Checklist
-
-Before committing changes, manually test:
-
-1. **Popup toggle:** Enable/disable in popup → verify buttons appear/disappear
-2. **Settings page:** Save API key → test connection → verify success message
-3. **CKEditor:** WordPress admin, Drupal → verify button appears in toolbar
-4. **Summernote:** CMS editors → verify button appears in toolbar
-5. **TinyMCE:** Various CMSs → verify button appears in toolbar
-6. **Quill:** Notion-like editors → verify button appears in toolbar
-7. **Plain textarea/input:** Gmail compose, basic forms → verify NO buttons appear (v3.1.0+)
-8. **HTML preservation:** Bold/italic text → correct → verify formatting preserved
-9. **Disable flow:** Disable in popup → verify observer stops → no buttons reappear on DOM changes
-
-**Check service worker logs** for any runtime errors after each test.
-
-## Common Issues & Fixes
-
-### "XSS vulnerability in HTML parsing" (CRITICAL - FIXED in v3.2.2)
-- **Cause:** Using `innerHTML` to parse editor content could execute malicious scripts
-- **Example:** `<svg onload=alert(1)>` would execute during parsing
-- **Fix:** Use DOMParser.parseFromString() which doesn't execute scripts (content.js:360-362)
-
-### "Word insertion/deletion corrupts output" (HIGH - FIXED in v3.2.2)
-- **Cause:** Position-only mapping cannot handle word count changes
-- **Example 1:** "Merhaba Ali" → "Merhaba Ali Bey" lost "Bey" (insertion)
-- **Example 2:** "a b c d" → "a b d" became "a b d d" (deletion)
-- **Fix:** Fallback to safe mode when word counts differ (content.js:349-351)
-
-### "Word mapping corrupts repeated words" (FIXED in v3.2.1)
-- **Cause:** String-based mapping without position tracking
-- **Example:** "Ali Ali" → "Ali Veli" became "Veli Veli"
-- **Fix:** Position-indexed Map with global counter during DOM tree walking (content.js:337-380)
-
-### "Button stays disabled after second modal opens" (FIXED in v3.2.1)
-- **Cause:** Opening second modal removed first modal without re-enabling its button
-- **Fix:** Store button reference and cleanup handler on modal (content.js:442-494)
-
-### "Duplicate buttons in Quill editor toolbar"
-- **Cause:** detectQuill() checks container but adds toolbar to processedFields
-- **Fix:** Explicitly mark container as processed when adding button to toolbar (fixed in v3.1.0, line 109)
-
-### "Format loss when accepting corrections"
-- **Cause:** Using `innerText` instead of HTML preservation
-- **Fix:** Ensure `mapTextToHTML()` is called for rich editors (implemented in v3.0.0)
-
-### "WeakSet.clear() TypeError"
-- **Cause:** WeakSet doesn't have clear() method
-- **Fix:** Use `Set` instead (fixed in v2.1.1, line 14)
-
-### "Buttons reappear after disabling"
-- **Cause:** MutationObserver not disconnected
-- **Fix:** Call `disconnectObserver()` when disabled (line 514)
-
-### "Failed to read headers property" fetch error
-- **Cause:** Object literal headers in Service Worker with non-ASCII chars
-- **Fix:** Use `Headers` constructor (fixed in v3.0.1, openai-provider.js lines 60-62)
-
-### "API key not saved" or "syncing to wrong devices"
-- **Cause:** Using sync storage for API keys
-- **Fix:** MUST use `chrome.storage.local` for API keys (security requirement)
-
-## Turkish Correction Prompt
-
-System prompt follows:
-1. **TDK** (Türk Dil Kurumu) spelling and grammar rules
-2. **Official correspondence regulations** (Resmî Yazışmalarda Uygulanacak Usul ve Esaslar)
-3. **JSON-only output:** `{"corrected_text":"..."}`
-4. **Temperature:** 0.3 for consistency
-5. **Model:** gpt-4o with `response_format: { type: 'json_object' }`
-
-Priority order: Official correspondence rules > TDK general rules
-
-## Version History (Key Changes)
-
-- **v3.3.0:** Remove unused activeTab permission (Chrome Web Store policy compliance)
-  - Chrome Web Store rejected v3.1.0-3.2.4 for requesting unused permissions
-  - Removed `activeTab` from manifest.json permissions array
-  - Extension already uses content_scripts with broad matches, no need for activeTab
-  - **Policy compliance:** Only request minimum necessary permissions
-- **v3.2.4:** Code quality improvements and cleanup
-  - **MEDIUM:** Removed unused WORD_DIFF_THRESHOLD constant from CONFIG object
-  - **MEDIUM:** Moved inline styles to CSS file (ai-corrector-warning class)
-  - Improved code maintainability and readability
-- **v3.2.3:** CRITICAL: Format preservation when word count changes
-  - **HIGH:** Fixed format destruction on word insertion/deletion
-  - Now preserves rich-text formatting (bold, italic, links) when possible
-  - Falls back to plain text with user warning when word count changes
-  - User sees warning: "⚠️ Düzeltme kelime sayısını değiştirdi. Formatlar korunmayabilir."
-  - **MEDIUM:** Removed redundant threshold check code
-  - **MEDIUM:** Removed no-op sanitizeTextForDisplay function
-  - Improved security comments at textContent insertion point
-- **v3.2.2:** CRITICAL SECURITY & BUG FIXES: XSS via innerHTML, word insertion/deletion handling
-  - **CRITICAL:** Fixed XSS vulnerability in HTML parsing (use DOMParser instead of innerHTML)
-  - **HIGH:** Fixed word insertion/deletion bug (fallback to safe mode when word count differs)
-  - **MEDIUM:** Simplified modal cleanup logic (removed redundant code)
-  - Examples fixed: "Merhaba Ali" → "Merhaba Ali Bey" (no longer loses "Bey")
-  - Examples fixed: "a b c d" → "a b d" (no longer becomes "a b d d")
-- **v3.2.1:** CRITICAL BUG FIXES: Word mapping position tracking, memory leak, prompt sync
-  - Fixed word mapping position tracking bug (repeated words now handled correctly)
-  - Fixed HTML entity escape regression (special chars like < > now display correctly)
-  - Fixed memory leak in ESC key event listener cleanup
-  - Synced full turkish-official.txt prompt to SYSTEM_PROMPT (complete official correspondence rules)
-- **v3.2.0:** SECURITY: XSS vulnerability fix, word mapping corruption fix, button state management improvement
-  - Fixed XSS vulnerability in AI output handling (sanitize all AI responses)
-  - Fixed word mapping corruption using position-aware DOM tree walking
-  - Fixed button staying disabled when multiple modals opened
-  - Standardized STORAGE_KEYS across all files
-  - Extracted magic numbers to named constants
-  - Added ESC key support for modal closing (accessibility)
-- **v3.1.0:** BREAKING: Removed support for plain textarea/input - ONLY rich text editors supported
-- **v3.0.1:** Fix Chrome Service Worker fetch header encoding (Headers constructor)
-- **v3.0.0:** HTML format preservation in rich text editors
-- **v2.1.1:** Fix WeakSet.clear() crash (changed to Set)
-- **v2.1.0:** Security fix (API keys to local storage), enable/disable guards, error handling
-- **v2.0.0:** Rich text editor support, duplicate button prevention
-- **v1.0.0:** Initial release
-
-## Critical Security Rules
-
-1. **API keys:** ALWAYS use `chrome.storage.local`, NEVER sync
-2. **New external APIs:** Add to `host_permissions` in manifest.json
-3. **User input:** All text goes through background script (no direct API calls from content script)
-4. **Storage keys:** Document in STORAGE_KEYS constant, maintain consistency across files
-
-## Repository
-
-- **GitHub:** https://github.com/mytsx/duzelt-ai
-- **Issues:** https://github.com/mytsx/duzelt-ai/issues
+PR açıklamasında kapsam, kullanıcı etkisi, gerçek doğrulama ve gerekli manuel adımları belirtin. Anahtar, prompt, kişisel metin veya gizli bilgiler PR'a girmez. Kaynak: https://github.com/mytsx/duzelt-ai ; destek: https://github.com/mytsx/duzelt-ai/issues.

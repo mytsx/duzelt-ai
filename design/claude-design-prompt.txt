@@ -1,0 +1,69 @@
+AI Türkçe Metin Düzeltici adlı, Chrome Web Store’da yayımlanmış Chrome eklentim için eksiksiz bir Türkçe ürün web sitesi tasarla ve düzenlenebilir kaynak dosyalarını teslim et. Sadece bir ekran resmi veya tasarım önerisi verme; masaüstü ve mobilde çalışan statik HTML/CSS/JavaScript dosyaları üret. Bu görev yalnız tasarım ve dosya teslimidir; hesabıma giriş yapma veya siteyi yayınlama.
+
+Ürün ve doğrulanmış sınırlar
+Ürün adı: AI Türkçe Metin Düzeltici. Geliştirici: Mehmet Yerli. Yerli Developer ürün ailesine aittir. Eklenti, uyumlu zengin metin editörlerinin araç çubuğuna Düzelt düğmesi ekler. Akış: Düzelt → eklenen/çıkarılan değişiklikleri incele → Kabul et ya da İptal. Kullanıcı kabul etmeden metin değiştirilmez. Varsayılan düzeltme kuralları Türkçe imla, noktalama, dilbilgisi ve resmî üslup içindir; özel sistem promptu ayarlardan değiştirilebilir. Sağlayıcı ve model tek ayarlar ekranından seçilir. OpenAI, OpenRouter, Anthropic, Google Gemini, Groq, DeepSeek, Mistral ve diğer API servisleri; Azure, Vertex, Bedrock gibi ek alan/belirteç gerektiren servisler; IBM watsonx IAM ve SAP AI Core hizmet kimliği/orkestrasyon bağlantıları; Ollama ve llama.cpp gibi yerel servisler için merkezi bağlantı yapısı bulunur. OpenCode / Models.dev kaynaklı katalog ve özel API adresi seçeneği vardır. Ekteki providers-research.md güncel kapsam ve özel giriş sınırlarını açıklar. Katalogda görünmek, her modelin canlı test edildiği anlamına gelmez. Copilot, GitLab Duo ve v0 gibi özel ürün/giriş/çalışma akışı isteyen üç hizmet yalnız bilgi kaydıdır ve etkinleştirilemez. “OpenCode’daki her sağlayıcı sorunsuz çalışır” ya da tüm modellere tam destek iddiası kullanma. Bulut kullanımı için kullanıcının kendi API anahtarı veya uygun erişim belirteci gerekir; sağlayıcı kullanımı eklentiden ayrı ücretlendirilir, bağlantı testi de ücret doğurabilir. ChatGPT/Claude/Copilot aboneliğinin API anahtarı yerine geçtiğini ima etme. Yerel kullanım için çalışan yerel servis ve yüklü model gerekir; tüm sağlayıcılar internet gerektirir deme. Eski OpenAI kullanıcısında gpt-4o ve anahtar korunur; modeli ürünün adının önüne geçirme.
+
+Normal input/textarea alanları desteklenmez. CKEditor 4/5, Summernote, TinyMCE ve Quill için test edilmiş standart kurulumları anlat; tüm sürüm ve sitelerde çalışma garantisi verme. Ekteki ürün/test kaydındaki sürümleri esas al. Notion, WordPress, Drupal veya Joomla desteğini doğrulanmış platform özelliği gibi sunma. Çok köklü/ortak düzenleme editörleri, kapalı shadow DOM ve ayrı iframe uygulamalarına genel destek vaadi verme. Paragraf, liste, bağlantı ve kalın/italik biçimler güvenli eşleme yapılabildiğinde korunur; yapısal değişikliklerde düz metne dönüşme uyarısı olabilir. Kusursuz doğruluk, tüm hataları düzeltme, resmî kurum onayı veya mevzuata tam uyum vaat etme. Düzeltme sonucunun kullanıcı tarafından kontrol edilmesi gerektiğini kısa ve sakin bir dille anlat.
+
+Gerçek bağlantılar
+Chrome’a ekle: https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl
+Hedef ana sayfa: https://duzelt.yerli.dev/
+Gizlilik: https://duzelt.yerli.dev/privacy/
+Destek: https://duzelt.yerli.dev/support/
+Geliştirici ana sitesi: https://yerli.dev/
+İletişim: iletisim@mehmetyerli.com
+Kaynak ve sorun bildirimi: https://github.com/mytsx/duzelt-ai ve https://github.com/mytsx/duzelt-ai/issues
+Mağaza yayımdaki sürüm 3.3.0; ekran görüntülerindeki yerel bakım sürümü 3.4.0 henüz mağazada yayınlanmadı. Yayın sürümünü sabit bir satış vaadine dönüştürme; sürüm alanını manifestten güncellenecek şekilde tasarla. Video henüz hazırlanmadı; sahte YouTube adresi, süre, küçük resim, kullanıcı sayısı, puan, yorum veya başarı rozeti üretme.
+
+Marka dili ve gerçek arayüz
+Profesyonel, sakin, okunaklı ve Türkçe metin düzenlemeye özgü bir görsel kimlik oluştur. Kalbur’un rengini, sloganını, logosunu veya reklam engelleme temasını kopyalama. Ekteki mevcut AI ikonunu kimlik referansı olarak kullan; web sitesinin tasarım dilini sen belirle. Gerçek popup, ayarlar ve editör/diff ekran görüntülerini doğru oran ve okunabilir ölçekte göster; ekran görüntüsünün içindeki düğme veya özellikleri çizerek değiştirme. Renkleri sonradan eklentiye uyarlanabilir tasarım değişkenleriyle tanımla. Ekteki modern ayarlar ekranında sağlayıcı arama, model alanı, bağlantı profili, ortak kurallar ve kullanım rehberi; popup’ta etkin sağlayıcı/model, aç/kapa ve inceleme akışı gerçekten vardır. Açık/koyu temayı, hafif ve amaca yönelik animasyonları profesyonel biçimde sürdür. Mevcut ekranlar, çalışan uygulamanın referansıdır; nihai web tasarımının bunlarla birebir aynı olması şart değildir. Uygulamada bulunmayan sohbet kutusu, belge yükleme, kullanıcı hesabı, abonelik, ücretsiz API kredisi, tek tıkla otomatik kabul veya bütün sitelerde düzeltme arayüzü tasarlama. Robot stok görselleri yerine gerçek metin düzenleme ve inceleme deneyimine odaklan. Sistem fontları kullan; dış font, analitik, reklam, izleyici veya üçüncü taraf görsel çağrısı ekleme.
+
+Ana sayfa /
+İlk ekranda ürün adını, somut faydayı ve gerçek mağazaya giden “Chrome’a ekle” düğmesini göster. Önerilen anlatım: “Türkçe metninizi düzeltin, değişikliklere siz karar verin.” Açıklama: “Uyumlu zengin metin editörlerinde imla, noktalama ve resmî üslup önerileri. Sonucu inceleyin, uygun bulursanız kabul edin.” Yakında/bekleme listesi kullanma. Ana CTA yanında bulut sağlayıcıları için kendi anahtarı/belirteci ve ayrı kullanım ücreti gereğini görünür tut; yerel model seçeneğini ayrı kısa ifadeyle açıkla.
+
+Kişisel veri içermeyen önce/sonra örneği göster:
+Önce: “bugun toplantida aldigimiz kararlari yarin paylasacagiz. herkesin gorusunu bekliyoruz.”
+Sonra: “Bugün toplantıda aldığımız kararları yarın paylaşacağız. Herkesin görüşünü bekliyoruz.”
+Bunu açıklayıcı örnek olarak etiketle; canlı API sonucu veya her metne uygulanacak garanti gibi sunma. Demo alanı sunucusuz ve statik olmalı; ziyaretçinin metnini veya anahtarını istememeli.
+
+Düzelt → incele → kabul et akışını, gerçek editör ve diff görüntüleriyle anlat. Eklenen/çıkarılan metni yalnız renkle değil işaret ve açıklamayla ayırt et. İptal seçeneğini görünür göster. Sonraki bölümlerde test edilmiş editör desteği ve sınırlar; mağazadan kurulum → sağlayıcı ve model seçme → anahtar/belirteç veya yerel adresi kaydetme → seçilen adres için bağlantı izni → isteğe bağlı düzeltme kuralları → düzeltme adımları; ücret ve veri akışı; gerçek popup/ayarlar görselleri; video alanı; SSS; destek ve geliştirici bağlantıları olsun.
+
+Video alanı, yerel kapak görseli ve belirgin oynat simgesiyle ilk bakışta video olarak anlaşılmalı. Video hazır olduğunda düğme “Tanıtımı izle” olmalı. videoUrl=null iken oynatıcı açılmamalı; bu durumda aynı kapak düzeninin yayımlanmayan bileşen önizlemesini teslim et. Video bileşenini yalnız kullanıcı tıklayınca youtube-nocookie.com iframe’i yükleyecek şekilde hazırla. Önceden YouTube isteği, preconnect veya remote thumbnail istemiyorum. Sesli otomatik oynatma yok. Süre ve erişilebilir düğme adı tek yapılandırma alanından türesin; henüz bilinmeyen süreyi uydurma. Gerçek kapak/video daha sonra bu tasarım diline göre üretilecek.
+
+SSS en az şu soruları yanıtlasın: Hangi sağlayıcıları seçebilirim? Katalogda görünen bazı hizmetler neden etkinleştirilemiyor? API anahtarı veya erişim belirteci neden gerekiyor? Yerel model nasıl kullanılır? Ücretsiz mi ve sağlayıcı ücreti nasıl ayrılıyor? Hangi editörlerde çalışır? Düğme neden görünmeyebilir? Biçimler her zaman korunur mu? Sonuç otomatik uygulanır mı? Metin nereye gönderilir? Anahtar/prompt nasıl temizlenir? Hatalarda ne yapmalıyım?
+
+Gizlilik sayfası /privacy/
+Ekteki PRIVACY.md politikasını eksiksiz ve anlamını değiştirmeden yerleştir. Sayfayı uzun Türkçe metnin rahat okunduğu başlık, satır uzunluğu ve bağlantılarla tasarla. Tek politika kaynağı PRIVACY.md olacak; HTML’de <!-- privacy:start --> ve <!-- privacy:end --> işaretleriyle değiştirilebilir içerik bölgesi bırak. Politika metninin ayrı, çelişen bir özet kopyasını oluşturma. Anahtar ve özel prompt chrome.storage.local içindedir; aç/kapa chrome.storage.sync ile eşitlenebilir. Düzeltilecek metin ve kurallar yalnız etkin sağlayıcının kaydedilmiş API adresine, anahtar/belirteç ilgili istekte kimlik doğrulama için kullanılır. IBM IAM akışında API anahtarı belirteç sunucusuna form gövdesinde, SAP akışında Client ID/secret hizmetin belirteç sunucusuna gönderilir; elde edilen erişim belirteci düzeltme isteğinin başlığında kullanılır. Metin ve kurallar bu belirteç sunucularına gönderilmez. Yerel adres seçilmişse istek yerel sunucuya gider; sunucunun kendi veri işleme davranışı ayrıca değerlendirilir. Geliştiriciye metin aktarımı/analitik yoktur; bu, tüm kullanımın tamamen yerel olduğu veya sağlayıcıda sıfır saklama garantisi anlamına gelmez. Sağlayıcı profilleri/anahtarlar özel promptla birlikte chrome.storage.local içinde tutulur. Başka sağlayıcıya kendiliğinden yedek geçiş yapılmaz. Yeni adresler için yalnız seçilen API adresi ve gerekiyorsa ayrı belirteç adresinin bağlantı izinleri istenir; sayfa/editör erişimi ile API bağlantı iznini birbirine karıştırma. “Anahtar hiçbir yere gönderilmez”, “kişisel veri hiç işlenmez”, şifreleme veya KVKK/GDPR uyum garantisi ekleme.
+
+Destek sayfası /support/
+Kısa kurulum rehberi, editörde düğme görünmemesi, sağlayıcı/model/deployment seçimi, bulut hesap/bölge alanları, kaydetme/test akışı, bağlantı izni reddi, eksik/geçersiz anahtar veya süresi dolmuş belirteç, yerel sunucunun çalışmaması, internet, her HTTP isteğinde 25 saniyelik zaman aşımı (IBM/SAP belirteç değişimi ve düzeltme toplamı yaklaşık 50 saniye olabilir), kota/rate limit ve bozuk yanıt için anlaşılır çözüm adımları ver. Model önerileri yerleşik katalogdan gelir; yenile düğmesi kayıtlı bağlantıyla kullanıcı isteği üzerine model listesi alır. Test yalnız kaydedilmiş bağlantıyı kullanır. Model değiştirmek veya başka sağlayıcıya geçmek ücret/veri işleme koşullarını değiştirebilir; kısa, anlaşılır açıklama kullan. Düzeltme sırasında metin değişirse yeni metnin korunacağını ve isteğin yeniden başlatılması gerektiğini anlat. E-posta ve GitHub Issues bağlantıları ekle. Sorun bildiriminde Chrome/eklenti/editör sürümü ve kişisel veri içermeyen adımlar istenebilir; API anahtarı, özel prompt ve gizli metin istenmemeli. Sunucuya form gönderme, canlı sohbet veya hesap sistemi ekleme. Teknik ayrıntıları tanıtım akışına değil gerektiği kadar destek bölümüne koy.
+
+Mobil, erişilebilirlik ve teslim
+320, 390, 768, 1024, 1440 px genişliklerde ana sayfa, gizlilik ve destek tasarımlarını kontrol et. Yalnız overflow ölçme: başlıkları, sütunları, tabloları, ekran görüntülerini, uzun iletişim adreslerini ve footer’ı görsel incele. Mobilde CTA’lar ve örnek metin rahat okunmalı; destek tablosu gerekiyorsa kartlara dönüşsün. Gerçek uygulama masaüstü Chrome eklentisidir; mobil görünüm eklentinin telefonda çalıştığı izlenimini vermesin. Klavye menüsü, görünür odak, atlama bağlantısı, semantik HTML, başlık hiyerarşisi, yeterli renk kontrastı, resim alt metinleri, dokunma hedefleri ve prefers-reduced-motion desteği sağla. Açık/koyu görünümü tasarla; tercihi işletim sisteminden al. E-posta ve uzun URL’leri güvenli kır. Gizlilik/support sayfaları ana sayfayla aynı kimliği taşısın.
+
+Cloudflare Workers Static Assets ile yayınlanacak sade bir statik site teslim et. React/Next.js, sunucu, veri tabanı, paket bağımlılığı veya CDN JavaScript istemiyorum. JavaScript kapalıyken temel metinler, mağaza/destek/gizlilik bağlantıları çalışsın. Dosya yapısı:
+site/index.html
+site/privacy/index.html
+site/support/index.html
+site/404.html
+site/assets/css/site.css
+site/assets/js/config.js
+site/assets/js/site.js
+site/assets/img/ (verilen gerçek ekranlar, ikonlar, yerel video kapak alanı, paylaşım görseli)
+site/robots.txt
+site/sitemap.xml
+site/_headers
+site/.assetsignore
+site/README.md
+
+config.js içindeki mağaza, site, destek, gizlilik, video URL/süre/kapak ve sürüm alanları sonradan tek kaynak lib/product-config.js ile eşitlenecek; aynı bağlantıyı birçok dosyada yönetme. İkonlar ve sürüm manifestle hazırlık aşamasında eşitlenecek. Gizlilik kaynağı değiştirilmeyecek. Favicon, özgün 1200×630 paylaşım görseli, doğru canonical/Open Graph başlıkları, hedef alan adlı robots/sitemap ve anlaşılır 404 sayfası ekle. Video ve mağaza tanıtım görsellerinin nihai üretimini yapma; bunlar tasarım onayından sonra hazırlanacak. Son olarak bütün kaynakları ZIP olarak, tasarım değişkenlerini ve kullanılan dosyaları açıklayan kısa README ile ver. Yayınlama yapma.
+
+Verilen dosyalar
+claude-design-prompt.txt: bu talimat.
+PRIVACY.md: depodaki tek politikanın bu teslim için oluşturulmuş kopyası.
+product-config.js ve manifest.json: doğrulanmış ürün bağlantıları/yerel sürüm.
+providers-research.md: kaynaklar, protokoller, katalog ve giriş sınırları.
+product-facts.txt ve testing.md: ürün sınırları ve test kanıtı.
+assets/icon16.png, icon48.png, icon128.png: mevcut marka ikonları.
+assets/popup-light.png, popup-dark.png, options-desktop.png, options-mobile.png, options-openrouter.png: çalışan 3.4.0 arayüzü.
+assets/editor-before.png, editor-preview.png, editor-accepted.png: gerçek Quill editöründe kontrollü örnek yanıtla kaydedilmiş akış; canlı model kalitesi kanıtı değildir.

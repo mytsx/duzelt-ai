@@ -1,0 +1,32 @@
+{
+  "checkedOn": "2026-10-03",
+  "version": "3.4.0",
+  "fileCount": 19,
+  "files": [
+    "background/background.js",
+    "background/openai-provider.js",
+    "background/provider-service.js",
+    "content/content.css",
+    "content/content.js",
+    "content/editor-bridge.js",
+    "icons/icon128.png",
+    "icons/icon16.png",
+    "icons/icon48.png",
+    "lib/diff.min.js",
+    "lib/product-config.js",
+    "lib/provider-catalog.js",
+    "manifest.json",
+    "options/options.css",
+    "options/options.html",
+    "options/options.js",
+    "popup/popup.css",
+    "popup/popup.html",
+    "popup/popup.js"
+  ],
+  "sha256": "c72e73e20a9e048b9f3a708624df48a5336a5f2c47f6efd87f7023078eafe4fc",
+  "rootManifestVerified": true,
+  "crcVerified": true,
+  "fileBytesMatchSource": true,
+  "deterministicRepeatMatched": true,
+  "regressionTests": 7
+}

@@ -116,7 +116,7 @@ npm run site:check
 npm run site:deploy
 ```
 
-Önizleme yalnız `127.0.0.1:8787` adresinde çalışır. Dağıtım yapılandırması `wrangler.site.jsonc` dosyasındadır. Cloudflare Workers Builds mevcut `mytsx/duzelt-ai` deposunun `main` dalına bağlandı; kök `/`, kontrol `npm run site:check`, yayın `npm run site:deploy`, preview build kapalıdır. Bağlantının kaydedilmesi uzak build başarısı sayılmaz; gerçek push/build/canlı sonuçları [teslim kaydında](evidence/delivery-results.json) ayrı tutulur.
+Önizleme yalnız `127.0.0.1:8787` adresinde çalışır. Dağıtım yapılandırması `wrangler.site.jsonc` dosyasındadır. Cloudflare Workers Builds mevcut `mytsx/duzelt-ai` deposunun `main` dalına bağlıdır; kök `/`, kontrol `npm run site:check`, yayın `npm run site:deploy`, preview build kapalıdır. `f635ca2` kod tesliminin gerçek main push'ı, başarılı uzak build/deploy ve canlı site ayrı ayrı doğrulandı; sonuçlar [teslim kaydında](evidence/delivery-results.json) tutulur.
 
 ## Video ve mağaza gönderimi
 

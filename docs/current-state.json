@@ -38,9 +38,13 @@
   "website_expected_http_results_passed": true,
   "website_live_evidence": "evidence/site-live-results.json",
   "website_deployment": {
-    "type": "manual-cloudflare-static",
+    "type": "automatic-cloudflare-workers-builds",
     "worker": "duzelt-site",
-    "version": "53596d06-d3c7-4566-bf1f-c84e16012f42"
+    "version": "a23b86aa-f6f7-4923-bb4f-5347ec3bb343",
+    "code_head": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+    "build_id": "05e5cf7e-70ec-4bfd-bf6a-3b2f487b9184",
+    "status": "success",
+    "proof": "output/publish-proof/cloudflare-main-build.jpg"
   },
   "cloudflare_workers_builds": {
     "connected": true,
@@ -49,8 +53,22 @@
     "root_directory": "/",
     "build_command": "npm run site:check",
     "deploy_command": "npm run site:deploy",
-    "actual_main_push_verified": false,
-    "remote_ci_verified": false
+    "actual_main_push_verified": true,
+    "remote_ci_verified": true,
+    "code_head": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+    "build_id": "05e5cf7e-70ec-4bfd-bf6a-3b2f487b9184",
+    "duration_seconds": 23,
+    "build_status": "success",
+    "deploy_status": "success",
+    "deployment_version": "a23b86aa-f6f7-4923-bb4f-5347ec3bb343",
+    "proof": {
+      "file": "output/publish-proof/cloudflare-main-build.jpg",
+      "sha256": "762f9ec88cb85125d0b0ac70ea8e5db225bc0e4643918d122f7ab12d1d023bc0"
+    },
+    "observed_logs": [
+      "Success: Deploy command completed",
+      "✨ Success! Build completed"
+    ]
   },
   "video_url": "https://youtu.be/q4k1awKQu1w",
   "video_status": "published-unlisted",
@@ -61,7 +79,7 @@
   "video_evidence": "store/youtube/channel.json",
   "video_full_human_watch_and_listen_verified": false,
   "design_source_status": "received-and-integrated",
-  "current_delivery_main_push_verified": false,
+  "current_delivery_main_push_verified": true,
   "git_head_before_current_delivery": "cc11ef1608e97c8b406c78e64cbc78cc1407896c",
   "store_review_pending": true,
   "store_new_version_published": false,
@@ -70,5 +88,15 @@
   "store_promo_count": 2,
   "store_submission_evidence": "store/submission.json",
   "site_browser_checks_passed": 58,
-  "site_browser_evidence": "evidence/site-ui-results.json"
+  "site_browser_evidence": "evidence/site-ui-results.json",
+  "delivery_code_head": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+  "delivery_code_committed": true,
+  "delivery_code_pushed_to_main": true,
+  "github_actions_current_head_status": "not-checked",
+  "metadata_commit_note": "This record identifies the tested and pushed delivery code SHA. Final evidence documentation is committed separately; its enclosing commit hash cannot be embedded in its own contents.",
+  "website_live_video_embed_verified": true,
+  "website_live_video_player_duration_seconds": 32,
+  "website_live_video_observed_time": "0:00 / 0:32",
+  "website_live_video_audio_muted": true,
+  "website_live_video_cc_control_used": true
 }

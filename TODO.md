@@ -55,7 +55,7 @@
 - [x] Tek politika kaynağı, manifest sürümü/ikon eşlemesi, sosyal görsel/favicon/robots/sitemap/404 hazırla; 14 hazırlık testi ve kaynak drift kontrolü geçti.
 - [x] 320, 390, 768, 1024, 1440 px görsel tarayıcı, klavye ve hareket azaltma kontrolü yap; final kaynaklarla 58/58 geçti.
 - [x] duzelt.yerli.dev DNS/Worker sahipliğini doğrula; ayrı assets-only duzelt-site Worker yayımlandı, mevcut GitHub bağlantısıyla main Workers Builds kaydedildi.
-- [ ] Yerel kontrol, gerçek main push uzak build ve canlı HTTPS yayınını ayrı doğrula.
+- [x] Yerel kontrol, gerçek main push uzak build ve canlı HTTPS yayınını ayrı doğrula. Kod teslimi f635ca2; Cloudflare 05e5cf7e build/deploy başarılı; canlı tanıtım oynatma tamamlandı.
 - [x] Video senaryosu/storyboard, ElevenLabs canlı plan/ses koşulları/kredi kontrolü. Aktif Starter planında tek 476 kredi üretimi, 38.852 kredi kaldı; yeni ödeme yok.
 - [x] 32 saniye gerçek ürün videosu, lisanslı seslendirme, özgün müzik, zamanlanmış 11 cue Türkçe SRT ve 1280/3840 kapak hazırla.
 - [x] Video 1080p/H.264/30fps/AAC, tam decode, gerçek sözcük/durak senkronu, ses seviyeleri ve bütün sahne/geçiş karelerinin görsel kontrolü.
@@ -65,7 +65,7 @@
 - [x] Mevcut mağaza öğesini yeni paket ve doğru açıklama/gizlilik/izin beyanlarıyla güncelle.
 - [x] Mağaza için 5 gerçek 1280×800 ekran, 440×280/1400×560 promosyon, açıklama/veri/izin beyanı ve inceleme notlarını hazırla.
 - [x] Mağaza incelemesine gönder; otomatik yayın seçeneğini final gönderim ekranında doğrula. Panel: İncelenmeyi bekliyor; 3.4.0 henüz yayımlanmış değildir.
-- [ ] Geçici sekmeleri/sunucuları temizle; nihai bağlantılar ve dosya yollarını teslim et.
+- [x] Geçici sekmeleri/sunucuları temizle; canlı site, video ve mağaza gönderimini teslim et. Kullanıcının mevcut sekmeleri ve yerel model servisi korunur.
 
 ## Kanıt sınırları
 - Anahtar gerektirmeyen deterministik API testleri gerçek sağlayıcı/model erişimi veya düzeltme kalitesini kanıtlamaz. Gerçek hesapla API çağrısı yapılmadı.

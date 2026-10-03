@@ -1,65 +1,452 @@
 {
-  "checkedOn": "2026-10-03",
+  "checkedOn": "2026-10-03T20:27:45.625224+00:00",
   "site": "https://duzelt.yerli.dev/",
-  "manualDeploymentVersion": "53596d06-d3c7-4566-bf1f-c84e16012f42",
   "worker": "duzelt-site",
+  "method": "Live HTTPS GET via curl --compressed; nine response bodies compared by SHA256 with Git commit blobs. CSP and other security headers are checked against committed site/_headers. HSTS exact differences are retained and its max-age is checked separately. No account browser or inference used.",
+  "testedSourceCommit": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+  "testedBranch": "main",
+  "testedDeploymentVersion": "a23b86aa-f6f7-4923-bb4f-5347ec3bb343",
+  "cloudflareBuildId": "05e5cf7e-70ec-4bfd-bf6a-3b2f487b9184",
+  "remoteBuildVerified": true,
+  "remoteBuildEvidence": {
+    "observedBy": "root agent in authenticated Cloudflare UI",
+    "proof": "output/publish-proof/cloudflare-main-build.jpg",
+    "messages": [
+      "Success: Deploy command completed",
+      "Success! Build completed"
+    ],
+    "durationSeconds": 23
+  },
   "allPassed": true,
+  "checkCount": 9,
   "checks": [
     {
       "path": "/",
       "status": 200,
+      "expectedStatus": 200,
+      "sourceFile": "site/index.html",
       "sha256": "faa66f0127281e2f5f5ea6591da025fefcf823d8bf919990bc86dac93302733a",
-      "cspPresent": true
+      "expectedSHA256": "faa66f0127281e2f5f5ea6591da025fefcf823d8bf919990bc86dac93302733a",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/",
+      "timeSeconds": 0.421248,
+      "contentType": "text/html",
+      "cacheControl": "no-cache",
+      "cfRay": "a44eb076c90419c0-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/privacy/",
       "status": 200,
-      "sha256": "59bf2eb971e2737e70bf26f0b3997357f2038b54ca8945d235d9353683bed62f",
-      "cspPresent": true
+      "expectedStatus": 200,
+      "sourceFile": "site/privacy/index.html",
+      "sha256": "64068a1a13b5851055be6863b4f8cef3d0fc7027c6068ea31c8b49e509f74f3c",
+      "expectedSHA256": "64068a1a13b5851055be6863b4f8cef3d0fc7027c6068ea31c8b49e509f74f3c",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/privacy/",
+      "timeSeconds": 0.53068,
+      "contentType": "text/html",
+      "cacheControl": "no-cache",
+      "cfRay": "a44eb076da83294e-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/support/",
       "status": 200,
-      "sha256": "bf63eb148b77cdcab31feaf7fce2263995c9466f90cb25a3c251e6650135ec29",
-      "cspPresent": true
+      "expectedStatus": 200,
+      "sourceFile": "site/support/index.html",
+      "sha256": "6046c50af237d8fb710ffb6b7e0a37c126725a2d76528c5b52f1223249cb1610",
+      "expectedSHA256": "6046c50af237d8fb710ffb6b7e0a37c126725a2d76528c5b52f1223249cb1610",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/support/",
+      "timeSeconds": 0.585477,
+      "contentType": "text/html",
+      "cacheControl": "no-cache",
+      "cfRay": "a44eb076ddb8fff5-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/assets/js/config.js",
       "status": 200,
-      "sha256": "cc66c7a477bc59d3c5f0a102adb2ab1fe4a082fea39807e0e9f7198388229fb2",
-      "cspPresent": true
+      "expectedStatus": 200,
+      "sourceFile": "site/assets/js/config.js",
+      "sha256": "4dbb7bb093e47519ce50d2d007d8cbf3cd5c9447211d6fbfa6f99f04ce571b3a",
+      "expectedSHA256": "4dbb7bb093e47519ce50d2d007d8cbf3cd5c9447211d6fbfa6f99f04ce571b3a",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/assets/js/config.js",
+      "timeSeconds": 0.40538,
+      "contentType": "text/javascript",
+      "cacheControl": "public, max-age=86400, must-revalidate, no-cache",
+      "cfRay": "a44eb076cd8b2162-AMS",
+      "passed": true,
+      "publishedVideoPresent": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/robots.txt",
       "status": 200,
+      "expectedStatus": 200,
+      "sourceFile": "site/robots.txt",
       "sha256": "559f70663836464b500dcae55f1264ed04fe2ce19c48a1843740e27feda5c4f2",
-      "cspPresent": true
+      "expectedSHA256": "559f70663836464b500dcae55f1264ed04fe2ce19c48a1843740e27feda5c4f2",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/robots.txt",
+      "timeSeconds": 0.321523,
+      "contentType": "text/plain",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "cfRay": "a44eb078db3c1c04-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/sitemap.xml",
       "status": 200,
+      "expectedStatus": 200,
+      "sourceFile": "site/sitemap.xml",
       "sha256": "87da7697a6145220956a0345f88746134add704c288fc0735005bc3920dd1c6d",
-      "cspPresent": true
+      "expectedSHA256": "87da7697a6145220956a0345f88746134add704c288fc0735005bc3920dd1c6d",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/sitemap.xml",
+      "timeSeconds": 0.325816,
+      "contentType": "application/xml",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "cfRay": "a44eb0790de18e65-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/README.md",
       "status": 404,
+      "expectedStatus": 404,
+      "sourceFile": "site/404.html",
       "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
-      "cspPresent": true
+      "expectedSHA256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/README.md",
+      "timeSeconds": 0.356843,
+      "contentType": "text/html",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "cfRay": "a44eb079bde3662e-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/_preview/video.html",
       "status": 404,
+      "expectedStatus": 404,
+      "sourceFile": "site/404.html",
       "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
-      "cspPresent": true
+      "expectedSHA256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/_preview/video.html",
+      "timeSeconds": 0.30108,
+      "contentType": "text/html",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "cfRay": "a44eb079ef69ae32-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     },
     {
       "path": "/olmayan-sayfa/",
       "status": 404,
+      "expectedStatus": 404,
+      "sourceFile": "site/404.html",
       "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
-      "cspPresent": true
+      "expectedSHA256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+      "sourceHashMatches": true,
+      "cspPresent": true,
+      "cspMatchesSource": true,
+      "securityHeadersMatchSource": {
+        "content-security-policy": true,
+        "referrer-policy": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "permissions-policy": true,
+        "cross-origin-opener-policy": true,
+        "strict-transport-security": false
+      },
+      "securityHeaders": {
+        "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+        "cross-origin-opener-policy": "same-origin",
+        "strict-transport-security": "max-age=31536000; includeSubDomains"
+      },
+      "effectiveURL": "https://duzelt.yerli.dev/olmayan-sayfa/",
+      "timeSeconds": 0.285617,
+      "contentType": "text/html",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "cfRay": "a44eb07acfa0d8cc-AMS",
+      "passed": true,
+      "hstsMaxAgeAtLeastSource": true,
+      "exactSecurityHeadersMatchSource": false,
+      "securityHeadersCompatibleWithSource": true
     }
   ],
-  "remoteBuildVerified": false,
-  "probeNote": "First urllib request returned403 immediately after deployment; subsequent curl and Chrome page load succeeded. No security setting changed."
+  "initialManualDeployment": {
+    "checkedOn": "2026-10-03",
+    "site": "https://duzelt.yerli.dev/",
+    "manualDeploymentVersion": "53596d06-d3c7-4566-bf1f-c84e16012f42",
+    "worker": "duzelt-site",
+    "allPassed": true,
+    "checks": [
+      {
+        "path": "/",
+        "status": 200,
+        "sha256": "faa66f0127281e2f5f5ea6591da025fefcf823d8bf919990bc86dac93302733a",
+        "cspPresent": true
+      },
+      {
+        "path": "/privacy/",
+        "status": 200,
+        "sha256": "59bf2eb971e2737e70bf26f0b3997357f2038b54ca8945d235d9353683bed62f",
+        "cspPresent": true
+      },
+      {
+        "path": "/support/",
+        "status": 200,
+        "sha256": "bf63eb148b77cdcab31feaf7fce2263995c9466f90cb25a3c251e6650135ec29",
+        "cspPresent": true
+      },
+      {
+        "path": "/assets/js/config.js",
+        "status": 200,
+        "sha256": "cc66c7a477bc59d3c5f0a102adb2ab1fe4a082fea39807e0e9f7198388229fb2",
+        "cspPresent": true
+      },
+      {
+        "path": "/robots.txt",
+        "status": 200,
+        "sha256": "559f70663836464b500dcae55f1264ed04fe2ce19c48a1843740e27feda5c4f2",
+        "cspPresent": true
+      },
+      {
+        "path": "/sitemap.xml",
+        "status": 200,
+        "sha256": "87da7697a6145220956a0345f88746134add704c288fc0735005bc3920dd1c6d",
+        "cspPresent": true
+      },
+      {
+        "path": "/README.md",
+        "status": 404,
+        "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+        "cspPresent": true
+      },
+      {
+        "path": "/_preview/video.html",
+        "status": 404,
+        "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+        "cspPresent": true
+      },
+      {
+        "path": "/olmayan-sayfa/",
+        "status": 404,
+        "sha256": "442209384f9d1c9a231bb4a04afc6c1cdae36336ef716496a0a9317c18afe39f",
+        "cspPresent": true
+      }
+    ],
+    "remoteBuildVerified": false,
+    "probeNote": "First urllib request returned403 immediately after deployment; subsequent curl and Chrome page load succeeded. No security setting changed."
+  },
+  "limitations": [
+    "This probe verifies public HTTP responses, source hashes and security headers. It does not itself verify YouTube playback, HD selection or caption contents.",
+    "The root agent separately observed the current deployed 0:32 button and privacy-enhanced YouTube player playing the published video with captions enabled and audio muted.",
+    "A later documentation-only commit may trigger another Cloudflare build; this record identifies the source commit and deployment version actually probed."
+  ],
+  "passCriteria": [
+    "Expected HTTP status and final URL",
+    "Body SHA256 equals the named tested commit source blob",
+    "CSP exactly equals committed policy",
+    "Other security headers exactly equal committed policy, with HSTS max-age at least the committed 31536000 seconds"
+  ],
+  "observedHeaderDifferences": [
+    {
+      "header": "Strict-Transport-Security",
+      "committedValue": "max-age=31536000",
+      "liveValue": "max-age=31536000; includeSubDomains",
+      "affectedRoutes": 9,
+      "note": "The deployed responses retain the committed one-year max-age and additionally include the subdomain directive. Exact comparison remains false for this header; no source or Cloudflare setting was changed."
+    }
+  ]
 }

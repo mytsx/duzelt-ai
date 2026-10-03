@@ -1,16 +1,16 @@
 {
   "checkedOn": "2026-10-03",
   "extensionVersion": "3.4.0",
-  "runtimeAndDesignHead": null,
-  "githubMainVerifiedAtThisHead": null,
-  "pushSucceeded": false,
+  "runtimeAndDesignHead": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+  "githubMainVerifiedAtThisHead": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+  "pushSucceeded": true,
   "githubActionsRunCount": null,
-  "remoteCIVerified": false,
+  "remoteCIVerified": true,
   "websitePublished": true,
   "videoProduced": true,
   "storeSubmissionMade": true,
   "publishedStoreVersion": "3.3.0",
-  "nextDependency": "Commit and push current delivery to main; verify actual Cloudflare Workers Builds run and live site results. Google Store review and publication remain external pending steps.",
+  "nextDependency": "Google Chrome Web Store review; automatic publication of 3.4.0 after approval is selected.",
   "accountPanelAccess": "Native Chrome UI verified the existing Store dashboard and YouTube Studio; previous general Not allowed blocker is resolved.",
   "providerLiveCallMade": true,
   "nativePermissionDialogVerified": false,
@@ -91,21 +91,25 @@
     "sourceEvidence": "evidence/ui-results.json",
     "screenshotCaptureNote": "Section screenshots temporarily hide only the unfocused skip link after verifying that it is outside the visible viewport; inline style restored after capture."
   },
-  "status": "store-submitted-current-git-delivery-pending",
+  "status": "site-video-delivered-store-review-pending",
   "priorRuntimeAndDesignHead": "0075b8d94700812fc5dad71f74b2c91052a05766",
   "priorGithubMainVerifiedAtThisHead": "0075b8d94700812fc5dad71f74b2c91052a05766",
   "priorRuntimePushSucceeded": true,
   "gitHeadBeforeCurrentDelivery": "cc11ef1608e97c8b406c78e64cbc78cc1407896c",
-  "currentDeliveryCommitted": false,
-  "mainPushStatus": "pending-for-current-delivery",
+  "currentDeliveryCommitted": true,
+  "mainPushStatus": "verified-delivery-code-head-on-main",
   "websiteUrl": "https://duzelt.yerli.dev/",
   "websitePublication": {
-    "method": "manual-cloudflare-static-deployment",
+    "method": "automatic-cloudflare-workers-builds-after-main-push",
     "worker": "duzelt-site",
-    "version": "53596d06-d3c7-4566-bf1f-c84e16012f42",
+    "version": "a23b86aa-f6f7-4923-bb4f-5347ec3bb343",
     "httpsCheckCount": 9,
     "expectedHttpResultsPassed": true,
-    "sourceEvidence": "evidence/site-live-results.json"
+    "sourceEvidence": "evidence/site-live-results.json",
+    "codeHead": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+    "buildId": "05e5cf7e-70ec-4bfd-bf6a-3b2f487b9184",
+    "automaticDeployVerified": true,
+    "buildProof": "output/publish-proof/cloudflare-main-build.jpg"
   },
   "cloudflareWorkersBuilds": {
     "connected": true,
@@ -114,8 +118,22 @@
     "rootDirectory": "/",
     "buildCommand": "npm run site:check",
     "deployCommand": "npm run site:deploy",
-    "actualMainPushVerified": false,
-    "remoteBuildVerified": false
+    "actualMainPushVerified": true,
+    "remoteBuildVerified": true,
+    "codeHead": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+    "buildId": "05e5cf7e-70ec-4bfd-bf6a-3b2f487b9184",
+    "durationSeconds": 23,
+    "buildStatus": "success",
+    "deployStatus": "success",
+    "deploymentVersion": "a23b86aa-f6f7-4923-bb4f-5347ec3bb343",
+    "proof": {
+      "file": "output/publish-proof/cloudflare-main-build.jpg",
+      "sha256": "762f9ec88cb85125d0b0ac70ea8e5db225bc0e4643918d122f7ab12d1d023bc0"
+    },
+    "observedLogs": [
+      "Success: Deploy command completed",
+      "✨ Success! Build completed"
+    ]
   },
   "videoUploaded": true,
   "youtubeVideo": {
@@ -136,7 +154,18 @@
     "playlistIdVerified": true,
     "playlistVideoCount": 1,
     "playlistVisibilityVerified": true,
-    "savedDetailsEvidence": "output/publish-proof/youtube-saved-details.jpg"
+    "savedDetailsEvidence": "output/publish-proof/youtube-saved-details.jpg",
+    "liveSiteEmbed": {
+      "verified": true,
+      "domain": "youtube-nocookie.com",
+      "videoId": "q4k1awKQu1w",
+      "observedPlayerTime": "0:00 / 0:32",
+      "durationSeconds": 32,
+      "muted": true,
+      "ccControlUsed": true,
+      "source": "Parent agent live Chrome reload and actual player after Cloudflare main deployment",
+      "fullHumanListeningVerified": false
+    }
   },
   "developerDashboardVerified": true,
   "storeUpdate": {
@@ -169,13 +198,23 @@
   },
   "designSourceGate": "satisfied: user-provided site source received and integrated",
   "remainingVerification": [
-    "Current delivery commit and main push",
-    "Actual Cloudflare Workers Builds run and live site result after push",
-    "Google Store review and 3.4.0 publication",
-    "Full human listening unavailable in agent interface"
+    "Google Store review and 3.4.0 publication"
   ],
-  "siteQaStatus": "58/58 final local browser checks passed with real video ID q4k1awKQu1w and 32-second copy; live CI deployment remains separate.",
+  "siteQaStatus": "58/58 local browser checks passed with video ID q4k1awKQu1w and 32-second copy; actual Cloudflare main build/deploy succeeded at the recorded deliveryCodeHead.",
   "storeReviewPending": true,
   "storeNewVersionPublished": false,
-  "storeAutoPublishOnApproval": true
+  "storeAutoPublishOnApproval": true,
+  "deliveryCodeHead": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+  "testedCodeHead": "f635ca2e2a16af0b48069d57ae81a0fc4cc0564e",
+  "remoteCIProvider": "Cloudflare Workers Builds",
+  "githubActionsStatus": "not-checked-for-current-delivery-code-head",
+  "deliveryCodePushed": true,
+  "metadataCommit": {
+    "note": "This record identifies the tested and pushed delivery code SHA. Final evidence documentation is committed separately; its enclosing commit hash cannot be embedded in its own contents."
+  },
+  "verificationLimits": {
+    "fullHumanAudioHearingVerified": false,
+    "actualUserChromeOllamaVerified": false,
+    "note": "Full human listening is unavailable in the agent interface. Earlier runtime permission/local-model tests do not verify the user Chrome extension origin."
+  }
 }

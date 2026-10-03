@@ -85,7 +85,9 @@ Hareket: menü açılışı, örnekteki Kabul et/İptal geçişi, SSS işareti v
 
 ## Geri bildirim kurulumu ve işletimi
 
-**4 Ekim 2026 durumu:** Form ve SDK düzeltmesi mevcut `main` → Workers Builds düzeniyle yayımlandı. Worker uyumluluk düzeltmesinden sonra 6 açık TEST bildirimi HTTP 202 ile kabul edildi. İlk 4 için SMTP kabul kaydı; ilk 2 ve son 2 olmak üzere 4 mesaj için Gmail gelen kutusu kanıtı var. Önceki denemede aynı geçerli belirteç yeniden kabul edildi; kök neden kesinleşmedi. Ek Durable Object koruması yerelde hazır, yeni canlı yayın ve tekrar reddi henüz bekliyor. [Canlı sonuçlar](../evidence/feedback-live-results.json).
+**4 Ekim 2026 durumu:** Ek Durable Object koruması mevcut `main` → Workers Builds düzeniyle yayımlandı. Toplam 7 açık TEST bildirimi HTTP 202 ile kabul edildi; ilk 4 ve son mesaj olmak üzere 5 SMTP kabul kaydı, toplam 5 mesaj için Gmail gelen kutusu kanıtı var. Son anonim testin form, SMTP ve gelen kutusu aşamaları birlikte doğrulandı. Yeni korumayla son bildirimin değişmemiş istek gövdesiyle tekrarı HTTP 400 / `token_replay` oldu, tekrar kuyruğa eklenmedi. Önceki yeniden kabulün kök nedeni kesinleşmiş sayılmaz. [Canlı sonuçlar](../evidence/feedback-live-results.json).
+
+Yayımlanmış kod commit'i `f2e9604a985a751040a4c25d38107d87e97caca4`; Workers Builds `03360d54-f5e7-4ce8-ad10-d72273fb8e93` build/deploy başarılı. Aktif Worker sürümü `1b751316-8fe9-480c-a9a9-f16ee707b27d`, trafik yüzde 100. Bu raporu içeren sonraki commit'in yayın sonucu Cloudflare Recent builds panelinden ayrıca doğrulanır; bu kod yayınının başarılı sonucu sonraki commit için kanıt sayılmaz.
 
 Yerel test, canlı gönderim ve posta kutusu sonuçları aşağıdaki tabloda ayrı izlenir:
 
@@ -98,10 +100,12 @@ Yerel test, canlı gönderim ve posta kutusu sonuçları aşağıdaki tabloda ay
 | Yerel SMTP ön kontrolü | TLS sertifikası + auth başarılı; e-posta gönderilmedi. |
 | Turnstile | Yalnız `duzelt.yerli.dev` widget'ı; gerçek belirteç ayrı Siteverify işleminde doğru hostname/action ile kabul edildi. |
 | Önbellek düzeltmesi | 3/3 hedefli kontrol; betik adresi içerik özetiyle yenilenir. |
-| Canlı form kabulü | 6 açık TEST bildirimi HTTP 202; yanlış Origin/tip/boyut sırasıyla 403/415/413. |
-| Worker SMTP | İlk 4 bildirim için SMTP kabul kaydı var; son 2 için tail kaydı yok. |
-| Gelen kutusu | İlk 2 ve son 2 olmak üzere 4 bildirim Gmail'de doğrulandı. |
-| Ek token tekrar koruması | Yerel testler geçti; canlı tekrar reddi henüz bekliyor. |
+| Canlı form kabulü | 7 açık TEST bildirimi HTTP 202; yanlış Origin/tip/boyut sırasıyla 403/415/413. |
+| Worker SMTP | İlk 4 ve son bildirim için 5 SMTP kabul kaydı var; aradaki 2 mesaj için tail kaydı yok. |
+| Gelen kutusu | Son anonim test dahil toplam 5 bildirim Gmail'de doğrulandı; bütün 7 mesajın teslimi iddia edilmez. |
+| Ek token tekrar koruması | Canlı değişmemiş gövdeyle tekrar HTTP 400 / `token_replay`; tekrar kuyruğa yazılmadı. Arıza HTTP 503 davranışı yerel testte doğrulandı. |
+
+Son testin `e550c79f-c2ae-44a3-a451-9004acd50f35` tam kayıt kimliği, SMTP kaydı ve Gmail gövdesinde eşleşti. Gmail'de Türkiye saati 4 Ekim 00:34, Türkçe karakterler, anonim bildirim açıklaması ve boş teknik alanların gizlenmesi doğrulandı. [Son anonim e-posta görüntüsü](../output/feedback/gmail-final-test-email.png), [yanıt adresli önceki örnek](../output/feedback/gmail-test-email-with-reply.png).
 
 Gerçek Chrome'da 320, 390, 768 ve 1440 px genişliklerde yatay taşma görülmedi; e-posta alternatifi görünür kaldı. Bu canlı kontrol sırasında güncel SDK kodu önbellek kapatılarak yüklendi. `site:prepare`, `feedback.js` içeriğinin ilk 12 SHA-256 karakterini betik adresine ekleyerek eski dosyanın önbellekten gelmesini önler. Üç hedefli önbellek kontrolü, önceki 37 form testinin yeniden çalıştırıldığı anlamına gelmez. [Önbellek kanıtı](../evidence/feedback-cache-results.json).
 
@@ -166,7 +170,7 @@ Kontrollü testler açıkça test olarak işaretlenmiş, az sayıda bildirimle v
 
 SMTP sorunu varsa 24 saatlik DLQ süresi dolmadan giderin. Başarısız kayıtları açmak veya yeniden göndermek kişisel veri erişimidir; içeriği açık loga dökmeyin. Hata kuyruğunda tekrar gönderme otomatik sınırsız döngüye dönüştürülmez. Ana ve DLQ'daki süre dolan mesajlar otomatik silinir; kuyruğun süresinin dolması posta kutusundaki e-postayı silmez.
 
-Geliştiricinin posta kutusundaki bildirim ve yanıtları talep kapandıktan sonra en geç 30 gün içinde elle silin. Aylık kontrol yapın; silinmişler/çöp kutusu ve destek yazışmasının ek kopyalarını da gözden geçirin. Bu bir otomatik posta silme görevi değildir. Bir silme talebini tam kayıt kimliğiyle eşleştirin; kullanıcıya uygulanan işlemi ve kalan sağlayıcı sınırlarını açıkça bildirin.
+Geliştiricinin posta kutusundaki bildirim ve yanıtları talep kapandıktan sonra en geç 30 gün içinde elle silin. Talep kapanırken son silme gününü belirleyin; sonraki aylık kontrol bu tarihten sonraysa kontrolü beklemeden, gerekirse kapanışta hemen silin. Aylık kontrol yapın; silinmişler/çöp kutusu ve destek yazışmasının ek kopyalarını da gözden geçirin. Bu bir otomatik posta silme görevi değildir. Bir silme talebini tam kayıt kimliğiyle eşleştirin; kullanıcıya uygulanan işlemi ve kalan sağlayıcı sınırlarını açıkça bildirin.
 
 Turnstile/SMTP arızasında `FEEDBACK_ENABLED=false` ile yeni gönderimleri durdurun. E-posta ve GitHub alternatifleri görünür kalır. Worker sürümüne geri dönmek, kuyrukta bekleyen mesajları veya posta kopyalarını kendiliğinden silmez; gizlilik ve form durumu fiilî veri akışıyla uyumlu tutulur. Mevcut `main` → Workers Builds düzeniyle yayın yapılır; ikinci bir CI/yayın düzeni kurulmaz.
 
@@ -185,7 +189,7 @@ Sunucu testleri: `npm run test:feedback` — **39/39 geçti**. Doğrulama/stream
 - 320, 390, 768 ve 1440 px; klavye odağı, etiketler, teknik bilgiler açılır alanı ve erişilebilir durum mesajları.
 - E-postasız gönderim, hata/ağ kesintisinde mesajın korunması, yinelenen gönderimin engellenmesi ve görünür e-posta alternatifi.
 - Doğrulama/boyut/Origin/içerik tipi, Turnstile hostname/action/süre ve hız sınırı.
-- Aynı tokenla tekrarın 400 olması ve kuyruk yazmaması; Durable Object arızasında 503, aktif kaydın alarm ile silinmesi. Canlı tekrar reddi henüz bekliyor.
+- Aynı tokenla tekrarın 400 olması ve kuyruk yazmaması canlıda doğrulandı; Durable Object arızasında 503 ve aktif kaydın alarm ile silinmesi yerel workerd testleriyle doğrulandı.
 - Queue arızası, SMTP retry/ACK, sabit alıcı, Reply-To, HTML kaçışı ve düz metin e-posta.
 - `.env`/secret'ların Git, site varlıkları, dry-run çıktısı ve eklenti ZIP'i dışında kaldığı.
 - Canlı form kabulü, SMTP kabulü, varsa gelen kutusu; gerçek main push sonrası uzak build ve yayın.

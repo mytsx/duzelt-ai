@@ -69,7 +69,7 @@
 
 ## 4. Site üzerinden e-posta geri bildirimi
 
-4 Ekim 2026: form yayımlandı; 6 açık TEST bildirimi HTTP 202 ile kabul edildi. İlk 4 için SMTP kabul kaydı, ilk 2 ve son 2 olmak üzere 4 mesaj için Gmail gelen kutusu kanıtı var. Önceki canlı denemede aynı belirteç yeniden kabul edildi; kök neden kesinleşmedi. Ek Durable Object korumasının yerel testleri geçti, canlı tekrar reddi henüz bekliyor. [Canlı sonuçlar](evidence/feedback-live-results.json).
+4 Ekim 2026: 7 açık TEST bildirimi HTTP 202 ile kabul edildi; 5 SMTP kabul kaydı ve toplam 5 mesaj için Gmail gelen kutusu kanıtı var. Son anonim testin form, SMTP ve gelen kutusu aşamalarının üçü de doğrulandı. Ek Durable Object koruması `f2e9604` kaynak commit'iyle yayımlandı; son bildirimin değişmemiş gövdeyle tekrarı HTTP 400 / `token_replay` oldu ve tekrar kuyruğa yazılmadı. Önceki yeniden kabulün kök nedeni kesinleşmiş sayılmaz. [Canlı sonuçlar](evidence/feedback-live-results.json).
 
 - [x] Kalbur'un Worker, form ve test kaynaklarını salt okunur incele; `.env` ve credential dosyalarını açma.
 - [x] İki aşamalı kurulum sınırını ve gerekli SMTP/Turnstile alanlarını belirle; ilk aşamada uygulama/yayın yapmadan dur.
@@ -85,22 +85,23 @@
 - [x] Canlı Chrome'da 320/390/768/1440 px yatay taşma ve görünür e-posta alternatifini kontrol et; güncel SDK için önbellek kapalıydı.
 - [x] Eski SDK dosyası için içerik özetli betik adresi üret; 3/3 hedefli önbellek kontrolünü çalıştır. Önceki 37 form kontrolünü URL değişikliği sonrası yeniden çalıştırılmış diye sunma.
 - [x] Canlı Chrome'da normal önbellekle güncel `feedback.js` dosyasını ve formun hazır olmasını doğrula; JavaScript hatası görülmedi.
-- [x] Worker uyumluluk düzeltmesi sonrası gerçek POST HTTP 202 kuyruk kabulünü doğrula; 6 TEST bildirimi kabul edildi.
-- [x] Worker SMTP kabulünü ve gelen kutusunu ayrı doğrula; ilk 4 SMTP kaydı, toplam 4 gelen kutusu kanıtı var. Bütün 6 mesaj için aynı kanıt düzeyi iddia edilmez.
+- [x] Worker uyumluluk düzeltmesi sonrası gerçek POST HTTP 202 kuyruk kabulünü doğrula; 7 TEST bildirimi kabul edildi.
+- [x] Worker SMTP kabulünü ve gelen kutusunu ayrı doğrula; ilk 4 ve son mesaj için 5 SMTP kaydı, toplam 5 mesaj için gelen kutusu kanıtı var. Bütün 7 mesaj için aynı kanıt düzeyi iddia edilmez.
 - [x] IP başına 5/dk ve uygulama anahtarına 60/dk binding'lerini ve taklit reddetme testlerini doğrula; sınır yaklaşık ve Cloudflare konumu bazlıdır. Canlı kısa denemede HTTP 429 görülmedi; eşik ölçümü yapılmış sayılmaz.
 - [x] Canlı yanlış Origin, içerik tipi ve büyük gövde isteklerini reddet; sırasıyla HTTP 403, 415 ve 413 görüldü.
 - [x] Token HMAC'ı ile nesne kimliği, atomik SQLite kullanım kaydı ve 24 saatlik silme alarmını uygula; `FEEDBACK_TOKEN_GUARD` / `FeedbackTokenGuard`. Ham token/IP/mesaj/e-posta depoya girmez; 30 güne kadar platform kurtarma geçmişi belgelenir.
-- [ ] Yeni korumayı yayımla; aynı geçerli belirtecin ikinci kullanımında HTTP 400 ve yeni kuyruk kaydı olmamasını canlı doğrula. Koruma arızasında HTTP 503 davranışını yerel sonuçla karıştırma.
-- [ ] Yeni koruma sonrası son kontrollü TEST bildiriminin kuyruk, SMTP ve gelen kutusu sonuçlarını ayrı doğrula.
+- [x] Yeni korumayı yayımla; son kabul edilen bildirimin değişmemiş istek gövdesiyle tekrarında HTTP 400 ve `token_replay` görüldü, yeni kuyruk kaydı oluşmadı. Koruma arızasında HTTP 503 davranışı yerel testle doğrulandı.
+- [x] Yeni koruma sonrası son anonim TEST bildiriminin HTTP 202 kabulünü ve aynı kayıt kimliğiyle SMTP kabulünü doğrula.
+- [x] Son TEST bildiriminin Gmail gelen kutusu görünümünü ayrıca doğrula; tam kayıt kimliği, Türkiye saati, Türkçe karakterler, anonim yanıt adresi açıklaması ve boş teknik alanların gizlenmesi eşleşti.
 - [x] Yerel testlerde sabit gönderen/alıcı, yalnız Reply-To, TLS seçenekleri, retry/ACK ve kayıt kimliğiyle izleme akışını doğrula. Gerçek DLQ yönlendirmesi bekliyor.
 - [x] Yerel SMTP ön kontrolü (`transporter.verify()`): TLS sertifikası ve kimlik doğrulaması başarılı; e-posta gönderilmedi.
 - [x] Gerekli 11 alanı mevcut Worker'a şifreli secret olarak aktar; değerleri gösterme. Yerel `.env` 0600 izinli ve Git dışında, sızıntı kontrolü bulgusuz.
 - [x] Son derleme/paket turunda secret ve `.env` dışlama kontrollerini yenile; 7/7 paket testi, `.env` 0600/Git dışında ve izlenen dosyalarda gizli değer sızıntısı bulgusuz.
 - [x] Doğrulama, boyut/Origin, taklit Turnstile hataları, hız sınırı, kuyruk arızası, SMTP retry, HTML kaçışı, sabit alıcı ve Durable Object tekrar koruması testlerini çalıştır; 39/39.
-- [x] Açıkça TEST işaretli canlı bildirimlerde kuyruk kabulünü, SMTP kabulünü ve gelen kutusu görünümünü ayrı kaydet; 6 kabul, 4 SMTP kayıtlı, 4 gelen kutusu doğrulanmış.
+- [x] Açıkça TEST işaretli canlı bildirimlerde kuyruk kabulünü, SMTP kabulünü ve gelen kutusu görünümünü ayrı kaydet; 7 kabul, 5 SMTP kayıtlı, 5 gelen kutusu doğrulanmış.
 - [x] Form kodunu ve SDK düzeltmesini (`01ab2ef`, `6c96419`) main'e pushla; mevcut Workers Builds otomatik build/deploy başarılı. Worker sürümü `94e7bfa1…`.
 - [x] Yeni gizlilik kaynağından site kopyasını üret; son `site:check` turunda 14 hazırlık ve 39 sunucu testi, syntax/drift ve Durable Object binding'li bundle dry-run geçti.
-- [ ] Son Durable Object/gizlilik değişikliğinden sonra site hazırlığı, main push, uzak build ve canlı koruma sonucunu doğrula; yalnız önceki yayın kanıtıyla tamamlandı sayma.
+- [x] Son Durable Object/gizlilik kaynaklarını hazırla ve `f2e9604a985a751040a4c25d38107d87e97caca4` commit'ini main'e pushla; Workers Builds `03360d54-f5e7-4ce8-ad10-d72273fb8e93` başarılı, aktif Worker `1b751316-8fe9-480c-a9a9-f16ee707b27d` yüzde 100. Canlı token tekrar reddi ayrıca doğrulandı.
 - [ ] 24 saatlik hata kuyruğunu arıza halinde izle; kapanan talebin posta yazışmalarını en geç 30 gün içinde sil ve aylık kontrolü işlet.
 
 ## Kanıt sınırları

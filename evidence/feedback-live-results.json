@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-10-03T21:31:07.377361+00:00",
+  "recordedAt": "2026-10-03T21:37:51.834499+00:00",
   "form": "https://duzelt.yerli.dev/support/#geri-bildirim",
   "scope": "Explicitly marked controlled TEST feedback to fixed server MAIL_TO; no reply email sent.",
   "beforeTokenGuard": {
@@ -108,12 +108,63 @@
     "realDlqFailureRoutingExercised": false
   },
   "afterTokenGuard": {
-    "status": "pending existing Workers Builds publish and one final controlled TEST"
+    "status": "passed",
+    "checkedAt": "2026-10-03T21:34:55.589Z",
+    "sourceCommit": "f2e9604a985a751040a4c25d38107d87e97caca4",
+    "workersBuild": {
+      "id": "03360d54-f5e7-4ce8-ad10-d72273fb8e93",
+      "status": "Success"
+    },
+    "workerVersion": "1b751316-8fe9-480c-a9a9-f16ee707b27d",
+    "trafficPercentage": 100,
+    "oneFinalControlledAnonymousTest": {
+      "messageId": "e550c79f-c2ae-44a3-a451-9004acd50f35",
+      "formStatus": 202,
+      "smtpAcceptedLog": true,
+      "gmailInboxVisible": true,
+      "gmailFullIdMatchesSmtp": true,
+      "turkishCharactersVisible": true,
+      "istanbulTimestampVisible": "4 Ekim 2026 00:34",
+      "emptyOptionalFieldsOmitted": true,
+      "anonymousReplyExplanationVisible": true,
+      "actualGmailScreenshot": "output/feedback/gmail-final-test-email.png",
+      "actualFormScreenshot": "output/feedback/live-form-final-accepted.png"
+    },
+    "immediateIdenticalCapturedBodyReplay": {
+      "status": 400,
+      "error": "turnstile",
+      "accepted": false,
+      "workerDiagnosticClass": "token_replay",
+      "newQueueJobCreated": false,
+      "capture": "Network.requestWillBeSent postData captured during the original UI submit; same immutable body, no token stored in evidence."
+    },
+    "safeLogEvents": [
+      {
+        "event": "feedback_accepted",
+        "id": "e550c79f-c2ae-44a3-a451-9004acd50f35"
+      },
+      {
+        "event": "feedback_validation_failed",
+        "class": "token_replay"
+      },
+      {
+        "event": "feedback_smtp_accepted",
+        "id": "e550c79f-c2ae-44a3-a451-9004acd50f35"
+      }
+    ],
+    "liveGuardOutageAndExpiryExercised": false,
+    "scopeNote": "Outage/restart/24h expiry tested in local workerd. Actual live duplicate rejection and one final mail delivery verified independently."
   },
   "secretProtection": {
     "envMode": "0600",
     "envIgnored": true,
     "envTracked": false,
     "privateValueLeaksInTrackedFiles": 0
+  },
+  "controlledTestTotals": {
+    "acceptedMessages": 7,
+    "smtpLogConfirmed": 5,
+    "gmailInboxConfirmed": 5,
+    "note": "Different evidence sets; not a claim that every accepted message has all three observations."
   }
 }

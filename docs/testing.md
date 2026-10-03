@@ -39,15 +39,17 @@ python3 tools/package-store.py
 
 API testleri sahte anahtar/metin ve taklit servis yanıtları kullanır; gerçek hesap, kişisel sır veya ücretli istek kullanılmaz. Paket testleri geçici örnek çalışma klasörlerini kullanır; gerçek kullanıcı ayarlarını okumaz.
 
-Paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Son paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik doğrulandı, kaynak değişmeden tekrarlanan üretim aynı ZIP'i verdi. `dist/duzelt-ai-3.4.0.zip` SHA-256: `c72e73e20a9e048b9f3a708624df48a5336a5f2c47f6efd87f7023078eafe4fc`. Çalışma kaynağı değişirse bu paket yeniden üretilmelidir.
+Paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik ve kaynak değişmeden tekrarlanan üretimin aynı ZIP'i vermesi doğrulandı. `dist/duzelt-ai-3.4.0.zip` güncel kaynakla iki kez üretildi; SHA-256: `6020d93155d44da9dd86585d8fad38c1190e71924090d4c6f694f5c87c18623d`. ZIP içeriği kaynak dosyalarla birebir karşılaştırıldı.
 
-Gerçek paketlenmemiş eklentinin yeni popup/ayarlar kontrolü Chromium **151.0.7922.34** ile **19/19 geçti**. Kanıt dosyası: [ui-results.json](../evidence/ui-results.json); ayrıntılı kaynak `output/playwright/ui-results.json`. Sağlayıcı seçimi/anahtar/prompt kaydı, eski OpenAI kaydının korunması, ayrı profiller, model araması, desteklenmeyen kayıtların durumu, kullanıcı eylemiyle model yenileme/test, IBM/SAP dinamik alanları ve iki origin izni, sır alanlarının maskelenmesi, tokenın depoya yazılmaması, toggle, sabit bağlantılar ve klavye akışları kapsanır. Chrome'un yerel API izin penceresinin sonucu fixture ile taklit edildi; gerçek kullanıcının izin kabulü bu koşuda doğrulanmadı. Gerçek sağlayıcı ağ isteği **0**.
+Gerçek paketlenmemiş eklentinin yeni popup/ayarlar kontrolü Chromium **151.0.7922.34** ile **29/29 geçti**. Kanıt dosyası: [ui-results.json](../evidence/ui-results.json); ayrıntılı kaynak `output/playwright/ui-results.json`. Sağlayıcı seçimi/anahtar/prompt kaydı, eski OpenAI kaydının korunması, ayrı profiller, model araması, desteklenmeyen kayıtların durumu, kaydedilmiş bağlantıyla test, IBM/SAP dinamik alanları ve iki origin izni, sır alanlarının maskelenmesi, tokenın depoya yazılmaması, toggle ve sabit bağlantılar kapsanır. Sağlayıcı listesindeki arama ile Home/End/Escape klavye akışı; Ollama seçiminde otomatik keşif; taslak URL değişince eski sonuçların uygulanmaması; komut kopyalama; bağlantı hatası/403/boş liste davranışı doğrulandı. İlk açılışta izin yoksa GET yapılmaz; izin varsa kayıtlı model korunur ve liste kapalı kalır. Chrome'un yerel API izin penceresinin sonucu fixture ile taklit edildi; gerçek kullanıcının izin kabulü bu koşuda doğrulanmadı. Bu arayüz koşusunda gerçek sağlayıcı ağ isteği **0**.
 
 Açık/koyu tema için **320/390/768/1024/1440 px** ayarlar görselleri ve iki popup görseli gerçek görüntü olarak incelendi. Başlık, alan, Türkçe açıklama, düğme, klavye odağı ve popup yüksekliği kontrol edildi; kırpılma/üst üste binme görülmedi. Bu sonuç son arayüz kaynaklarına ve kaydedilmiş ekran görüntülerine aittir.
 
 Gerçek editör tarayıcı testinde **127/127**, bootstrap kontrolünde **7/7 geçti**; sayfa hatası yok. Altı sürümün tamamında native undo, yazım/kelime ekleme-çıkarma, kalın/italik/bağlantı/liste korunması, iptal/devre dışı bırakma ve bekleyen/önizlenen metnin değişmesi kapsanır. Test gerçek manifestin MAIN/ISOLATED betiklerini ve merkezi arka plan servisini kullanır; taşıma katmanı taklit edilir, gerçek sağlayıcı isteği **0**. Kanıt: [editor-results.json](../evidence/editor-results.json), ayrıntılı kayıt `output/playwright/editors/results.json`.
 
-Merkezi ve bağımsız sağlayıcı testleri **155/155 geçti**: 12 çalışma protokolü, API hata ayrımları, her HTTP isteğinde 25 saniye sınırı, strict JSON sonucu, depolama/izin/yönlendirme sınırları, Azure model/deployment ayrımı, Mantle Responses/model keşfi ve IBM IAM/SAP OAuth-Orchestration kapsanır. Bu toplamın içinde **40** bağımsız kimlik/izin/gizlilik regresyonu vardır. Tam katalogdaki **225** protokol sağlayıcısı için **7.806** URL/gövde fixture'ı oluşturuldu: **7.804** seçilebilir katalog model kaydı + katalog modeli olmayan iki yerel sağlayıcı için manuel örnek. SAP native OpenAI ayrıca özel fixture ile sınanır. Kanıt: [provider-edge-review.json](../evidence/provider-edge-review.json); ağ çağrısı **0**, çözülemeyen adres şablonu veya kimlik sınırını aşan override yok. Bu, canlı hesap veya bütün modellerin metin kalitesi testi değildir. SAP X.509/mTLS ve IBM yazılım/deployment/gateway ürünleri bu kimlik sözleşmesinin dışındadır.
+Merkezi ve bağımsız sağlayıcı testleri **188/188 geçti**: 12 çalışma protokolü, API hata ayrımları, her HTTP isteğinde 25 saniye sınırı, strict JSON sonucu, depolama/izin/yönlendirme sınırları, Azure model/deployment ayrımı, Mantle Responses/model keşfi, IBM IAM/SAP OAuth-Orchestration ve yerel model keşfi kapsanır. Ollama native liste/JSON Schema, isteğe bağlı yetenek filtresi, proxy kökü, anahtarsız GET, taslak keşfin ayarlar sayfası/loopback/izin sınırı ve kayıtlı ayarlara dokunmaması kontrol edilir. Bu toplamın içinde **40** bağımsız kimlik/izin/gizlilik regresyonu vardır. Tam katalogdaki **225** protokol sağlayıcısı için **7.806** URL/gövde fixture'ı oluşturuldu: **7.804** seçilebilir katalog model kaydı + katalog modeli olmayan iki yerel sağlayıcı için manuel örnek. SAP native OpenAI ayrıca özel fixture ile sınanır. Kanıt: [provider-results.json](../evidence/provider-results.json), [provider-edge-review.json](../evidence/provider-edge-review.json); ağ çağrısı **0**, çözülemeyen adres şablonu veya kimlik sınırını aşan override yok. Bu, canlı hesap veya bütün modellerin metin kalitesi testi değildir. SAP X.509/mTLS ve IBM yazılım/deployment/gateway ürünleri bu kimlik sözleşmesinin dışındadır.
+
+Gerçek yerel model listesi ayrıca doğrulandı: güncel `ProviderService.discoverLocalModels`, `http://127.0.0.1:11434/api/tags` adresinden **HTTP 200** aldı ve `qwen2.5:7b` modelini listeledi. Authorization başlığı, inference/bulut çağrısı veya kayıtlı ayarlarda okuma/yazma yoktu. Bu koşu Node ortamında gerçek Ollama GET isteği kullandı; Chrome izin sonucu taklit edildi, gerçek tarayıcı origin'i doğrulanmadı. Kanıt: [ollama-discovery-results.json](../evidence/ollama-discovery-results.json).
 
 Katalog hazırlığında **30/30** kalıcı regresyon testi geçti (`tests/test_provider_catalog.py`); 226 kaynak sağlayıcısı eksiksiz taşındı, tarih/SHA-256/MIT lisansı, model/URL/alan sınırları, IBM IAM/SAP OAuth-Orchestration profil sözleşmesi, tekrarlanabilir çıktı ve paket bağımlılıkları doğrulandı. İlk kaynak taramasının kanıtı `output/provider-research/catalog-validation.json` eski 223 sağlayıcı aşamasına aittir; güncel katalogda 225 protokol sağlayıcısı ve 7.804 seçilebilir model adayı vardır. Kalıcı test ve tekrar komutu [providers-research.md](providers-research.md) dosyasındadır.
 
@@ -59,6 +61,28 @@ OpenAI/gpt-4o JSON modu korundu; bütün ailelerde özel prompta da `corrected_t
 
 Her HTTP isteğinin zaman aşımı **25 saniyedir**; gövde okuması bu süreye dahildir. IBM/SAP için token değişimi ve inference ayrı HTTP sınırları kullanır; toplam işlem yaklaşık 50 saniyeye çıkabilir. Bu süre, MV3 servis işçisinin uzun süren fetch nedeniyle kapanmasından önce anlaşılır hata döndürmek için seçildi; [Chrome servis işçisi yaşam döngüsü](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle) belgesi incelendi.
 
+## Yerel model bağlantısı
+
+Sağlayıcı araması açılan seçim listesinde bulunur; Ollama ve llama.cpp ayrıca görünür kartlardan seçilir. Yerel adres açık, anahtar alanı gizlidir. Kullanıcı Ollama'yı seçtiğinde Chrome bağlantı izni istenir ve izin verilirse taslak adresten modeller otomatik alınır. Ayarlar ilk açıldığında yalnız önceden verilmiş izinle otomatik keşif yapılır; izin yoksa **Modelleri getir** düğmesiyle devam edilir. Model seçimi **Kaydet** ile etkinleşir; keşif sırasında kaydedilmiş sağlayıcı ve diğer profiller değişmez. Model bilinmiyorsa adresi boş modelle kaydetme → modelleri getirme → model seçip tekrar kaydetme de mümkündür.
+
+Ollama native `/api/tags`, llama.cpp uyumlu `/v1/models` kullanır. Ollama listesinde isteğe bağlı `capabilities` varsa embedding-only kayıtlar elenir; yetenek alanı olmayan kayıtlar korunur. Yerel non-cloud Ollama düzeltmesi `temperature: 0.2` ve zorunlu `corrected_text` alanıyla JSON Schema kullanır; bulut/uzak dal JSON object biçimindedir. Bu taşıma ve doğrulayıcı davranışı taklit servis yanıtlarıyla test edilir.
+
+Arayüzdeki kurulum yardımında [resmî CLI komutları](https://docs.ollama.com/cli) bulunur:
+
+```sh
+ollama serve
+ollama list
+ollama pull <model-adı>
+```
+
+Son komut isteğe bağlıdır; `<model-adı>` yerine seçtiğiniz model adı yazılır. Ollama zaten çalışıyorsa ikinci sunucuyu başlatmayın. Origin erişimi gerekiyorsa çalışan sunucuyu durdurup arayüzün gerçek `chrome.runtime.id` ile hazırladığı komutla yeniden başlatın:
+
+```sh
+OLLAMA_ORIGINS="chrome-extension://EKLENTI_KIMLIGI" ollama serve
+```
+
+Buradaki yer tutucu o kurulumun gerçek kimliğiyle değiştirilir. Chrome bağlantı izni ve Ollama'nın origin izni ayrı koşullardır. [Ollama origin ayarı](https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama). Kullanıcının gerçek Chrome kurulum kimliği/izin penceresi doğrulanmadı.
+
 ## Yerel testlerde kapsanan kabul kontrolleri
 
 - [x] Popup açma/kapatma, düğmelerin eklenmesi/kaldırılması ve dinamik editör davranışı.
@@ -69,11 +93,14 @@ Her HTTP isteğinin zaman aşımı **25 saniyedir**; gövde okuması bu süreye 
 - [x] Türkçe karakterler, kelime ekleme/çıkarma, biçimli paragraflar/listeler/bağlantılar.
 - [x] HTML güvenliği, tehlikeli bağlantı/olay özniteliklerinin temizlenmesi ve model metninin HTML olarak çalıştırılmaması.
 - [x] Normal input/textarea alanlarına düğme eklenmemesi.
+- [x] Ollama/llama.cpp kartları, anahtarsız yerel adres, tam model etiketi, boş modelle adres kaydı ve diğer sağlayıcı profillerinin korunması.
+- [x] Taslak model keşfinin yalnız ayarlar sayfasına açık olması, izin/loopback kontrolü ve kayıt okumadan/yazmadan çalışması.
 
 ## Ayrıca gerekli gerçek ortam kontrolleri
 
 - [ ] Kullanıcının kendi Chrome profilinde seçilen API origin'i için gerçek izin penceresi, kabul/ret ve izin kaldırma.
-- [ ] Gerçek sağlayıcı hesabı/anahtarı/bölgesi ile model erişimi, faturalandırma ve Türkçe düzeltme kalitesi. Yerel fixture başarısı bu kontrolün yerine geçmez.
+- [ ] Kullanıcının kendi Chrome kurulumundan yerel sunucuya bağlantı, origin izni ve model listesinin alınması.
+- [ ] Gerçek bulut hesabı/anahtarı/bölgesi ile model erişimi ve faturalandırma. Yerel fixture başarısı bu kontrolün yerine geçmez.
 - [ ] Belirli bir WordPress/Drupal/Joomla/Notion veya diğer üretim sitesinin kendi editör kurulumuyla uyumluluk.
 - [x] Son arayüzün bütün ekran görüntülerinde gerçek görsel inceleme sonucu.
 - [ ] Uzak build/canlı site ve Chrome Web Store geliştirici paneli/inceleme/yayın sonucu.
@@ -81,6 +108,8 @@ Her HTTP isteğinin zaman aşımı **25 saniyedir**; gövde okuması bu süreye 
 ## Tasarım ve yayın aşaması
 
 Claude Design dosyaları henüz gelmedi. Bu aşamadan önce site tasarımı/yayını, video görselleri veya mağaza tanıtım görselleri tamamlanmış sayılmaz.
+
+Claude Design referans kiti **22 dosya** içerir; Ollama masaüstü/dar ekran referansları da dahildir. Bu kit bir site tasarımı veya mağaza eklenti paketi değildir. Kullanıcıdan düzenlenebilir site kaynaklarını içeren tasarım ZIP'i beklenir.
 
 Tasarım geldiğinde 320, 390, 768, 1024 ve 1440 px genişliklerde gerçek tarayıcı görsel kontrolü; klavye erişimi; hareket azaltma; yalnız tıklama sonrası YouTube oynatıcı yükleme; güncel süre/erişilebilir düğme adı kontrol edilir. Ardından gerçek `main` push'u için uzak build ve canlı HTTPS kanıtları kaydedilir.
 

@@ -21,6 +21,8 @@ function saved(id, profile) {
 function harness({ storage = { openai_api_key: KEY }, permission = true, fetchMock, storageError = false } = {}) {
     const calls = [];
     const permissions = [];
+    const storageReads = [];
+    const storageWrites = [];
     const logs = [];
     const timers = new Map();
     let nextTimer = 0;
@@ -32,7 +34,8 @@ function harness({ storage = { openai_api_key: KEY }, permission = true, fetchMo
         chrome: {
             runtime,
             storage: { local: {
-                get: (keys, callback) => { runtime.lastError = storageError ? { message: PRIVATE + KEY } : null; callback(storageError ? undefined : storage); runtime.lastError = null; },
+                get: (keys, callback) => { storageReads.push(plain(keys)); runtime.lastError = storageError ? { message: PRIVATE + KEY } : null; callback(storageError ? undefined : storage); runtime.lastError = null; },
+                set: (values, callback) => { storageWrites.push(plain(values)); Object.assign(storage, values); if (callback) callback(); },
                 setAccessLevel: (options, callback) => { accessLevel = options.accessLevel; callback(); }
             } },
             permissions: { contains: (options, callback) => { permissions.push(plain(options)); callback(typeof permission === 'function' ? permission(options) : permission); } }
@@ -55,7 +58,7 @@ function harness({ storage = { openai_api_key: KEY }, permission = true, fetchMo
         const accepted = listener(request, sender, resolve);
         if (accepted === false || accepted === undefined) resolve(undefined);
     });
-    return { service: context.ProviderService, catalog: context.catalog, calls, permissions, logs, timers, rpc, context, get accessLevel() { return accessLevel; } };
+    return { service: context.ProviderService, catalog: context.catalog, calls, permissions, storageReads, storageWrites, logs, timers, rpc, context, get accessLevel() { return accessLevel; } };
 }
 
 function output(protocol) {
@@ -368,8 +371,195 @@ test('Yerel Ollama anahtarsız çalışır; uzak OpenAI anahtarsız kabul edilme
     const local = harness({ storage: saved('ollama', { apiKey: '', model: 'qwen2.5:7b' }), fetchMock: async () => reply(output('openai-chat')) });
     await local.service.correctText('metin');
     assert.equal(local.calls[0].options.headers.has('authorization'), false);
+    assert.deepEqual(local.calls[0].body.response_format, {
+        type: 'json_schema',
+        json_schema: {
+            name: 'text_correction', strict: true,
+            schema: { type: 'object', properties: { corrected_text: { type: 'string' } }, required: ['corrected_text'], additionalProperties: false }
+        }
+    });
+    assert.equal(local.calls[0].body.temperature, 0.2);
+    assert.equal(local.calls[0].url, 'http://127.0.0.1:11434/v1/chat/completions');
+    for (const [id, profile] of [['openai', { model: 'gpt-4o' }], ['llamacpp', { model: 'fixture-model' }], ['custom', { baseURL: 'http://localhost:8080/v1', model: 'fixture-model' }]]) {
+        const resolved = local.service.resolveProfile(id, { apiKey: KEY, ...profile });
+        const request = local.service.buildCorrectionRequest(resolved, 'metin');
+        assert.equal(request.body.temperature, id === 'openai' ? 0.3 : undefined);
+        assert.deepEqual(request.body.response_format === undefined ? undefined : plain(request.body.response_format), id === 'openai' ? { type: 'json_object' } : undefined);
+    }
+    for (const profile of [{ model: 'gemma4:cloud' }, { model: 'qwen2.5:7b', baseURL: 'https://ollama.com/v1' }]) {
+        const request = local.service.buildCorrectionRequest(local.service.resolveProfile('ollama', profile), 'metin');
+        assert.deepEqual(plain(request.body.response_format), { type: 'json_object' });
+    }
+    const wrongField = harness({ storage: saved('ollama', { apiKey: '', model: 'qwen2.5:7b' }), fetchMock: async () => reply({ choices: [{ finish_reason: 'stop', message: { content: '{"correct_text":"Yanlış alan."}' } }] }) });
+    await assert.rejects(wrongField.service.correctText('metin'), { code: 'invalid_response' });
     const h = harness();
     assert.throws(() => h.service.resolveProfile('openai', { authType: 'none' }), { code: 'authentication' });
+});
+
+test('Ollama model yenileme boş modelle tek native GET yapar, embedding modellerini yetenekle ayıklar', async () => {
+    const rows = [
+        { model: 'qwen2.5:7b', name: 'Qwen etiketi', capabilities: ['completion', 'tools'] },
+        { model: 'chat-model:latest', capabilities: ['chat'] },
+        { name: 'legacy-model:latest' },
+        { name: 'nomic-embed-text:latest', capabilities: ['embedding'] },
+        { name: 'tools-only', capabilities: ['tools'] },
+        { name: 'no-capabilities', capabilities: [] },
+        { name: 'malformed-capabilities', capabilities: 'completion' },
+        null,
+        { capabilities: ['completion'] }
+    ];
+    const h = harness({ storage: saved('ollama', { apiKey: '', model: '' }), fetchMock: async () => reply({ models: rows }) });
+    assert.equal((await h.service.getProviderStatus()).configured, false);
+    assert.equal(h.calls.length, 0);
+    const result = await h.rpc({ action: 'listProviderModels', providerId: 'ollama', baseURL: 'https://unsaved.example/v1' });
+    assert.deepEqual(plain(result), {
+        models: [{ id: 'qwen2.5:7b', name: 'Qwen etiketi' }, { id: 'chat-model:latest', name: 'chat-model:latest' }, { id: 'legacy-model:latest', name: 'legacy-model:latest' }],
+        source: 'provider', truncated: false
+    });
+    assert.equal(h.calls.length, 1);
+    assert.equal(h.calls[0].url, 'http://127.0.0.1:11434/api/tags');
+    assert.equal(h.calls[0].options.method, 'GET');
+    assert.equal(h.calls[0].body, undefined);
+    assert.equal(h.calls[0].options.headers.has('authorization'), false);
+    assert.deepEqual(h.permissions, [{ origins: ['http://127.0.0.1:11434/*'] }]);
+    await assert.rejects(h.service.correctText('metin'), { code: 'model' });
+    assert.equal(h.calls.length, 1);
+});
+
+test('Taslak yerel keşif yalnız GET yapar, kayıtlı sağlayıcıyı okumadan/değiştirmeden model listeler', async t => {
+    for (const [id, baseURL, endpoint, data, expected] of [
+        ['ollama', 'http://localhost:11434/draft/v1', 'http://localhost:11434/draft/api/tags', { models: [{ model: 'qwen2.5:7b', capabilities: ['completion'] }, { model: 'nomic:latest', capabilities: ['embedding'] }] }, [{ id: 'qwen2.5:7b', name: 'qwen2.5:7b' }]],
+        ['llamacpp', 'https://127.0.0.1:8443/v1', 'https://127.0.0.1:8443/v1/models', { data: [{ id: 'local-llama' }] }, [{ id: 'local-llama', name: 'local-llama' }]]
+    ]) {
+        await t.test(id, async () => {
+            const storage = saved('openrouter', { model: 'openai/gpt-4o' });
+            storage.ai_provider_config.providers.ollama = { baseURL: 'http://127.0.0.1:9999/v1', model: 'saved-model', apiKey: KEY };
+            const before = plain(storage);
+            const h = harness({ storage, storageError: true, fetchMock: async () => reply(data) });
+            const result = await h.rpc({ action: 'discoverLocalModels', providerId: id, baseURL });
+            assert.deepEqual(plain(result), { models: expected, source: 'provider', truncated: false });
+            assert.deepEqual(storage, before);
+            assert.deepEqual(h.storageReads, []);
+            assert.deepEqual(h.storageWrites, []);
+            assert.equal(h.calls.length, 1);
+            assert.equal(h.calls[0].url, endpoint);
+            assert.equal(h.calls[0].options.method, 'GET');
+            assert.equal(h.calls[0].body, undefined);
+            assert.equal(h.calls[0].options.headers.has('authorization'), false);
+            assert.deepEqual(h.permissions, [{ origins: [new URL(baseURL).origin + '/*'] }]);
+        });
+    }
+    const defaults = harness({ storageError: true, fetchMock: async () => reply({ models: [] }) });
+    assert.deepEqual(plain(await defaults.service.discoverLocalModels('ollama')), { models: [], source: 'provider', truncated: false });
+    assert.equal(defaults.calls[0].url, 'http://127.0.0.1:11434/api/tags');
+    assert.deepEqual(defaults.storageReads, []);
+});
+
+test('Taslak keşif bulut/özel sağlayıcı, uzak adres, kimlik/protokol alanı veya eksik izinle ağ açmaz', async t => {
+    for (const [id, profile, code] of [
+        ['openai', { baseURL: 'http://localhost:11434/v1' }, 'configuration'],
+        ['custom', { baseURL: 'http://localhost:11434/v1' }, 'configuration'],
+        ['ollama', { baseURL: 'https://evil.example/v1' }, 'endpoint'],
+        ['ollama', { baseURL: 'https://localhost.evil.example/v1' }, 'endpoint'],
+        ['ollama', { baseURL: 'http://remote.example/v1' }, 'endpoint'],
+        ['ollama', { baseURL: 'https://user:password@localhost:11434/v1' }, 'endpoint'],
+        ['ollama', { baseURL: 'http://localhost:11434/v1?key=secret' }, 'endpoint'],
+        ['ollama', { baseURL: 'http://localhost:11434/v1', apiKey: KEY }, 'configuration'],
+        ['ollama', { baseURL: 'http://localhost:11434/v1', model: 'unused-model' }, 'configuration'],
+        ['ollama', { baseURL: 'http://localhost:11434/v1', authType: 'bearer' }, 'configuration'],
+        ['ollama', { baseURL: 'http://localhost:11434/v1', protocol: 'openai-chat' }, 'configuration'],
+        ['ollama', { baseURL: 123 }, 'configuration'],
+        ['ollama', null, 'configuration']
+    ]) {
+        await t.test(id + '/' + JSON.stringify(profile), async () => {
+            const h = harness();
+            await assert.rejects(h.service.discoverLocalModels(id, profile), { code });
+            assert.equal(h.calls.length, 0);
+            assert.deepEqual(h.permissions, []);
+            assert.deepEqual(h.storageReads, []);
+        });
+    }
+    const denied = harness({ permission: false });
+    await assert.rejects(denied.service.discoverLocalModels('ollama', { baseURL: 'http://localhost:11434/v1' }), { code: 'host_permission' });
+    assert.equal(denied.calls.length, 0);
+    assert.deepEqual(denied.storageReads, []);
+});
+
+test('Taslak keşif RPC yalnız aynı eklentinin ayarlar sayfasına açıktır; diğer taslak alanlar reddedilir', async () => {
+    const h = harness({ fetchMock: async () => reply({ models: [] }) });
+    const request = { action: 'discoverLocalModels', providerId: 'ollama', baseURL: 'http://localhost:11434/v1' };
+    for (const sender of [
+        { id: 'fixture-extension', url: 'https://page.example/' },
+        { id: 'fixture-extension', url: 'chrome-extension://fixture-extension/popup/popup.html' },
+        { id: 'fixture-extension', url: 'chrome-extension://fixture-extension/options/options.html/child' },
+        { id: 'another-extension', url: 'chrome-extension://fixture-extension/options/options.html' },
+        { id: 'fixture-extension' }
+    ]) assert.equal(await h.rpc(request, sender), undefined);
+    assert.equal(h.calls.length, 0);
+    for (const extra of [{ apiKey: KEY }, { model: 'unused-model' }, { profile: { baseURL: 'https://evil.example/v1' } }]) {
+        const result = await h.rpc({ ...request, ...extra });
+        assert.equal(result.errorCode, 'configuration');
+    }
+    assert.equal(h.calls.length, 0);
+    assert.deepEqual(h.storageReads, []);
+    const result = await h.rpc(request, { id: 'fixture-extension', url: 'chrome-extension://fixture-extension/options/options.html?panel=local' });
+    assert.deepEqual(plain(result), { models: [], source: 'provider', truncated: false });
+    assert.equal(h.calls.length, 1);
+    assert.deepEqual(h.storageWrites, []);
+});
+
+test('Ollama native keşfi yalnız son v1 yolunu çıkarır, proxy kökü ve izin originini korur', async t => {
+    for (const [baseURL, endpoint] of [
+        ['http://localhost:11434/v1/', 'http://localhost:11434/api/tags'],
+        ['http://127.0.0.1:11434/proxy/v1', 'http://127.0.0.1:11434/proxy/api/tags'],
+        ['https://fixture.example/v1/proxy/v1/', 'https://fixture.example/v1/proxy/api/tags']
+    ]) {
+        await t.test(baseURL, async () => {
+            const h = harness({ storage: saved('ollama', { apiKey: '', model: '', baseURL }), fetchMock: async () => reply({ models: [{ name: 'legacy:latest' }] }) });
+            const result = await h.service.listProviderModels();
+            assert.deepEqual(plain(result.models), [{ id: 'legacy:latest', name: 'legacy:latest' }]);
+            assert.equal(h.calls.length, 1);
+            assert.equal(h.calls[0].url, endpoint);
+            assert.deepEqual(h.permissions, [{ origins: [new URL(baseURL).origin + '/*'] }]);
+        });
+    }
+});
+
+test('Ollama keşfi izinsiz ağ açmaz; bozuk native listeyi veya sunucu 403 yanıtını saklamaz', async t => {
+    const denied = harness({ storage: saved('ollama', { apiKey: '', model: '' }), permission: false });
+    await assert.rejects(denied.service.listProviderModels(), { code: 'host_permission' });
+    assert.equal(denied.calls.length, 0);
+    for (const [data, status, code] of [[{ data: [{ id: 'wrong-api-shape' }] }, 200, 'invalid_response'], [{ models: null }, 200, 'invalid_response'], [{ message: PRIVATE }, 403, 'permission']]) {
+        await t.test(code + '/' + status, async () => {
+            const h = harness({ storage: saved('ollama', { apiKey: '', model: '' }), fetchMock: async () => reply(data, status) });
+            await assert.rejects(h.service.listProviderModels(), error => error.code === code && !error.message.includes(PRIVATE));
+            assert.equal(h.calls.length, 1);
+            assert.equal(h.calls[0].options.redirect, 'error');
+            assert.equal(h.calls[0].options.credentials, 'omit');
+            assert.equal(h.calls[0].options.referrerPolicy, 'no-referrer');
+            assert.deepEqual(h.logs, []);
+        });
+    }
+});
+
+test('Yerel bağlantı ve erişim hataları sunucu/origin kontrolünü anlatır, bulut mesajları korunur', async t => {
+    const offline = async () => { throw new Error(KEY + PRIVATE); };
+    const forbiddenText = async () => ({ ok: false, status: 403, json: async () => { throw new Error('Forbidden ' + PRIVATE); } });
+    for (const [id, profile, fetchMock, code, message] of [
+        ['ollama', { apiKey: '', model: '' }, offline, 'connection', 'Yerel sunucuya bağlanılamadı. Sunucunun çalıştığını, adresini, portunu ve eklenti origin iznini kontrol edin.'],
+        ['ollama', { apiKey: '', model: '' }, forbiddenText, 'permission', 'Yerel sunucu erişime izin vermedi. Sunucu adresini, portunu, erişim ayarlarını ve eklenti origin iznini kontrol edin.'],
+        ['ollama', { apiKey: '', model: '' }, async () => reply({ error: { message: PRIVATE } }, 403), 'permission', 'Yerel sunucu erişime izin vermedi. Sunucu adresini, portunu, erişim ayarlarını ve eklenti origin iznini kontrol edin.'],
+        ['openai', { model: 'gpt-4o' }, offline, 'connection', 'Sağlayıcıya bağlanılamadı. İnternet bağlantısını ve doğrudan API adresini kontrol edin.'],
+        ['openai', { model: 'gpt-4o' }, forbiddenText, 'permission', 'Sağlayıcı erişime izin vermedi. Anahtar izinlerini, modeli ve bulut proje erişimini kontrol edin.']
+    ]) {
+        await t.test(id + '/' + code, async () => {
+            const h = harness({ storage: saved(id, profile), fetchMock });
+            await assert.rejects(h.service.listProviderModels(), error => error.code === code && error.message === message);
+            assert.deepEqual(h.logs, []);
+            assert.equal(h.calls.length, 1);
+            assert.equal(h.timers.size, 0);
+        });
+    }
 });
 
 test('Tüm seçilebilir katalog modelleri yapılandırılmış fixture ile tek geçerli API yolu oluşturur', t => {

@@ -13,6 +13,17 @@ Doğrulama: 3 Ekim 2026. Bu not birincil belgelerin ve protokol şekillerinin de
 | GitHub Copilot | Resmî SDK, Copilot CLI server ile JSON-RPC üzerinden çalışır. OAuth/GitHub App kullanıcı token'ı veya fine-grained PAT kabul edilebilir. | Chrome eklentisinde yerel CLI/runtime bağlantısı doğrulanmadı; ürün adına kayıtlı OAuth uygulaması ve giriş akışı da yok. GitHub Models, Copilot aboneliğinin yerine geçmez. |
 | GitLab Duo | Chat REST API GitLab.com'da internal-only; Self-Managed'da `access_rest_chat` flag'i gerekir. Agent Platform ayrı workflow/token zinciri kullanır. | Genel kullanıcılara açık Duo düzeltme adaptörü doğrulanmadı. REST API yok veya PAT hiç kullanılamaz şeklinde açıklanmamalı. |
 | v0 | Güncel v2 API uygulama oluşturma, kalıcı chat/VM, dosya ve tool parçaları döndüren iş akışı sağlar. | Güncel API var; eklentinin tek metin düzeltme sözleşmesi için doğrulanmış adaptör yok. Eski OpenAI chat-completions belgesi güncel API sayfasına yönlenir. |
+| Ollama / llama.cpp | Loopback sunucu, anahtarsız OpenAI chat; Ollama model listesi native `/api/tags`, llama.cpp listesi `/v1/models`. | Model keşfi kaydedilmemiş yerel adresle yapılabilir; etkin sağlayıcı Kaydet ile değişir. Chrome host izni ve sunucunun origin ayarı ayrı koşullardır. |
+
+## Yerel keşif ve origin
+
+Ollama/llama.cpp kartları adresi doğrudan gösterir ve anahtar alanını gizler. Kullanıcı Ollama'yı seçince Chrome bağlantı izni istenir; izin verilirse taslak adreste modeller otomatik alınır. Ayarlar ilk açılırken yalnız önceden verilmiş izin kullanılır; izin yoksa **Modelleri getir** düğmesiyle devam edilir. Bu keşif yalnız ayarlar sayfasına açık, anahtarsız yerel katalog kaydı ve loopback adresiyle sınırlıdır; kayıtlı profil okunmaz/yazılmaz. Modeli seçip Kaydet demeden etkin sağlayıcı değişmez.
+
+[Ollama `/api/tags`](https://docs.ollama.com/api/tags) yanıtındaki `model`/`name` değerleri tam etiketle korunur. İsteğe bağlı `capabilities` varsa yalnız `completion`/`chat` kayıtları tutulur; alan yoksa embedding modeli olduğu varsayılıp kayıt elenmez. Eklenti ayrıca `/api/show` çağrısı yapmaz. Ollama düzeltmesinde `temperature: 0.2` kullanılır; loopback ve `:cloud` olmayan model için zorunlu `corrected_text` alanıyla JSON Schema istenir. llama.cpp için aynı sıcaklık veya schema desteği varsayılmaz. [OpenAI uyumluluğu](https://docs.ollama.com/api/openai-compatibility).
+
+Başlatma/listeme komutları `ollama serve` ve `ollama list` değerleridir. Arayüz origin komutunu gerçek `chrome.runtime.id` ile üretir: `OLLAMA_ORIGINS="chrome-extension://EKLENTI_KIMLIGI" ollama serve`. Erişim reddedilirse çalışan sunucuyu durdurup bu ayarla yeniden başlatın; macOS uygulaması için aynı ortam değişkenini `launchctl setenv` ile ayarlayıp uygulamayı yeniden başlatın. Var olan origin izinlerini koruyun. [Resmî Ollama origin/ortam ayarı](https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama), [CLI](https://docs.ollama.com/cli).
+
+Terminalden çalışan yerel servis, kullanıcının gerçek Chrome kurulumunda origin ve host izinlerinin doğru olduğunu kanıtlamaz. Bu kurulumun kimliği ve gerçek izin penceresi henüz doğrulanmadı; geniş wildcard origin açmak gerekli değildir.
 
 ## Cloudflare ayrıntısı
 
@@ -38,7 +49,7 @@ Bu sayfa 2 Ekim 2026 güncellemesinde `/compat/chat/completions` yolunu yeni tek
 
 [IBM native chat şeması](https://ibm.github.io/watsonx-ai-node-sdk/interfaces/1_7_x.WatsonXAI.TextChatParams.html) `model_id`, `messages` ve yalnız bir `project_id`/`space_id` bağlamını ister. İstek tarihli `version=YYYY-MM-DD` kullanır; `max_tokens` geçerlidir, daha yeni `max_completion_tokens` alanı da vardır. Token ve inference adresleri farklı origin ise ikisinin izni ilk kimlik isteğinden önce kontrol edilmelidir. SAP için aynı kural client secret'a uygulanır. Token süreleri ürün/hizmete göre değişir; örnekteki süreden kalıcı token sonucu çıkarılmaz.
 
-[IBM system message](https://ibm.github.io/watsonx-ai-node-sdk/interfaces/1_7_x.TextChatMessageSystem.html) `content` değerini string olarak tanımlar; kullanıcı mesajı metin parçaları kullanabilir. Eklentinin `watsonx-chat` dalı bu ayrımı korur. IBM Cloud IAM anahtarı her işlemde yenilenir ve access token yalnız işlem belleğinde tutulur; software/CP4D veya ayrı IBM Inference/deployment ürünlerinin kimlik sözleşmesi bu testin kapsamında değildir.
+[IBM system message](https://ibm.github.io/watsonx-ai-node-sdk/interfaces/1_7_x.TextChatMessageSystem.html) `content` değerini string olarak tanımlar; kullanıcı mesajı metin parçaları kullanabilir. Eklentinin `watsonx-chat` dalı bu ayrımı korur. IBM Cloud API anahtarıyla her işlemde yeni IAM erişim belirteci alınır; access token yalnız işlem belleğinde tutulur. Software/CP4D veya ayrı IBM Inference/deployment ürünlerinin kimlik sözleşmesi bu testin kapsamında değildir.
 
 [SAP Orchestration V2](https://sap.github.io/ai-sdk/docs/python/examples/orchestration-service2) model ailelerini `config.modules.prompt_templating` ile seçer, `placeholder_values` kullanır ve `final_result.choices` döndürür. [V2 completion yolu](https://help.sap.com/docs/sap-ai-core/generative-ai/use-orchestration-config-in-llm-orchestration) deployment URL'sine `/v2/completion` eklenir. Eklentinin varsayılan SAP taşıması bu orkestrasyon yoludur; ayrıca yalnız uygun OpenAI deployment için OpenAI chat yolu seçilebilir. X.509/mTLS servis anahtarları uygulanmadı. Bu seçimler modelin kullanıcının hesabında/deployment'ında açıldığını kanıtlamaz.
 
@@ -70,6 +81,7 @@ Bu sayfa 2 Ekim 2026 güncellemesinde `/compat/chat/completions` yolunu yeni tek
 - SAP client secret ve IBM API key; token/inference URL host/path/query, model ve deployment alanlarında bulunursa gönderim reddedilsin. Dönen access token da inference URL'ye sızmasın.
 - Copilot/Duo OAuth/runtime taşınmadıysa katalog durumu bunu açık göstermeli ve kullanıcı anahtarı/metni yanlış endpoint'e gitmemeli.
 - Anahtar, metin ve özel promptu hata body/URL/loga eklemeyin; kimlik bilgisi taşıyan istekte redirect izlemeyin.
+- Taslak yerel keşif yalnız adres kabul etsin; anahtar/model/profile gibi ek alan, bulut/özel sağlayıcı, uzak host veya eksik origin izniyle ağ açmasın. Keşif kayıtlı sağlayıcıyı/anahtarı/promptu okumadan ve değiştirmeden yalnız model-listesi GET isteği yapsın.
 
 ## Çalıştırılmış bağımsız denetim
 

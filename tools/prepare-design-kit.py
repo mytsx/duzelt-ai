@@ -36,7 +36,7 @@ def prepare():
         'assets/editor-preview.png': 'output/playwright/editors/quill-preview.png',
         'assets/editor-accepted.png': 'output/playwright/editors/quill-accepted.png',
     }
-    for name in ('icon16.png', 'icon48.png', 'icon128.png', 'popup-light.png', 'popup-dark.png', 'options-desktop.png', 'options-mobile.png', 'options-openrouter.png'):
+    for name in ('icon16.png', 'icon48.png', 'icon128.png', 'popup-light.png', 'popup-dark.png', 'options-desktop.png', 'options-mobile.png', 'options-openrouter.png', 'options-ollama.png', 'options-ollama-mobile.png'):
         sources['assets/' + name] = 'design/claude-assets/' + name
     for name, source in sources.items():
         source_path = ROOT / source

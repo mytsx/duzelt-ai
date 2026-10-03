@@ -7,7 +7,7 @@
 - [x] Editör desteğini gerçek editörlerle test et; platform iddialarını ayır.
 - [x] Gizlilik metnini gerçek veri akışına göre düzelt.
 - [x] Gerçek arayüz ekran görüntülerini ve mevcut ikonları tasarım paketi için hazırla.
-- [x] Claude Design için eksiksiz promptu ve 20 dosyalık tasarım referans paketini hazırla.
+- [x] Claude Design için eksiksiz promptu ve 22 dosyalık tasarım referans paketini hazırla.
 - [ ] Kullanıcıdan web tasarım dosyalarını bekle. Bu aşamadan önce web tasarımı/yayını, video görseli ve mağaza tanıtım görseli üretme.
 
 ## 2. Tasarımdan bağımsız bakım
@@ -21,7 +21,7 @@
 - [x] Yerel 3.4.0 sürümü ve tek bağlantı yapılandırmasını hazırla.
 - [x] Tekrarlanabilir ZIP paketleme ve manifest/CRC/dosya doğrulamasını tamamla; 19 çalışma dosyası, 7 paket testi.
 - [x] README destek iddialarını ve sağlayıcı API ücretinin ayrı olduğunu düzelt.
-- [x] Anlamlı Türkçe commitlerle main'e pushla; bakım/arayüz/tasarım devri 31925a1 kod başlığında GitHub main ile eşleşti. Son teslim kaydı ayrıca sürümlenir.
+- [x] Anlamlı Türkçe commitlerle main'e pushla; son kaynak, doğrulama ve paket teslimi evidence/delivery-results.json içinde sürümlenir.
 
 ## 2b. Kullanıcının genişlettiği kapsam: çoklu sağlayıcı ve yeni arayüz
 - [x] OpenCode/Models.dev ve sağlayıcıların resmî belgeleriyle tüm katalog/protokol/kimlik doğrulama eşlemesini araştır.
@@ -31,8 +31,16 @@
 - [x] Yalnız seçilen servise istek gönder; API ve gerekiyorsa belirteç adresleri için ayrı isteğe bağlı Chrome izni, yönlendirme/URL/anahtar güvenliği.
 - [x] Sağlayıcı/model/anahtar/bağlantı ayarlarını tek profesyonel, modern ve erişilebilir arayüzde yönet.
 - [x] Anlamlı animasyonlar, açık/koyu tema, hareket azaltma ve mobil kontroller.
-- [x] 155 sağlayıcı, 30 katalog ve 19 arayüz kontrolü; 7.804 model kaydı + 2 yerel örneğin istek oluşturma taraması geçti.
+- [x] 188 sağlayıcı, 30 katalog ve 29 arayüz kontrolü; 7.804 model kaydı + 2 yerel örneğin istek oluşturma taraması geçti.
 - [x] Gizlilik, README ve Claude Design promptunu yeni sağlayıcı kapsamıyla güncelle; eski ekran referanslarını yenile.
+
+## 2c. Yerel model ve seçim kolaylığı
+- [x] Sağlayıcı aramasını seçim listesinin içine taşı; model listesi ve elle ID girişini tek kontrolde birleştir.
+- [x] Ollama/llama.cpp kartlarını, açık adres alanını ve anahtarsız bağlantıyı göster.
+- [x] İzinli yerel sunucudan modelleri otomatik listele; taslak keşfi kayıtlı sağlayıcıyı değiştirmeden yap.
+- [x] Kapalı sunucu/erişim reddi/boş liste için kopyalanabilir komut ve sonraki adımı göster.
+- [x] Son UI 29/29 ve sağlayıcı 188/188; gerçek yerel model-listesi GET HTTP 200.
+- [ ] Kullanıcının kendi Chrome kurulumundan host/origin iznini ve yerel bağlantıyı doğrula.
 
 ## 3. Tasarım tesliminden sonra
 - [ ] Gelen site tasarımını site/ altında entegre et; /privacy/ ve /support/ bağla.

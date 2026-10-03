@@ -2,8 +2,10 @@
   "checkedOn": "2026-10-03",
   "extensionVersion": "3.4.0",
   "browser": "151.0.7922.34",
-  "checkCount": 19,
+  "checkCount": 29,
   "checks": [
+    "Sağlayıcı araması açılan seçim listesinin içinde; filtreleme ve Escape etkin bağlantıyı değiştirmiyor.",
+    "Sağlayıcı listesi klavyeyle açılıp aranıp seçiliyor; Home/End ve Escape çalışıyor, yalnız Kaydet etkin bağlantıyı değiştiriyor.",
     "Eksik anahtar, ağ isteği yapılmadan gösteriliyor; katalog yerel olarak yükleniyor.",
     "Geçersiz anahtar depoya yazılmıyor.",
     "Eski OpenAI anahtarı ve gpt-4o, merkezi yapılandırmaya kayıpsız taşınıyor.",
@@ -12,7 +14,15 @@
     "Model yenileme kullanıcı tıklamasıyla kayıtlı bağlantıdan alınıyor.",
     "Bağlantı hatası güvenli metinle gösteriliyor; sağlayıcının ham mesajı açığa çıkmıyor.",
     "Özel ürün girişi ve çalışma ortamı isteyen kayıtlar açıklamalarıyla görünür; yanlış API anahtarı yoluyla etkinleştirilemiyor.",
-    "Kurumsal alanlar katalogdan oluşuyor; Ollama anahtarsız yerel profil olarak kaydediliyor.",
+    "Ollama seçilince izin sonrası modeller otomatik listeleniyor; izin reddinde istek yok ve keşif etkin sağlayıcıyı değiştirmiyor.",
+    "Yerel adresi kaydetmeden yeni adresten modeller alınabiliyor; diğer kayıtlar ve etkin bağlantı korunuyor.",
+    "Ollama ve llama.cpp kartları görünür; yerel adres doğrudan düzenlenip anahtarsız localhost profili olarak kaydediliyor.",
+    "Model bilinmeden yerel adres kaydedilip modeller getiriliyor; embedding modeli ayrılıyor, seçilen metin modeli kaydedilip test ediliyor.",
+    "Adres değişince eski model listesi temizleniyor; önceki adrese ait gecikmiş yanıt yeni adresin listesine karışmıyor.",
+    "Kapalı yerel sunucu ve erişim reddi komutlarla açıklanıyor; Kopyala doğru eklenti kimliğiyle komutu verir, komut çalıştırılmaz.",
+    "Boş model listesi anlaşılır durumda gösteriliyor; eski model önerileri kalmıyor.",
+    "Kayıtlı yerel ayarlar açılırken bağlantı izni yoksa otomatik istek veya izin penceresi açılmıyor.",
+    "Kayıtlı yerel ayarlar açılırken önceden verilen izinle modeller geliyor; seçim ve kayıtlar korunuyor, liste kendiliğinden açılmıyor.",
     "IBM IAM ve inference adresleri için ayrı izinler isteniyor; API anahtarıyla belirteç alıp yerel fixture düzeltmesi tamamlanıyor.",
     "SAP giriş alanları ve orkestrasyon seçimi merkezi formda çalışıyor; iki adres izinli, alınan belirteç ve profiller Sync depoya yazılmıyor.",
     "Güvensiz uzak HTTP ve anahtar içerebilecek sorgulu adresler kaydedilmiyor.",
@@ -40,13 +50,13 @@
       "dark"
     ],
     "reviewer": "Codex",
-    "findings": "Başlıklar, sağlayıcı alanları, uzun Türkçe açıklamalar, düğmeler ve footer görsel olarak incelendi. 320px etkin model satırı için daralma giderildi. Son OpenRouter, mobil ve iki popup referansı yeniden incelendi. Popup yüksekliği 522px; boş alt alan yok.",
-    "motion": "no-preference giriş animasyonu ve reduce tercihi gerçek tarayıcıda doğrulandı."
+    "findings": "Son açık/koyu ayarlar ekranları beş genişlikte incelendi. Sağlayıcı içi arama ve yerel model listesi açık halde, Ollama mobil ve 320px koyu ekranı ayrıca incelendi. Kartlar, alanlar, Türkçe açıklamalar, odak ve menüler taşmasız.",
+    "motion": "no-preference ve reduce tercihleri gerçek tarayıcıda doğrulandı."
   },
   "sourceSha256": {
-    "options/options.css": "531674503c51ce092ff0d0874e8c0d28fa64e9e61c7a854ec855bbe1cbac5d46",
-    "options/options.html": "be5621153a6c12cfb2b3adc8c916285b5de9458f5116101d80fd3239c30f70ee",
-    "options/options.js": "bea6f8cf842bbfc46bccf685071c9c70625ef9375ba22af265c68311f6c62883",
+    "options/options.css": "5b84f376f9955624892e03c2e2cdac094a971ed5c24f3963177965ff737039bb",
+    "options/options.html": "fbae273f1ea3b84db7ebd8ea834d75a5d312b2b1801e9ec6a86d08a917fa5605",
+    "options/options.js": "d26770eddc974df1796a1dac3ab4370ea0a8080f92b15869326424fd4d28f4a5",
     "popup/popup.css": "317af9ae76b79e52573986abe87da826e953f0bc242195cab9883a969e4f67d1",
     "popup/popup.html": "0bdc9abffb19996d1462adb3ea2667ed2aba5dea32ac8d8eb1bba22806739c04",
     "popup/popup.js": "0b2787f5088ee9263d60f250249bf7d85470294129e15c5bad5f9128a5f4fb80"
@@ -55,9 +65,11 @@
     "design/claude-assets/icon128.png": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
     "design/claude-assets/icon16.png": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
     "design/claude-assets/icon48.png": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
-    "design/claude-assets/options-desktop.png": "2887a1842db2f5e9bcb5316ace69ada8b330ca3fb9840246a028f9d0e76819e5",
-    "design/claude-assets/options-mobile.png": "e6b90b1e26d679d07030c5f5b7f9cff76e78f7b045ee8f5b506dd5dea6dd13bd",
-    "design/claude-assets/options-openrouter.png": "442f5314323b4ee1e3a9594b91df3e0a8116cb747e9b680802167d363e3f472e",
+    "design/claude-assets/options-desktop.png": "e509ecff8a25a00c0bdbc8d3b87e1a0369bb3a3147fde1ff587f3a08a94706a5",
+    "design/claude-assets/options-mobile.png": "91eaf0956cc97c8e88dfc1a02cb46b37b410dab38fb3915b2904f87580b62eb2",
+    "design/claude-assets/options-ollama-mobile.png": "3a16b4fd36d9b3412bd8e219758722a1880ce07154b346f4c2b6d4dbe18be50c",
+    "design/claude-assets/options-ollama.png": "fb5772fa1fc190e21f7386efd5a824613745c048b1cb000161ba5b9a1333fc23",
+    "design/claude-assets/options-openrouter.png": "772a8a9b0559bc242ad0e4c68cc39716d88b6dabd07ec53fa238c00904bfce39",
     "design/claude-assets/popup-dark.png": "503ab0f8b883f122b3d65ca84c82ecaa71c73a9899ef27ee42fba07fead83237",
     "design/claude-assets/popup-light.png": "d07777f95f3fc26d15870b1bdbf3d2a89d5dd5f545a56fa6cfc9b7e88642037e"
   }

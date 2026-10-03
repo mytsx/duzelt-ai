@@ -229,7 +229,17 @@
             case 'azure-openai':
                 body = { model: requestModel, messages, stream: false };
                 if (resolved.providerId === 'openai' && resolved.model === 'gpt-4o') body.temperature = 0.3;
+                else if (Number.isFinite(resolved.entry.temperature)) body.temperature = resolved.entry.temperature;
                 if (resolved.providerId === 'openai' && resolved.model === 'gpt-4o' || ['openai', 'openrouter'].includes(resolved.providerId) && modelEntry?.structuredOutput === true || resolved.entry.jsonMode === true) body.response_format = { type: 'json_object' };
+                if (resolved.providerId === 'ollama' && ['localhost', '127.0.0.1', '[::1]'].includes(new URL(resolved.baseURL).hostname) && !resolved.model.endsWith(':cloud')) {
+                    body.response_format = {
+                        type: 'json_schema',
+                        json_schema: {
+                            name: 'text_correction', strict: true,
+                            schema: { type: 'object', properties: { corrected_text: { type: 'string' } }, required: ['corrected_text'], additionalProperties: false }
+                        }
+                    };
+                }
                 if (resolved.providerId === 'openai') body.store = false;
                 if (resolved.isAzure && /\/models$/.test(resolved.baseURL)) {
                     url += '/chat/completions?api-version=' + encodeURIComponent(safeField(resolved.profile.apiVersion || '2024-05-01-preview', 'API sürümü'));
@@ -354,9 +364,10 @@
         return result.corrected_text;
     }
 
-    function apiError(response, data) {
+    function apiError(response, data, localAnonymous = false) {
         const rawCode = data?.error?.code || data?.error?.type || data?.errors?.[0]?.code || data?.code || data?.__type || data?.type;
         if (response.status === 401) return failure('authentication', 'Sağlayıcı anahtarı veya erişim tokenı kabul etmedi. Ayarlardan kontrol edin.');
+        if (response.status === 403 && localAnonymous) return failure('permission', 'Yerel sunucu erişime izin vermedi. Sunucu adresini, portunu, erişim ayarlarını ve eklenti origin iznini kontrol edin.');
         if (response.status === 403) return failure('permission', 'Sağlayıcı erişime izin vermedi. Anahtar izinlerini, modeli ve bulut proje erişimini kontrol edin.');
         if (rawCode === 'context_length_exceeded') return failure('text_too_long', 'Metin veya prompt modelin bağlam sınırını aşıyor. Daha kısa metinle deneyin.');
         if (response.status === 402 || ['insufficient_quota', 'credit_balance_exhausted', 'billing_hard_limit_reached', 'organization_spend_limit_exceeded', 'project_spend_limit_exceeded', 'organization_usage_limit_exceeded', 'billing_error'].includes(rawCode)) return failure('quota', 'Sağlayıcının kullanım kotası veya bütçe sınırı dolmuş. Hesabınızın bakiye ve sınırlarını kontrol edin.');
@@ -367,7 +378,9 @@
         return failure('api', 'Sağlayıcı isteği tamamlanamadı. API adresini, modeli, anahtarı ve promptu kontrol edin.');
     }
 
-    async function requestJSON(url, options) {
+    async function requestJSON(url, options, anonymous = false) {
+        const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(url).hostname);
+        const localAnonymous = loopback && anonymous;
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
         try {
@@ -379,15 +392,16 @@
             let data;
             try { data = await response.json(); } catch {
                 if (controller.signal.aborted) throw failure('timeout', 'Sağlayıcı isteği zaman aşımına uğradı.');
-                if (!response.ok) throw apiError(response, null);
+                if (!response.ok) throw apiError(response, null, localAnonymous);
                 throw failure('invalid_response', 'Sağlayıcı geçerli JSON yanıtı döndürmedi. Asıl metin korunuyor.');
             }
             if (controller.signal.aborted) throw failure('timeout', 'Sağlayıcı isteği zaman aşımına uğradı.');
-            if (!response.ok || data?.error || Array.isArray(data?.errors) && data.errors.length) throw apiError(response, data);
+            if (!response.ok || data?.error || Array.isArray(data?.errors) && data.errors.length) throw apiError(response, data, localAnonymous);
             return data;
         } catch (error) {
             if (controller.signal.aborted) throw failure('timeout', 'Sağlayıcı isteği zaman aşımına uğradı. Lütfen yeniden deneyin.');
             if (error instanceof OpenAIProviderError) throw error;
+            if (loopback) throw failure('connection', 'Yerel sunucuya bağlanılamadı. Sunucunun çalıştığını, adresini, portunu ve eklenti origin iznini kontrol edin.');
             throw failure('connection', 'Sağlayıcıya bağlanılamadı. İnternet bağlantısını ve doğrudan API adresini kontrol edin.');
         } finally { clearTimeout(timeoutId); }
     }
@@ -427,7 +441,7 @@
         return requestJSON(url, {
             method: body === undefined ? 'GET' : 'POST', headers: headersFor(resolved, token),
             body: body === undefined ? undefined : JSON.stringify(body)
-        });
+        }, resolved.authType === 'none');
     }
 
     async function correctText(text, providerId) {
@@ -445,23 +459,42 @@
         const id = providerId || saved.config.activeProviderId;
         const profile = saved.config.providers[id];
         if (!profile) throw failure('configuration', 'Seçilen sağlayıcı henüz kaydedilmemiş. Ayarlardan kaydedin.');
-        const resolved = resolveProfile(id, profile);
+        return listResolvedModels(resolveProfile(id, profile));
+    }
+
+    async function discoverLocalModels(providerId, profile = {}) {
+        const entry = catalogEntry(providerId);
+        if (entry.local !== true || entry.authType !== 'none') throw failure('configuration', 'Bu işlem yalnız anahtarsız yerel model sağlayıcıları için kullanılabilir.');
+        if (!profile || typeof profile !== 'object' || Array.isArray(profile) || Object.keys(profile).some(key => key !== 'baseURL') || profile.baseURL !== undefined && typeof profile.baseURL !== 'string') {
+            throw failure('configuration', 'Yerel model keşfi yalnız sunucu adresini kabul eder.');
+        }
+        const resolved = resolveProfile(providerId, { baseURL: profile.baseURL, model: '' });
+        if (!['localhost', '127.0.0.1', '[::1]'].includes(new URL(resolved.baseURL).hostname)) throw failure('endpoint', 'Yerel model keşfi için localhost veya loopback sunucu adresi kullanın.');
+        return listResolvedModels(resolved);
+    }
+
+    async function listResolvedModels(resolved) {
         const modelEntry = resolved.entry.models?.find(item => item.id === resolved.model);
-        const path = Object.prototype.hasOwnProperty.call(modelEntry || {}, 'modelListPath')
+        const isOllama = resolved.providerId === 'ollama';
+        const path = isOllama ? '/api/tags' : Object.prototype.hasOwnProperty.call(modelEntry || {}, 'modelListPath')
             ? modelEntry.modelListPath
             : Object.prototype.hasOwnProperty.call(resolved.entry, 'modelListPath') ? resolved.entry.modelListPath
             : ['openai-chat', 'openai-responses', 'anthropic-messages'].includes(resolved.protocol) && !resolved.isAzure && !resolved.isVertex ? '/models' : resolved.protocol === 'gemini' ? '/models' : null;
         if (!path) return { models: (resolved.entry.models || []).map(item => ({ ...item, id: item.id, name: item.name || item.id })), source: 'catalog' };
         if (typeof path !== 'string' || !path.startsWith('/') || path.includes('..') || path.includes('?') || path.includes('#')) throw failure('endpoint', 'Model listesi adresi geçersiz.');
-        const data = await fetchJSON(resolved, resolved.baseURL + path);
-        const rows = Array.isArray(data?.data) ? data.data : Array.isArray(data?.models) ? data.models : null;
+        // Ollama'nın native listesi yetenekleri verir; yalnız son /v1 çıkarılır, proxy kökü korunur.
+        const listBaseURL = isOllama ? resolved.baseURL.replace(/\/v1$/, '') : resolved.baseURL;
+        const data = await fetchJSON(resolved, listBaseURL + path);
+        const rows = isOllama ? Array.isArray(data?.models) ? data.models : null : Array.isArray(data?.data) ? data.data : Array.isArray(data?.models) ? data.models : null;
         if (!rows) throw failure('invalid_response', 'Sağlayıcının model listesi okunamadı.');
-        const models = rows.filter(item => item && typeof (item.id || item.name) === 'string').slice(0, 10000).map(item => {
-            const id = String(item.id || item.name).replace(/^models\//, '').slice(0, 256);
+        const modelID = item => isOllama ? item.model || item.name : item.id || item.name;
+        const availableRows = rows.filter(item => item && typeof modelID(item) === 'string' && (!isOllama || !Object.prototype.hasOwnProperty.call(item, 'capabilities') || Array.isArray(item.capabilities) && item.capabilities.some(capability => capability === 'completion' || capability === 'chat')));
+        const models = availableRows.slice(0, 10000).map(item => {
+            const id = (isOllama ? String(modelID(item)) : String(modelID(item)).replace(/^models\//, '')).slice(0, 256);
             const metadata = resolved.entry.models?.find(model => model.id === id) || {};
-            return { ...metadata, id, name: String(item.displayName || item.name || metadata.name || item.id).slice(0, 256) };
+            return { ...metadata, id, name: String(item.displayName || item.name || metadata.name || modelID(item)).slice(0, 256) };
         });
-        return { models, source: 'provider', truncated: rows.length > models.length || Boolean(data.has_more || data.next_page || data.nextPageToken) };
+        return { models, source: 'provider', truncated: (isOllama ? availableRows.length : rows.length) > models.length || Boolean(data.has_more || data.next_page || data.nextPageToken) };
     }
 
     async function getProviderStatus() {
@@ -478,5 +511,5 @@
         }
     }
 
-    root.ProviderService = Object.freeze({ CONFIG_KEY, PROTOCOLS: Object.freeze(Array.from(PROTOCOLS)), resolveProfile, getPermissionOrigin, getPermissionOrigins, loadSavedConfiguration, buildCorrectionRequest, readOutput, fetchJSON, correctText, listProviderModels, getProviderStatus });
+    root.ProviderService = Object.freeze({ CONFIG_KEY, PROTOCOLS: Object.freeze(Array.from(PROTOCOLS)), resolveProfile, getPermissionOrigin, getPermissionOrigins, loadSavedConfiguration, buildCorrectionRequest, readOutput, fetchJSON, correctText, listProviderModels, discoverLocalModels, getProviderStatus });
 })(globalThis);

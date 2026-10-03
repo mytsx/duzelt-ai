@@ -12,8 +12,14 @@ let selectedId = 'openai';
 let defaultPrompt = '';
 let busy = false;
 let loaded = false;
+let discoveryGeneration = 0;
+let localRequestOwner = null;
+let providerPicker;
+let modelPicker;
+const pickers = [];
 const element = id => document.getElementById(id);
 const currentEntry = () => providers.find(provider => provider.id === selectedId) || CUSTOM_PROVIDER;
+const searchText = value => String(value).toLocaleLowerCase('tr').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/ı/g, 'i');
 
 function localGet(keys) {
     return new Promise((resolve, reject) => chrome.storage.local.get(keys, values => {
@@ -36,7 +42,11 @@ function localRemove(keys) {
 function message(payload) {
     return new Promise((resolve, reject) => chrome.runtime.sendMessage(payload, response => {
         if (chrome.runtime.lastError || !response) reject(new Error('Eklentiden yanıt alınamadı. Eklentiyi yeniden yükleyip tekrar deneyin.'));
-        else if (typeof response.error === 'string') reject(new Error(response.error));
+        else if (typeof response.error === 'string') {
+            const error = new Error(response.error);
+            error.code = response.errorCode;
+            reject(error);
+        }
         else resolve(response);
     }));
 }
@@ -56,19 +66,159 @@ function readConfig(values) {
     }
     return { version: 1, activeProviderId: 'openai', providers: { openai: { model: 'gpt-4o', apiKey: typeof values[STORAGE_KEYS.OPENAI_KEY] === 'string' ? values[STORAGE_KEYS.OPENAI_KEY] : '' } } };
 }
-function populateProviders() {
-    const query = element('provider-search').value.trim().toLocaleLowerCase('tr');
-    element('provider-select').replaceChildren();
-    providers.filter(provider => provider.id === selectedId || !query || (provider.name + ' ' + provider.id).toLocaleLowerCase('tr').includes(query)).forEach(provider => {
-        const option = document.createElement('option');
-        option.value = provider.id;
-        option.textContent = provider.name + (provider.selectable === false ? ' — özel giriş gerekli' : '');
-        element('provider-select').append(option);
+function createPicker({ prefix, controlId, searchId, toggleId, items, selectedValue, onSelect }) {
+    const container = element(prefix + '-picker');
+    const control = element(controlId);
+    const search = element(searchId);
+    const panel = element(prefix + '-panel');
+    const list = element(prefix + '-options');
+    const results = element(prefix + '-results');
+    const toggle = toggleId ? element(toggleId) : control;
+    const separateSearch = search !== control;
+    let open = false;
+    let showAll = false;
+    let choices = [];
+    let activeIndex = -1;
+
+    function setActive(index, scroll = false) {
+        activeIndex = choices.length && index >= 0 ? Math.min(index, choices.length - 1) : -1;
+        Array.from(list.children).forEach((option, row) => option.classList.toggle('is-active', row === activeIndex));
+        for (const target of new Set([control, search])) {
+            if (open && activeIndex >= 0) target.setAttribute('aria-activedescendant', list.children[activeIndex].id);
+            else target.removeAttribute('aria-activedescendant');
+        }
+        if (scroll && activeIndex >= 0) list.children[activeIndex].scrollIntoView({ block: 'nearest' });
+    }
+    function render() {
+        const query = showAll ? '' : searchText(search.value.trim());
+        const matches = items().filter(item => !query || searchText(item.name + ' ' + item.id).includes(query));
+        const previous = choices[activeIndex]?.id;
+        choices = matches.slice(0, prefix === 'model' ? 150 : 300);
+        list.replaceChildren();
+        choices.forEach((item, index) => {
+            const option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'picker-option';
+            option.id = prefix + '-option-' + index;
+            option.dataset.value = item.id;
+            option.tabIndex = -1;
+            option.setAttribute('role', 'option');
+            option.setAttribute('aria-selected', String(item.id === selectedValue()));
+            if (item.selectable === false) option.dataset.unavailable = 'true';
+            const copy = document.createElement('span');
+            copy.className = 'picker-option-copy';
+            const name = document.createElement('strong');
+            name.textContent = item.name || item.id;
+            copy.append(name);
+            const detail = prefix === 'provider'
+                ? item.selectable === false ? item.supportNote || 'Bu hizmet ek giriş veya bağlantı bileşeni gerektirir.' : item.local === true ? 'Bilgisayarınızda çalışır' : item.id
+                : item.id !== item.name ? item.id : '';
+            if (detail) {
+                const description = document.createElement('small');
+                description.textContent = detail;
+                copy.append(description);
+            }
+            const mark = document.createElement('span');
+            mark.className = 'picker-option-mark';
+            mark.setAttribute('aria-hidden', 'true');
+            mark.textContent = item.selectable === false ? 'ⓘ' : item.id === selectedValue() ? '✓' : '';
+            option.append(copy, mark);
+            option.addEventListener('pointerdown', event => event.preventDefault());
+            option.addEventListener('pointermove', () => setActive(index));
+            option.addEventListener('click', event => choose(index, event));
+            list.append(option);
+        });
+        results.textContent = matches.length
+            ? (matches.length > choices.length ? 'İlk ' + choices.length + ' seçenek gösteriliyor. Arayarak daraltın.' : matches.length.toLocaleString('tr') + (prefix === 'provider' ? ' sağlayıcı' : ' model'))
+            : prefix === 'provider' ? 'Bu adla sağlayıcı bulunamadı.' : currentEntry().local === true ? 'Henüz model yok. “Modelleri getir” düğmesini kullanın veya model adını yazın.' : 'Eşleşen model yok. Tam model adını elle yazabilirsiniz.';
+        const selected = choices.findIndex(item => item.id === selectedValue());
+        const remembered = choices.findIndex(item => item.id === previous);
+        setActive(remembered >= 0 ? remembered : selected >= 0 ? selected : 0);
+    }
+    function close(restoreFocus = false) {
+        open = false;
+        panel.hidden = true;
+        for (const target of new Set([control, search, toggle])) target.setAttribute('aria-expanded', 'false');
+        setActive(-1);
+        if (restoreFocus && !control.disabled) control.focus({ preventScroll: true });
+    }
+    function show({ all = false, focus = true } = {}) {
+        if (control.disabled) return;
+        for (const picker of pickers) if (picker.container !== container) picker.close();
+        if (!open && separateSearch) search.value = '';
+        showAll = all;
+        open = true;
+        panel.hidden = false;
+        for (const target of new Set([control, search, toggle])) target.setAttribute('aria-expanded', 'true');
+        render();
+        if (focus) search.focus({ preventScroll: true });
+    }
+    function choose(index, event) {
+        if (!event.isTrusted || !loaded || busy || !choices[index]) return;
+        const item = choices[index];
+        close(true);
+        onSelect(item, event);
+    }
+    function onKey(event) {
+        if (!['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape', 'Tab'].includes(event.key)) return;
+        if (event.key === 'Tab') {
+            if (open && separateSearch && event.target === search) {
+                event.preventDefault();
+                close();
+                const next = event.shiftKey ? control : !element('provider-model').disabled ? element('provider-model')
+                    : Array.from(document.querySelectorAll('button, input, select, textarea, a[href], summary')).find(target => !target.disabled && target.tabIndex >= 0 && target.getClientRects().length && (control.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING));
+                (next || control).focus();
+            } else close();
+            return;
+        }
+        if (event.key === 'Escape') {
+            if (open) { event.preventDefault(); event.stopPropagation(); close(true); }
+            return;
+        }
+        if (!open) {
+            if (!separateSearch && ['Home', 'End', 'Enter'].includes(event.key)) return;
+            event.preventDefault();
+            show({ all: !separateSearch });
+            if (event.key === 'ArrowUp' || event.key === 'End') setActive(choices.length - 1, true);
+            if (event.key === 'Home') setActive(0, true);
+            return;
+        }
+        event.preventDefault();
+        if (event.key === 'ArrowDown') setActive(activeIndex < choices.length - 1 ? activeIndex + 1 : 0, true);
+        if (event.key === 'ArrowUp') setActive(activeIndex > 0 ? activeIndex - 1 : choices.length - 1, true);
+        if (event.key === 'Home') setActive(0, true);
+        if (event.key === 'End') setActive(choices.length - 1, true);
+        if (event.key === 'Enter') {
+            if (activeIndex >= 0) choose(activeIndex, event);
+            else close(true);
+        }
+    }
+    for (const target of new Set([control, search])) target.addEventListener('keydown', onKey);
+    search.addEventListener('input', () => {
+        showAll = false;
+        if (!open) show({ focus: false });
+        else { activeIndex = -1; render(); }
     });
-    element('provider-select').value = selectedId;
+    toggle.addEventListener('click', () => {
+        if (open) close();
+        else show({ all: !separateSearch });
+    });
+    if (!separateSearch) search.addEventListener('focus', () => { if (!open) show({ all: true, focus: false }); });
+    container.addEventListener('focusout', () => setTimeout(() => { if (!container.contains(document.activeElement)) close(); }, 0));
+    document.addEventListener('pointerdown', event => { if (open && !container.contains(event.target)) close(); });
+    const picker = { container, open: show, close, refresh: render };
+    pickers.push(picker);
+    return picker;
+}
+function populateProviders() {
+    const entry = currentEntry();
+    element('provider-current-name').textContent = entry.name;
+    element('provider-current-detail').textContent = entry.selectable === false ? 'Ek bağlantı gerekli' : entry.local === true ? 'Bilgisayarınızda' : entry.id === 'custom' ? 'Kendi bağlantınız' : 'Bulut hizmeti';
+    element('provider-select').dataset.value = selectedId;
+    providerPicker?.refresh();
 }
 function profileFor(entry) {
-    const saved = drafts.get(entry.id) || config.providers[entry.id] || {};
+    const saved = drafts.get(entry.id) || config?.providers[entry.id] || {};
     const profile = { ...saved, model: saved.model ?? entry.defaultModel ?? '', apiKey: saved.apiKey ?? '' };
     (entry.fields || []).forEach(field => {
         if (profile[field.key] === undefined && field.default !== undefined) profile[field.key] = field.default;
@@ -76,7 +226,7 @@ function profileFor(entry) {
     return profile;
 }
 function collectProfile() {
-    const profile = { ...profileFor(currentEntry()), model: element('provider-model').value.trim(), apiKey: currentEntry().usesAPIKey === false ? '' : element('openai-key').value.trim() };
+    const profile = { ...profileFor(currentEntry()), model: element('provider-model').value.trim(), apiKey: currentEntry().usesAPIKey === false || currentEntry().authType === 'none' ? '' : element('openai-key').value.trim() };
     element('provider-fields').querySelectorAll('[data-profile-field]').forEach(input => { profile[input.dataset.profileField] = input.value.trim(); });
     const baseURL = element('base-url').value.trim();
     if (baseURL) profile.baseURL = baseURL;
@@ -122,20 +272,29 @@ function renderFields(entry, profile) {
         element('provider-fields').append(group);
     });
 }
+function localEndpoint(id = selectedId) {
+    const entry = providers.find(provider => provider.id === id);
+    if (entry?.local !== true || entry.authType !== 'none') throw new Error('Model keşfi için bir yerel sağlayıcı seçin.');
+    const resolved = ProviderService.resolveProfile(id, { baseURL: element('base-url').value.trim(), model: '' });
+    if (!['localhost', '127.0.0.1', '[::1]'].includes(new URL(resolved.baseURL).hostname)) throw new Error('Yerel modeller için localhost veya loopback sunucu adresi kullanın.');
+    return resolved.baseURL;
+}
+function currentModels() {
+    const entry = currentEntry();
+    const discovered = discoveredModels.get(selectedId);
+    if (entry.local === true) {
+        try { return discovered?.baseURL === localEndpoint() ? discovered.models : []; }
+        catch { return []; }
+    }
+    return discovered?.models || entry.models || [];
+}
 function renderModels() {
     const entry = currentEntry();
-    const models = discoveredModels.get(selectedId) || entry.models || [];
-    const query = element('provider-model').value.toLocaleLowerCase('tr');
-    element('model-options').replaceChildren();
-    models.filter(model => model.selectable !== false && (!query || (model.id + ' ' + model.name).toLocaleLowerCase('tr').includes(query))).slice(0, 100).forEach(model => {
-        const option = document.createElement('option');
-        option.value = model.id;
-        option.label = model.name || model.id;
-        element('model-options').append(option);
-    });
-    element('model-help').textContent = models.length
-        ? models.length.toLocaleString('tr') + ' katalog/model kaydı. Adını yazın veya kendi model/deployment adınızı girin. Her model bu metin akışını desteklemeyebilir.'
-        : 'Yerelde yüklü modelin veya sağlayıcıdaki metin modelinin tam adını girin.';
+    const models = currentModels().filter(model => model.selectable !== false);
+    modelPicker?.refresh();
+    element('model-help').textContent = entry.local === true
+        ? models.length ? models.length.toLocaleString('tr') + ' yerel model bulundu. Listeden seçin veya kendi model adınızı yazın; ardından kaydedin.' : '“Modelleri getir” ile bu sunucudaki modelleri bulun. Tam model adını elle de yazabilirsiniz.'
+        : models.length ? models.length.toLocaleString('tr') + ' model seçeneği. Listeden seçin veya kendi model/deployment adınızı yazın.' : 'Sağlayıcıdaki metin modelinin tam adını girin.';
 }
 function updateDestination() {
     try {
@@ -153,8 +312,10 @@ function updateDestination() {
             : 'Bağlantı bilgilerini tamamlayın. Kaydetmeden önce hedef adres için Chrome izni istenir.';
     }
 }
-function selectProvider(id, remember = true) {
+function selectProvider(id, remember = true, event) {
     if (remember && loaded) drafts.set(selectedId, collectProfile());
+    discoveryGeneration += 1;
+    modelPicker?.close();
     selectedId = id;
     const entry = currentEntry();
     const profile = profileFor(entry);
@@ -165,12 +326,18 @@ function selectProvider(id, remember = true) {
     element('toggle-key').textContent = 'Göster';
     element('toggle-key').setAttribute('aria-pressed', 'false');
     const noKey = entry.authType === 'none';
-    element('provider-key-group').hidden = entry.usesAPIKey === false;
+    element('provider-key-group').hidden = noKey || entry.usesAPIKey === false;
     element('openai-key').disabled = noKey;
     element('toggle-key').disabled = noKey;
     element('key-label').textContent = entry.authType === 'bearer' ? 'Erişim belirteci / Bearer anahtarı' : noKey ? 'API anahtarı gerekmiyor' : 'API anahtarı';
-    element('base-url').value = profile.baseURL || '';
-    element('advanced-settings').open = id === 'custom' || entry.requiresBaseURL === true;
+    const local = entry.local === true;
+    element('provider-model').placeholder = local ? 'Yüklü model seçin veya adını yazın' : 'Model seçin veya adını yazın';
+    element('base-url').value = profile.baseURL || (local ? entry.baseURL : '');
+    element('advanced-settings').open = local || id === 'custom' || entry.requiresBaseURL === true;
+    element('connection-settings-title').textContent = local ? 'Yerel sunucu bağlantısı' : 'Gelişmiş bağlantı ayarları';
+    element('base-url-label').textContent = local ? 'Yerel sunucu adresi' : 'API adresi';
+    element('endpoint-help').textContent = local ? 'Sunucunun OpenAI uyumlu API adresini /v1 ile birlikte yazın. Ollama veya llama.cpp çalışıyor olmalı. Chrome izni yalnız seçtiğiniz adres için istenir.' : 'Boş bırakmak sağlayıcının adresini kullanır. Özel ağ geçitleri için HTTPS, yerel modeller için localhost veya 127.0.0.1 kullanın. İzin yalnız seçilen alan için istenir.';
+    element('usage-note').textContent = local ? 'Test, kaydedilmiş yerel sunucuya kısa bir örnek metin gönderir. Kaydedilmemiş değişiklikler kullanılmaz.' : 'Test, kaydedilmiş bağlantıya kısa bir örnek metin gönderir ve kullanım ücreti doğurabilir. Kaydedilmemiş değişiklikler kullanılmaz.';
     element('base-url').placeholder = entry.baseURL || 'https://…/v1';
     element('protocol-group').hidden = id !== 'custom';
     element('provider-protocol').value = profile.protocol || 'openai-chat';
@@ -178,16 +345,21 @@ function selectProvider(id, remember = true) {
     element('provider-note').textContent = [entry.supportNote, entry.authSupportNote].filter(Boolean).join(' ') || 'API anahtarınızı sağlayıcının hesabından alın. Metin modelinin tam adıyla bağlantıyı kaydedin.';
     renderFields(entry, profile);
     renderModels();
+    updateLocalGuide();
     updateDestination();
     document.querySelectorAll('[data-provider]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.provider === id)));
     element('connection-status').hidden = true;
     updateButtons();
+    if (local && entry.authType === 'none' && loaded && event?.isTrusted) discoverLocalModels({ requestPermission: true });
 }
 function updateButtons() {
     const unsupported = currentEntry().selectable === false;
-    ['save-api-btn', 'test-btn', 'refresh-models'].forEach(id => { element(id).disabled = busy || !loaded || unsupported; });
+    ['save-api-btn', 'test-btn', 'refresh-models', 'local-fetch-models', 'model-toggle'].forEach(id => { element(id).disabled = busy || !loaded || unsupported; });
     // Avoid a provider switch while a saved test or permission request is in flight.
     element('provider-select').disabled = busy || !loaded;
+    element('provider-search').disabled = busy || !loaded;
+    element('provider-model').disabled = !loaded || unsupported;
+    if (busy) providerPicker?.close();
     document.querySelectorAll('[data-provider]').forEach(button => { button.disabled = busy || !loaded; });
 }
 function setBusy(value, buttonId) {
@@ -214,6 +386,112 @@ function requestOrigin(id, profile) {
         else resolve();
     }));
 }
+function hasOrigin(id, profile) {
+    const origins = ProviderService.getPermissionOrigins(id, profile);
+    return new Promise((resolve, reject) => chrome.permissions.contains({ origins }, allowed => {
+        if (chrome.runtime.lastError) reject(new Error('Bağlantı izni kontrol edilemedi. “Modelleri getir” ile yeniden deneyin.'));
+        else resolve(allowed);
+    }));
+}
+function updateLocalGuide(state = 'ready', count = 0, errorCode) {
+    element('local-setup').hidden = selectedId !== 'ollama';
+    if (selectedId !== 'ollama') return;
+    element('local-setup').dataset.state = state;
+    element('local-setup-details').open = state === 'error' || state === 'empty';
+    element('local-copy-status').hidden = true;
+    element('local-setup-state').textContent = state === 'loading' ? 'Sunucunuzdaki model listesi alınıyor…'
+        : state === 'success' ? count.toLocaleString('tr') + ' model bulundu. Seçiminizi kaydedin.'
+        : state === 'empty' ? 'Sunucuda metin modeli bulunamadı. Yüklü modellerinizi kontrol edin.'
+        : state === 'error' ? errorCode === 'permission' || errorCode === 'local_access' ? 'Erişim iznini kontrol edip model listesini yeniden getirin.' : 'Ollama’nın çalıştığını ve sunucu adresini kontrol edin.'
+        : 'Üç adımda yüklü modellerinizi kullanın.';
+}
+function validModelList(models) {
+    if (!Array.isArray(models)) throw new Error('Model listesi okunamadı.');
+    return models.filter(model => typeof model?.id === 'string' && model.id.trim()).map(model => ({ ...model, name: typeof model.name === 'string' && model.name ? model.name : model.id }));
+}
+function isCurrentDiscovery(owner) {
+    if (owner.generation !== discoveryGeneration || owner.id !== selectedId) return false;
+    try { return localEndpoint() === owner.baseURL; }
+    catch { return false; }
+}
+async function discoverLocalModels({ requestPermission = false, openList = true } = {}) {
+    if (!loaded || busy || currentEntry().local !== true) return;
+    let owner;
+    let permission;
+    try {
+        owner = { generation: ++discoveryGeneration, id: selectedId, baseURL: localEndpoint() };
+        // A trusted choice or refresh starts the permission request before the first await.
+        permission = requestPermission ? requestOrigin(owner.id, { baseURL: owner.baseURL, model: '' }) : hasOrigin(owner.id, { baseURL: owner.baseURL, model: '' });
+    } catch (error) {
+        showStatus(error.message, 'error');
+        updateLocalGuide('error', 0, error.code);
+        return;
+    }
+    localRequestOwner = owner;
+    setBusy(true, 'refresh-models');
+    updateLocalGuide('loading');
+    showStatus('Yerel sunucudaki model listesi alınıyor…');
+    try {
+        const allowed = await permission;
+        if (!isCurrentDiscovery(owner)) return;
+        if (!requestPermission && !allowed) {
+            element('connection-status').hidden = true;
+            updateLocalGuide();
+            return;
+        }
+        const result = await message({ action: 'discoverLocalModels', providerId: owner.id, baseURL: owner.baseURL });
+        if (!isCurrentDiscovery(owner)) return;
+        const models = validModelList(result.models);
+        discoveredModels.set(owner.id, { baseURL: owner.baseURL, models });
+        renderModels();
+        const count = models.filter(model => model.selectable !== false).length;
+        updateLocalGuide(count ? 'success' : 'empty', count);
+        showStatus(count ? count.toLocaleString('tr') + ' yerel model bulundu. Listeden seçip kaydedin.' + (result.truncated ? ' Liste kısaltıldı; tam model adını elle de yazabilirsiniz.' : '') : 'Bu sunucuda yüklü metin modeli bulunamadı. Model adını elle girebilir veya sunucudaki modellerinizi kontrol edebilirsiniz.', count ? 'success' : 'info');
+        if (openList && count) modelPicker.open({ all: true, focus: false });
+    } catch (error) {
+        if (!isCurrentDiscovery(owner)) return;
+        discoveredModels.delete(owner.id);
+        renderModels();
+        showStatus(error.message, 'error');
+        updateLocalGuide('error', 0, error.code);
+    } finally {
+        if (localRequestOwner === owner) {
+            localRequestOwner = null;
+            setBusy(false);
+        }
+    }
+}
+function invalidateLocalModels() {
+    if (currentEntry().local !== true) return;
+    discoveryGeneration += 1;
+    discoveredModels.delete(selectedId);
+    modelPicker.close();
+    // A request for the previous draft address can finish, but cannot update this page.
+    if (localRequestOwner) {
+        localRequestOwner = null;
+        setBusy(false);
+    }
+    renderModels();
+    updateLocalGuide();
+    element('connection-status').hidden = true;
+}
+function refreshModels(event) {
+    if (!event.isTrusted || !loaded || busy) return;
+    if (currentEntry().local === true) discoverLocalModels({ requestPermission: true });
+    else useSavedConnection(event, 'listProviderModels');
+}
+async function copyCommand(event) {
+    if (!event.isTrusted) return;
+    const button = event.currentTarget;
+    const status = element('local-copy-status');
+    try {
+        await navigator.clipboard.writeText(element(button.dataset.copyCommand).textContent);
+        status.textContent = 'Komut kopyalandı. Terminale yapıştırabilirsiniz.';
+    } catch {
+        status.textContent = 'Kopyalanamadı. Komut metnini seçip elle kopyalayabilirsiniz.';
+    }
+    status.hidden = false;
+}
 async function saveProvider(event) {
     if (!loaded || busy || !event.isTrusted) return;
     let permission;
@@ -221,7 +499,7 @@ async function saveProvider(event) {
     const id = selectedId;
     try {
         profile = collectProfile();
-        if (!profile.model) throw new Error('Bir metin modeli veya deployment adı girin.');
+        if (!profile.model && currentEntry().local !== true) throw new Error('Bir metin modeli veya deployment adı girin.');
         if (profile.apiKey && !/^[\x21-\x7E]+$/.test(profile.apiKey)) throw new Error('Anahtar geçersiz karakter veya boşluk içeriyor. Sağlayıcı anahtarınızı kontrol edin.');
         permission = requestOrigin(id, profile);
     } catch (error) { showStatus(error.message, 'error'); return; }
@@ -240,7 +518,10 @@ async function saveProvider(event) {
         }
         await updateSummary();
         const hasCredential = currentEntry().usesAPIKey === false ? Boolean(profile.clientSecret) : Boolean(profile.apiKey || currentEntry().authType === 'none');
-        showStatus(currentEntry().name + ' etkinleştirildi. ' + (hasCredential ? 'Bağlantıyı test ederek model erişimini doğrulayabilirsiniz.' : 'Giriş bilgileri eksik; düzeltme için sağlayıcı bilgilerinizi tamamlayın.'), 'success');
+        const nextStep = currentEntry().local === true && !profile.model
+            ? 'Sunucu adresi kaydedildi. “Modelleri getir” ile bir metin modeli seçip tekrar kaydedin.'
+            : hasCredential ? 'Bağlantıyı test ederek model erişimini doğrulayabilirsiniz.' : 'Giriş bilgileri eksik; düzeltme için sağlayıcı bilgilerinizi tamamlayın.';
+        showStatus(currentEntry().name + ' etkinleştirildi. ' + nextStep, 'success');
     } catch (error) { showStatus(error.message, 'error'); }
     finally { setBusy(false); }
 }
@@ -263,12 +544,12 @@ async function useSavedConnection(event, action) {
             if (result.success !== true) throw new Error('Testten geçerli bir düzeltme yanıtı alınamadı.');
             showStatus('Bağlantı başarılı. Kaydedilmiş sağlayıcı ve model ile test tamamlandı.', 'success');
         } else {
-            if (!Array.isArray(result.models)) throw new Error('Model listesi okunamadı.');
-            discoveredModels.set(id, result.models.filter(model => typeof model?.id === 'string'));
+            discoveredModels.set(id, { models: validModelList(result.models) });
             renderModels();
             showStatus(result.models.length.toLocaleString('tr') + ' model ' + (result.source === 'catalog' ? 'yerleşik katalogdan gösteriliyor; sağlayıcı ayrı model listesi sunmuyor.' : 'sağlayıcıdan alındı.') + (result.truncated ? ' Liste kısaltıldı; diğer model adlarını elle girebilirsiniz.' : ''), 'success');
+            modelPicker.open({ all: true, focus: false });
         }
-    } catch (error) { showStatus(error.message, 'error'); }
+    } catch (error) { showStatus(error.message, 'error'); if (currentEntry().local === true) updateLocalGuide('error', 0, error.code); }
     finally { setBusy(false); }
 }
 async function savePrompt() {
@@ -292,6 +573,7 @@ async function loadSettings() {
     document.querySelectorAll('[data-product-link]').forEach(link => { link.href = PRODUCT_CONFIG[link.dataset.productLink]; });
     element('version-label').textContent = 'Sürüm ' + chrome.runtime.getManifest().version;
     element('catalog-count').textContent = PROVIDER_CATALOG.providers.length + ' sağlayıcı kaydı';
+    element('ollama-origin-command').textContent = 'OLLAMA_ORIGINS=chrome-extension://' + chrome.runtime.id + ' ollama serve';
     updateButtons();
     try {
         const values = await localGet(Object.values(STORAGE_KEYS));
@@ -299,6 +581,9 @@ async function loadSettings() {
         if (!providers.some(provider => provider.id === config.activeProviderId)) throw new Error('Etkin sağlayıcı katalogda bulunamadı. Mevcut kayıt değiştirilmedi.');
         selectedId = config.activeProviderId;
         selectProvider(selectedId, false);
+        const initialId = selectedId;
+        let initialURL = null;
+        if (currentEntry().local === true) { try { initialURL = localEndpoint(); } catch { /* Keep invalid saved endpoints editable. */ } }
         const response = await message({ action: 'getDefaultPrompt' });
         if (typeof response.prompt !== 'string' || !response.prompt.trim()) throw new Error('Varsayılan kurallar alınamadı. Sayfayı yeniden açın.');
         defaultPrompt = response.prompt;
@@ -306,15 +591,24 @@ async function loadSettings() {
         loaded = true;
         updateButtons();
         await updateSummary();
+        if (initialId === selectedId && initialURL && localEndpoint() === initialURL) discoverLocalModels({ openList: false });
     } catch (error) { showStatus(error.message, 'error'); }
 }
 
 document.addEventListener('DOMContentLoaded', loadSettings);
-element('provider-search').addEventListener('input', populateProviders);
-element('provider-select').addEventListener('change', event => selectProvider(event.target.value));
-document.querySelectorAll('[data-provider]').forEach(button => button.addEventListener('click', () => selectProvider(button.dataset.provider)));
+providerPicker = createPicker({ prefix: 'provider', controlId: 'provider-select', searchId: 'provider-search', items: () => providers, selectedValue: () => selectedId, onSelect: (item, event) => selectProvider(item.id, true, event) });
+modelPicker = createPicker({ prefix: 'model', controlId: 'provider-model', searchId: 'provider-model', toggleId: 'model-toggle', items: () => currentModels().filter(model => model.selectable !== false), selectedValue: () => element('provider-model').value.trim(), onSelect: item => {
+    element('provider-model').value = item.id;
+    renderModels();
+    updateDestination();
+} });
+document.querySelectorAll('[data-provider]').forEach(button => button.addEventListener('click', event => {
+    if (!loaded || busy || !event.isTrusted) return;
+    providerPicker.close();
+    selectProvider(button.dataset.provider, true, event);
+}));
 element('provider-model').addEventListener('input', () => { renderModels(); updateDestination(); });
-element('base-url').addEventListener('input', updateDestination);
+element('base-url').addEventListener('input', () => { invalidateLocalModels(); updateDestination(); });
 element('provider-protocol').addEventListener('change', updateDestination);
 element('provider-auth').addEventListener('change', updateDestination);
 element('toggle-key').addEventListener('click', () => {
@@ -325,7 +619,9 @@ element('toggle-key').addEventListener('click', () => {
 });
 element('save-api-btn').addEventListener('click', saveProvider);
 element('test-btn').addEventListener('click', event => useSavedConnection(event, 'testProvider'));
-element('refresh-models').addEventListener('click', event => useSavedConnection(event, 'listProviderModels'));
+element('refresh-models').addEventListener('click', refreshModels);
+element('local-fetch-models').addEventListener('click', refreshModels);
+document.querySelectorAll('[data-copy-command]').forEach(button => button.addEventListener('click', copyCommand));
 element('save-prompt-btn').addEventListener('click', savePrompt);
 element('reset-prompt-btn').addEventListener('click', () => {
     if (!defaultPrompt) return;

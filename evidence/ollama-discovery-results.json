@@ -1,0 +1,27 @@
+{
+  "checkedOn": "2026-10-03T16:50:22.127Z",
+  "extensionVersion": "3.4.0",
+  "scope": "Final central service with real local Ollama GET; Chrome permission API is a fixture. No inference or quality evaluation.",
+  "models": [
+    "qwen2.5:7b"
+  ],
+  "requests": [
+    {
+      "url": "http://127.0.0.1:11434/api/tags",
+      "method": "GET",
+      "status": 200,
+      "authorizationHeaderPresent": false
+    }
+  ],
+  "realLocalModelListCall": true,
+  "inferenceCallMade": false,
+  "cloudCallMade": false,
+  "savedSettingsReadOrWritten": false,
+  "nativeChromePermissionVerified": false,
+  "browserOriginVerified": false,
+  "sourceSha256": {
+    "lib/provider-catalog.js": "42a8fb3c1b7b653a7be838957b2b24c16575876de4025d031751ca64a117ebfa",
+    "background/openai-provider.js": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
+    "background/provider-service.js": "b08575a2b51c53cb13360029b1519bdc2b40db0690874f9a20874800c01a062a"
+  }
+}

@@ -2,14 +2,16 @@
   "checkedOn": "2026-10-03",
   "extensionVersion": "3.4.0",
   "command": "node --test tests/provider-*.test.cjs",
-  "tests": 155,
-  "passed": 155,
+  "tests": 188,
+  "passed": 188,
   "failed": 0,
   "realProviderCall": false,
   "sourceSha256": {
-    "background/background.js": "42a063786ce1f722851e9bb24724979c4007ad65930d453ad044fb63be9ded38",
+    "background/background.js": "040e08ec5ad5c9d98c3b198aae976c6e131958cb012069bd548bd4bca7b3a731",
     "background/openai-provider.js": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
-    "background/provider-service.js": "48fe603b63903e28c7c15e9423492c1d60a4719288976ad33f7f0f8c9a74f51f",
-    "lib/provider-catalog.js": "7c974e7488d452828c0ce51f1cbc9756ce35d9075d6c1e91cdb20a7262ce1f32"
-  }
+    "background/provider-service.js": "b08575a2b51c53cb13360029b1519bdc2b40db0690874f9a20874800c01a062a",
+    "lib/provider-catalog.js": "42a8fb3c1b7b653a7be838957b2b24c16575876de4025d031751ca64a117ebfa"
+  },
+  "generatedAt": "2026-10-03T16:47:58.707Z",
+  "skipped": 0
 }

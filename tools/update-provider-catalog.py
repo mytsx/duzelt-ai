@@ -343,12 +343,16 @@ def make_catalog(data, source_date, source_hash):
                                         ('llamacpp', 'llama.cpp (yerel)', 'http://127.0.0.1:8080/v1')]:
         if identifier in data:
             continue
-        providers.append({'id': identifier, 'name': name, 'baseURL': base_url, 'protocol': 'openai-chat',
+        provider = {'id': identifier, 'name': name, 'baseURL': base_url, 'protocol': 'openai-chat',
                           'authType': 'none', 'docURL': 'https://opencode.ai/docs/providers/#' + ('ollama' if identifier == 'ollama' else 'llamacpp'),
                           'npm': '@ai-sdk/openai-compatible', 'env': [], 'selectable': True, 'status': 'protocol',
                           'liveVerified': False, 'popular': False, 'local': True, 'fields': [], 'models': [],
                           'origins': [base_url.split('/v1')[0] + '/*'], 'source': 'opencode-docs-local-example',
-                          'supportNote': 'Katalog model ID sağlamaz; yerelde yüklenmiş modelin gerçek ID değerini girin. Yerel servis ve erişim izni gerekir.'})
+                          'supportNote': 'Katalog model ID sağlamaz; yerelde yüklenmiş modelin gerçek ID değerini girin. Yerel servis ve erişim izni gerekir.'}
+        if identifier == 'ollama':
+            provider.update({'jsonMode': True, 'temperature': 0.2,
+                             'transportDocURL': 'https://docs.ollama.com/api/openai-compatibility'})
+        providers.append(provider)
     providers.sort(key=lambda entry: entry['id'])
     return {
         'schemaVersion': 1,

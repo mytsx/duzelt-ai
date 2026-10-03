@@ -15,15 +15,27 @@ Eklenti yazım, noktalama ve resmî yazışma üslubu için seçtiğiniz yapay z
 
 ## Sağlayıcı ve model seçimi
 
-OpenCode'un kullandığı [Models.dev](https://models.dev/) kaynağından alınan 3 Ekim 2026 görüntüsündeki **226 sağlayıcının tamamı** merkezi katalogda tutulur. Ollama ve llama.cpp yerel bağlantılarıyla arayüzde **228 kayıt** bulunur. Arama alanı ve sağlayıcı listesiyle sağlayıcıyı bulabilir; OpenRouter dahil uyumlu API'leri veya kendi bağlantınızı seçebilirsiniz.
+OpenCode'un kullandığı [Models.dev](https://models.dev/) kaynağından alınan 3 Ekim 2026 görüntüsündeki **226 sağlayıcının tamamı** merkezi katalogda tutulur. Ollama ve llama.cpp yerel bağlantılarıyla arayüzde **228 kayıt** bulunur. Sağlayıcı seçimini açıp aynı listenin içinden arama yapabilir; OpenRouter dahil uyumlu API'leri veya kendi bağlantınızı seçebilirsiniz.
 
 Katalogda bulunmak, gerçek hesabınızla çalışmanın veya her modelin metin düzeltmeye uygunluğunun doğrulandığı anlamına gelmez. **225 kayıt** için bağlantı protokolü ve kimlik yöntemi uygulanır. GitHub Copilot, GitLab Duo ve v0 kayıtları açıklamalarıyla görünür; bu ürünlerin gerekli oturum/ajan akışı için doğrulanmış adaptör bulunmadığından doğrudan seçilemez. Görsel, ses, gerçek zamanlı ve özel araç akışı gerektiren modeller düzeltme adaylarından ayrılır. Bedrock ve Vertex gibi servislerde bölgesel erişim ve model/protokol sınırları vardır. Ayrıntılar [sağlayıcı araştırmasında](docs/providers-research.md) ve [özel bağlantı notlarında](docs/provider-edge-notes.md) açıklanır.
 
 IBM watsonx, IBM Cloud anahtarını IAM erişim belirtecine dönüştürerek proje veya alan kimliğiyle bağlanır. SAP AI Core, servis anahtarındaki Client ID/secret ve OAuth adresiyle bağlanır; varsayılan Orchestration V2 farklı model aileleri için ortak metin yolunu kullanır. SAP'de doğrudan OpenAI deployment seçeneği de vardır. Bu bağlantılar kendi hesabınızdaki deployment, kaynak grubu, bölge ve model yetkilerini gerektirir.
 
-Model kataloğu eklentiyle birlikte gelir; arayüz açılırken Models.dev'den veri veya uzak SDK indirilmez. **Modelleri yenile** işlemi yalnız tıkladığınızda, kaydedilmiş sağlayıcının desteklenen model-listesi API'sini kullanır; bu yol uygulanmamışsa yerleşik kayıtlar gösterilir. Modelin tam adını/deployment kimliğini elle de girebilirsiniz. Hesabınızın erişimi **Bağlantıyı test et** ile ayrıca doğrulanır.
+Model kataloğu eklentiyle birlikte gelir; arayüz açılırken Models.dev'den veri veya uzak SDK indirilmez. Bulut bağlantılarında **Modelleri yenile**, kaydedilmiş sağlayıcının desteklenen model-listesi API'sini kullanır; bu yol uygulanmamışsa yerleşik kayıtlar gösterilir. Yerel sağlayıcı seçilince adres için Chrome izni verildikten sonra çalışan sunucunun modelleri otomatik listelenir. Kayıtlı yerel bağlantıyla ayarlar açıldığında yalnız önceden izin verilmiş adresten liste alınır. Modelin tam adını/deployment kimliğini elle de girebilirsiniz. **Bağlantıyı test et** kaydedilmiş bağlantıyı kullanır.
 
 Bağlantı kaydedilirken seçilen API adresi ve gerekiyorsa kimlik doğrulama adresi için Chrome izni istenir. Yeni bir özel bağlantı adresini kullanmadan önce ekranda gösterilen hedefleri kontrol edin. Özel servisler HTTPS; yerel servisler localhost/loopback HTTP kullanabilir. Metin seçtiğiniz model bağlantısına, kimlik bilgileri ilgili sağlayıcının API veya belirteç servisine gönderilir.
+
+### Ollama ve llama.cpp ile yerel kullanım
+
+Ayarlar ekranındaki **Bilgisayarınızda çalıştırın** bölümünde **Ollama** veya **llama.cpp** kartını seçin. Yerel sunucu adresi doğrudan görünür; bu bağlantılarda API anahtarı gerekmez. Ollama için varsayılan adres `http://127.0.0.1:11434/v1`, llama.cpp için `http://127.0.0.1:8080/v1` adresidir. `localhost` da kullanılabilir.
+
+Ollama kartını seçin ve Chrome bağlantı iznini verin. Sunucu çalışıyorsa yüklü metin modelleri seçim listesinde görünür; modeli seçip **Kaydet** düğmesine basın. Model listesini almak etkin sağlayıcınızı değiştirmez ve bağlantıyı önceden kaydetmenizi gerektirmez. Adresi değiştirdiğinizde **Modelleri getir** ile yeni adresten liste alın. Model adını biliyorsanız elle de girebilirsiniz. Ollama'nın model listesinde yetenek bilgisi varsa yalnız embedding üreten modeller ayrılır.
+
+Sunucu kapalıysa arayüzdeki **Kopyala** düğmesiyle `ollama serve` komutunu alıp Terminal'de çalıştırın; eklenti bilgisayarınızda komut çalıştırmaz. `ollama list` komutu yüklü modelleri gösterir. Sunucu açıkken arayüzde **Modelleri getir** düğmesine basın.
+
+Ollama bağlantısı [resmî OpenAI uyumlu API](https://docs.ollama.com/api/openai-compatibility) üzerinden yapılır. Varsayılan bağlantı localhost/loopback kullanır; farklı origin veya ağ erişimi gerekiyorsa Ollama'nın kendi erişim ayarları ayrıca geçerlidir.
+
+Ollama tarayıcı eklentisinin origin'ine izin vermiyorsa Chrome'un bağlantı izni tek başına yeterli değildir. Arayüz, [Ollama'nın resmî origin ayarını](https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama) kendi eklenti kimliğiyle hazırlar: `OLLAMA_ORIGINS=chrome-extension://EKLENTI_KIMLIGI ollama serve`. Ekrandaki tam komutu kopyalayın; kimliği elle bulmanız gerekmez. Önce çalışan Ollama sunucusunu kapatıp bu komutla yeniden başlatın.
 
 ## Editör desteği ve sınırlar
 

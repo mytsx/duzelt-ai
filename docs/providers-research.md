@@ -31,7 +31,7 @@ API gövdesi ayrı bir anlık görüntüdür; public API'nin bu depo revision'ı
 
 251 kayıt metin girdisi/çıktısı sağlamadığı için, 109 kayıt embedding/rerank/moderation sınıfında olduğu için paketlenmiş model listesinden çıkarıldı. Kalan listede 154 görsel/ses/gerçek zamanlı, araştırma/arama/bilgisayar araç akışı kaydı `selectable: false` ile tutulur; düzeltme adayı değildir. Kaynakta beta/deprecated durumu varsa korunur. Diğer kayıtların destek durumunun güncel ve eksiksiz olduğu, katalog adlarının gerçek hesap model/deployment adıyla birebir aynı olduğu veya bütün modellerin JSON üretebildiği varsayılmaz.
 
-Model varsayılanı **OpenAI / gpt-4o** olarak korunur. Diğer servislerde tek bir modelin maliyet/kalite üstünlüğü doğrulanmadığı için yeni zorunlu varsayılan eklenmez. QVAC ve model listesi boş olan yerel servislerde kullanıcı gerçek model/alias adını girmelidir.
+Model varsayılanı **OpenAI / gpt-4o** olarak korunur. Diğer servislerde tek bir modelin maliyet/kalite üstünlüğü doğrulanmadığı için yeni zorunlu varsayılan eklenmez. Yerel bağlantılarda model sunucudan alınabilir veya gerçek model/alias adı elle girilebilir. QVAC model değeri sunucunun `serve.models` alias'ıdır.
 
 ## Protokol aileleri
 
@@ -77,9 +77,23 @@ Native SDK default URL'si her zaman seçilen REST protokolünün kökü değildi
 
 Ayrıntılı bulut/kimlik kaynakları [provider-edge-notes.md](provider-edge-notes.md) dosyasındadır. Yeni adaptör, resmî HTTP/kimlik sözleşmesi ve fixture testleri tamamlanmadan bu kayıtların durumunu aktif yapmayın.
 
+## Ollama ve llama.cpp bağlantısı
+
+Ayarlar ekranında Ollama ve llama.cpp kartları görünür; yerel sunucu adresi açık, anahtar alanı gizlidir. Varsayılan adresler Ollama için `http://127.0.0.1:11434/v1`, llama.cpp için `http://127.0.0.1:8080/v1` değerleridir. Sağlayıcı araması açılan seçim listesinin içindedir.
+
+Kullanıcı Ollama kartını veya seçeneğini seçtiğinde arayüz Chrome bağlantı iznini ister ve izin verilirse model listesini otomatik getirir. Ayarlar ilk açıldığında ise yalnız önceden verilmiş izinle otomatik keşif yapılır; izin yoksa **Modelleri getir** düğmesi kullanılır. Sunucu adresini model bilmeden girmek mümkündür; taslak keşif önce kaydetmeyi gerektirmez. Kullanıcı modeli seçip **Kaydet** dediğinde bağlantı etkinleşir. Bu sırada önceki etkin sağlayıcı ve diğer profiller korunur. Boş modelle adres kaydetme ve daha sonra model seçip tekrar kaydetme de desteklenir.
+
+Keşif, yalnız aynı eklentinin ayarlar sayfasından `action`, `providerId`, `baseURL` alanlarıyla çağrılır. Katalog kaydı yerel ve anahtarsız olmalı; adres localhost/loopback HTTP veya HTTPS olmalı ve origin izni verilmiş olmalıdır. İşlem anahtar/prompt/kayıtlı profil okumaz, depoya yazmaz ve etkin sağlayıcıyı değiştirmez. Ollama [native `GET /api/tags`](https://docs.ollama.com/api/tags) kullanır; yalnız son `/v1` eki kaldırılır, varsa proxy kökü korunur. llama.cpp uyumlu `/v1/models` yolunu kullanır.
+
+Ollama liste yanıtında `capabilities` verilirse `completion` veya `chat` içermeyen kayıtlar önerilerden çıkarılır; embedding-only kayıtlar bu durumda elenir. Bu alanın bulunmadığı kayıtlar korunur: native liste, her modelin yetenek bilgisini zorunlu olarak sağlamaz. Model etiketi `:` ve `/` içerebilir; kullanıcı sunucudaki tam adı seçer veya yazar.
+
+Ollama düzeltmesi [OpenAI uyumlu chat API](https://docs.ollama.com/api/openai-compatibility) üzerinden, `temperature: 0.2` ile gönderilir. Loopback adresindeki `:cloud` olmayan model için `corrected_text` string alanını zorunlu tutan JSON Schema istenir; cloud/uzak bağlantıda JSON object biçimi kullanılır. Sonuç yine eklentinin doğrulayıcısından geçer. Bu ayar llama.cpp'ye zorunlu sıcaklık veya JSON Schema desteği eklemez.
+
+Arayüz `ollama serve`, `ollama list` ve isteğe bağlı `ollama pull <model-adı>` komutlarını gösterir. Origin komutu o kurulumun `chrome.runtime.id` değerinden hazırlanır: `OLLAMA_ORIGINS="chrome-extension://EKLENTI_KIMLIGI" ollama serve`. Chrome host izni ile Ollama'nın origin izni ayrı ayarlardır; çalışan sunucu yeni ortam ayarıyla yeniden başlatılmalıdır. [Ollama CLI](https://docs.ollama.com/cli), [origin ayarı](https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama). Eklenti sunucuyu başlatmaz veya komutları kendiliğinden çalıştırmaz.
+
 ## Yerel hazırlık ve test
 
-Çalışma sürümü public metadata'yı kendi başına yenilemez. Normal kullanımda `lib/provider-catalog.js` okunur; model discovery yalnız kullanıcı tıklamasıyla, kaydedilmiş API origin'ine verilen optional Chrome izni sonrası servis işçisinden çalışır. IBM/SAP profili belirteç origin'ini de izin listesine ekler; model-listesi yolu uygulanmadığında katalog döner ve kimlik ağı çalışmaz. API anahtarı, SAP client secret, özel prompt ve sağlayıcı profili local; açma/kapatma sync'tir. Anahtar URL/MAIN-world olay/log içine konmaz. SDK'nızın/npm kaydınızın varlığı tarayıcıda çalıştırma yetkisi değildir.
+Çalışma sürümü public metadata'yı kendi başına yenilemez. Normal kullanımda `lib/provider-catalog.js` okunur; bulut model keşfi kullanıcı tıklamasıyla, kaydedilmiş API origin'ine verilen optional Chrome izni sonrası servis işçisinden çalışır. Yerel sağlayıcı seçimi, izin verilmiş taslak loopback adresinde otomatik keşfi başlatabilir. IBM/SAP profili belirteç origin'ini de izin listesine ekler; model-listesi yolu uygulanmadığında katalog döner ve kimlik ağı çalışmaz. API anahtarı, SAP client secret, özel prompt ve sağlayıcı profili local; açma/kapatma sync'tir. Anahtar URL/MAIN-world olay/log içine konmaz. SDK'nızın/npm kaydınızın varlığı tarayıcıda çalıştırma yetkisi değildir.
 
 Elde tutulan kaynakla aynı katalog üretimi/doğrulaması:
 

@@ -1,8 +1,8 @@
 {
   "checkedOn": "2026-10-03",
   "extensionVersion": "3.4.0",
-  "runtimeAndDesignHead": "2d465504418f9136bf9c8431531602054571d133",
-  "githubMainVerifiedAtThisHead": "2d465504418f9136bf9c8431531602054571d133",
+  "runtimeAndDesignHead": "0075b8d94700812fc5dad71f74b2c91052a05766",
+  "githubMainVerifiedAtThisHead": "0075b8d94700812fc5dad71f74b2c91052a05766",
   "pushSucceeded": true,
   "githubActionsRunCount": null,
   "remoteCIVerified": false,
@@ -18,7 +18,7 @@
     "providers": 188,
     "editorBrowser": 127,
     "editorBootstrap": 7,
-    "uiBrowser": 29,
+    "uiBrowser": 36,
     "catalog": 30,
     "package": 7
   },
@@ -36,12 +36,12 @@
   "artifacts": {
     "dist/duzelt-ai-3.4.0.zip": {
       "absolutePath": "/Users/yerli/Developer/duzelt-ai/dist/duzelt-ai-3.4.0.zip",
-      "sha256": "6020d93155d44da9dd86585d8fad38c1190e71924090d4c6f694f5c87c18623d",
+      "sha256": "22727bbdcd4cbd3a162aa5a17806b6f73880dff02cbcad8056e1c5f6c63f16c4",
       "fileCount": 19
     },
     "output/claude-design-kit-3.4.0.zip": {
       "absolutePath": "/Users/yerli/Developer/duzelt-ai/output/claude-design-kit-3.4.0.zip",
-      "sha256": "d0023ec4e6a8d2059fb075e95de717574ae6d06650a83c0d5e4e2e5276888232",
+      "sha256": "e33e6141c0ffecf5cac52c074cc3a196698f82ba23a11f70c6935993f6f43c8a",
       "fileCount": 22
     }
   },
@@ -49,5 +49,25 @@
   "localModelDiscoveryVerified": true,
   "providerLiveInferenceVerified": false,
   "liveCallScope": "Final central service local Ollama model-list GET HTTP 200; Chrome permission API is a fixture, browser origin remains unverified.",
-  "browserExtensionUpdate": "User reload required; chrome://extensions navigation was blocked by the browser URL policy. User Chrome configuration was not modified."
+  "browserExtensionUpdate": "User reload required; chrome://extensions navigation was blocked by the browser URL policy. User Chrome configuration was not modified.",
+  "optionsMaintenance": {
+    "scope": "Settings layout, command-copy alignment, single Ollama origin-enabled startup guide and explicit saved/draft states.",
+    "uiChecks": 36,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "actualProviderCalls": 0,
+    "actualInferenceCalls": 0,
+    "userChromeProfileModified": false,
+    "sourceEvidence": "evidence/ui-results.json",
+    "screenshotCaptureNote": "Section screenshots temporarily hide only the unfocused skip link after verifying that it is outside the visible viewport; inline style restored after capture."
+  }
 }

@@ -1,0 +1,45 @@
+{
+  "checkedOn": "2026-10-03T21:05:21.367Z",
+  "browser": "151.0.7922.34",
+  "checkCount": 3,
+  "checks": [
+    "Preparation deterministically versions the feedback URL from current bytes, is idempotent and changes the cache key after a script edit.",
+    "Native Chromium HTTP cache retains the warmed old URL, while the deployed content fingerprint requests and executes the new script. No route interception disables this cache proof.",
+    "The new versioned support script opens the form and completes one intercepted 202 acceptance without SDK ready() usage."
+  ],
+  "sourceHashes": {
+    "site/support/index.html": "368c4741e099496ff120a028c5000a3fa02ac8ad8639eb4c1e2322b91dfdf597",
+    "site/assets/css/feedback.css": "e6b82546c20dcff55842fdd1264f0a5ad5763719e21ad0ed4ffa30b72cf43fd1",
+    "site/assets/js/feedback.js": "ec4288fb2214ca1ac618714a51dcb5c36c91673386ecf686d48d9f25fde5d4df",
+    "site/assets/js/site.js": "06bc3ca5b57e06b3b554baf2390a80a44f223a693dda17ca4d14b5b0dd5571c3",
+    "site/assets/js/config.js": "4dbb7bb093e47519ce50d2d007d8cbf3cd5c9447211d6fbfa6f99f04ce571b3a",
+    "site/_headers": "5481acd4753a7724d4af058a77c331ae676b32fe59248870424eba03b2d48c7d",
+    "tools/prepare-site.py": "9642675e39faf35c22843957dba8f261325aab5dfc001025a26bd9707730717b"
+  },
+  "feedbackScriptVersion": "ec4288fb2214",
+  "preparation": {
+    "idempotent": true,
+    "updatedOnContentChange": true,
+    "staleQueryRemoved": true
+  },
+  "nativeHTTPCacheEnabled": true,
+  "nativeCacheProofUsedRouteInterception": false,
+  "nativeScriptNetworkRequests": [
+    "/assets/js/feedback.js",
+    "/assets/js/feedback.js?v=ec4288fb2214"
+  ],
+  "fixtureQuerySubmissionAccepted": true,
+  "pageErrors": [],
+  "realExternalCalls": 0,
+  "scope": "Three targeted preparation/cache/query-flow checks. The earlier 37-case UI suite is retained as its dated record and was not rerun for the script URL-only change.",
+  "fixtures": "Cache server serves labelled old/new script bodies locally. Query form flow uses intercepted config, Turnstile and POST; no real CAPTCHA or mail.",
+  "additionalVerification": {
+    "prepareSiteUnitTests": {
+      "passed": 14,
+      "total": 14
+    },
+    "prepareSiteDriftCheck": "passed",
+    "browserHarnessSyntax": "passed",
+    "scopedDiffCheck": "passed"
+  }
+}

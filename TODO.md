@@ -69,23 +69,31 @@
 
 ## 4. Site üzerinden e-posta geri bildirimi
 
+4 Ekim 2026: form yayımlandı ve canlı yapılandırma yanıtı başarılı. İlk gerçek POST HTTP 503 döndü; gerçek kuyruk kabulü, Worker SMTP ve gelen kutusu teslimi tamamlanmadı.
+
 - [x] Kalbur'un Worker, form ve test kaynaklarını salt okunur incele; `.env` ve credential dosyalarını açma.
 - [x] İki aşamalı kurulum sınırını ve gerekli SMTP/Turnstile alanlarını belirle; ilk aşamada uygulama/yayın yapmadan dur.
 - [x] Gizlilik ve işletim belgelerine manuel alanlar, Cloudflare/SMTP veri akışı, kuyruk kabulü/teslim ayrımı ve saklama-silme düzenini ekle.
 - [x] Mevcut destek sayfası ve GitHub bağlantısını koruyarak formu, e-posta alternatifini ve erişilebilir durum mesajlarını ekle; API alanlarıyla kaynak sözleşmesi eşleşti.
 - [x] Mesajı hata halinde koru; yinelenen gönderim, boş isteğe bağlı alanlar, 320/390/768/1440 px ve klavye davranışlarını doğrula; 37/37 izole Chromium kontrolü, 8 tema/genişlik birleşimi.
 - [x] Düzelt için yalnız `duzelt.yerli.dev` alanına bağlı managed Turnstile widget'ı oluştur.
-- [x] `duzelt-feedback` / `duzelt-feedback-dlq` canlı kuyruklarını ve her birinde 86.400 saniye saklamayı ayrı doğrula; her iki panelde 86400 seconds görüldü.
+- [x] `duzelt-feedback` / `duzelt-feedback-dlq` canlı kuyruklarını ve her birinde 86.400 saniye saklamayı ayrı doğrula; her iki panelde 86.400 saniye görüldü.
 - [x] Sunucu kaynaklarında Origin/içerik tipi, 16 KiB gövde, 4.000 karakter mesaj, tuzak alanı, HMAC IP özeti ve Turnstile token/hostname/action kontrollerini uygula; kaynak salt okunur gözden geçirildi.
-- [x] Sunucu kontrollerini `node --test tests/feedback.test.mjs` ile doğrula; 31/31 ve bağımsız tekrar başarılı.
-- [ ] Canlı kaynak/Turnstile/Queue ve Worker SMTP davranışını yerel testten ayrı doğrula.
+- [x] Sunucu kontrollerini `node --test tests/feedback.test.mjs` ile doğrula; 33/33 ve bağımsız tekrar başarılı.
+- [x] Canlı yapılandırmayı doğrula: `/api/feedback/config` HTTP 200 ve `enabled: true`; `/.env` HTTP 404.
+- [x] Gerçek widget belirtecini ayrı Siteverify işleminde doğru hostname/action ile doğrula; bu sonuç Worker POST kabulü değildir.
+- [x] Canlı Chrome'da 320/390/768/1440 px yatay taşma ve görünür e-posta alternatifini kontrol et; güncel SDK için önbellek kapalıydı.
+- [ ] Eski SDK dosyasının önbelleğini gider; gerçek Worker POST için başarılı 202 kuyruk kabulünü doğrula. İlk deneme 503; uyumluluk düzeltmesi yerel workerd regresyonuyla hazır, yeni yayın bekliyor.
+- [ ] Worker SMTP kabulünü ve erişilebiliyorsa gelen kutusunu ayrıca doğrula.
 - [ ] IP başına 5/dk ve uygulama anahtarına 60/dk yaklaşık, Cloudflare konumu bazlı sınırı doğrula; kesin küresel kota diye sunma.
 - [x] Yerel testlerde sabit gönderen/alıcı, yalnız Reply-To, TLS seçenekleri, retry/ACK ve kayıt kimliğiyle izleme akışını doğrula. Gerçek DLQ yönlendirmesi bekliyor.
 - [x] Yerel SMTP ön kontrolü (`transporter.verify()`): TLS sertifikası ve kimlik doğrulaması başarılı; e-posta gönderilmedi.
-- [ ] Secret'ları değerlerini göstermeden mevcut Worker'a aktar; `.env` izinlerini ve Git/site/ZIP dışlama kontrollerini tamamla.
-- [x] Doğrulama, boyut/Origin, taklit Turnstile hataları, hız sınırı, kuyruk arızası, SMTP retry, HTML kaçışı ve sabit alıcı testlerini çalıştır; 31/31.
+- [x] Gerekli 11 alanı mevcut Worker'a şifreli secret olarak aktar; değerleri gösterme. Yerel `.env` 0600 izinli ve Git dışında, sızıntı kontrolü bulgusuz.
+- [ ] Son derleme/paket turunda secret ve `.env` dışlama kontrollerini yenile.
+- [x] Doğrulama, boyut/Origin, taklit Turnstile hataları, hız sınırı, kuyruk arızası, SMTP retry, HTML kaçışı ve sabit alıcı testlerini çalıştır; 33/33.
 - [ ] Az sayıda açıkça test olarak işaretli bildirimle gerçek form kabulünü, SMTP sunucusunun kabulünü ve mümkünse alıcı gelen kutusu görünümünü ayrı doğrula.
-- [ ] Mevcut main → Workers Builds düzeniyle commit/push/yayın ve canlı form kontrolünü tamamla; eski site teslim kanıtını yeni form kanıtıyla karıştırma.
+- [x] Form kodunu ve SDK düzeltmesini (`01ab2ef`, `6c96419`) main'e pushla; mevcut Workers Builds otomatik build/deploy başarılı. Worker sürümü `94e7bfa1…`.
+- [ ] Son Worker/önbellek düzeltmesinden sonra main push, uzak build ve canlı form teslimini tekrar doğrula.
 - [ ] 24 saatlik hata kuyruğunu arıza halinde izle; kapanan talebin posta yazışmalarını en geç 30 gün içinde sil ve aylık kontrolü işlet.
 
 ## Kanıt sınırları

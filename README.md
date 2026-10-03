@@ -103,7 +103,7 @@ Katalog hazırlama aracı `tools/update-provider-catalog.py` yalnız yerel geli�
 
 ## Web sitesi ve yayın
 
-Claude Design kaynakları `site/` altında entegre edildi. [duzelt.yerli.dev](https://duzelt.yerli.dev/), [destek](https://duzelt.yerli.dev/support/) ve [gizlilik](https://duzelt.yerli.dev/privacy/) 3 Ekim 2026'da canlı HTTPS ile doğrulandı. Site, statik varlıkları sunan `duzelt-site` Worker'ını kullanır. Geri bildirim için aynı Worker'a `/api/feedback` yolu eklenir; eklentinin düzeltme API istekleri veya kullanıcı anahtarları siteye gönderilmez.
+Claude Design kaynakları `site/` altında entegre edildi. [duzelt.yerli.dev](https://duzelt.yerli.dev/), [destek](https://duzelt.yerli.dev/support/) ve [gizlilik](https://duzelt.yerli.dev/privacy/) 3 Ekim 2026'da canlı HTTPS ile doğrulandı. Site, statik varlıkları sunan `duzelt-site` Worker'ını kullanır. Geri bildirim için aynı Worker'da `/api/feedback` yolu bulunur; eklentinin düzeltme API istekleri veya kullanıcı anahtarları siteye gönderilmez.
 
 Bağlantılar `lib/product-config.js`, sürüm/ikonlar `manifest.json`, politika `PRIVACY.md` kaynağından hazırlanır. `site/assets/js/config.js` ve sitedeki politika kopyası elle düzenlenmez. İkon, güncel popup/ayar ekranları, HTML bağlantıları, favicon, robots ve sitemap aynı hazırlık adımında eşitlenir.
 
@@ -120,15 +120,21 @@ npm run site:deploy
 
 ## Site üzerinden geri bildirim
 
-[Destek sayfasına](https://duzelt.yerli.dev/support/) hata bildirimi, öneri ve özellik isteği formu ekleniyor; mevcut GitHub bağlantısı ve doğrudan e-posta seçeneği korunur. Mesaj zorunlu, yanıt e-postası ve elle girilen sürüm/tarayıcı alanları isteğe bağlıdır. E-posta vermeden gönderim yapılabilir. Form eklentideki özel metni, API anahtarını veya promptu otomatik toplamaz; hata durumunda yazılan mesaj korunur.
+[Destek sayfasında](https://duzelt.yerli.dev/support/) hata bildirimi, öneri ve özellik isteği formu yayımlandı; mevcut GitHub bağlantısı ve doğrudan e-posta seçeneği korunur. Mesaj zorunlu, yanıt e-postası ve elle girilen sürüm/tarayıcı alanları isteğe bağlıdır. E-posta vermeden gönderim yapılabilir. Form eklentideki özel metni, API anahtarını veya promptu otomatik toplamaz; hata durumunda yazılan mesaj korunur.
 
 Sunucu düzeni mevcut `duzelt-site` Worker'ı, yalnız Düzelt alan adına ait Turnstile widget'ı ve ayrı `duzelt-feedback` / `duzelt-feedback-dlq` kuyruklarıdır. Kuyruğa kabul edilen mesaj için **Alındı** gösterilir; bu durum SMTP veya gelen kutusu teslimini kanıtlamaz. Sabit gönderen/alıcı, TLS doğrulamalı SMTP, üç yeniden deneme ve kayıt kimliğiyle izleme kullanılır. Kullanıcı e-postası yalnız Reply-To olur.
 
-Yerel `.env` ve `.env.example` alanları, secret aktarımı, hız/saklama sınırları ve arıza işlemleri [site işletim rehberinde](site/README.md#geri-bildirim-kurulumu-ve-isletimi) açıklanır. Gerçek `.env` Git'e, site varlıklarına veya eklenti paketine girmez. Saklama politikasının tek kaynağı [PRIVACY.md](PRIVACY.md#web-sitesi-uzerinden-geri-bildirim) dosyasıdır.
+Yerel `.env` ve `.env.example` alanları, secret aktarımı, hız/saklama sınırları ve arıza işlemleri [site işletim rehberinde](site/README.md#geri-bildirim-kurulumu-ve-i%C5%9Fletimi) açıklanır. Gerçek `.env` Git'e, site varlıklarına veya eklenti paketine girmez. Saklama politikasının tek kaynağı [PRIVACY.md](PRIVACY.md#web-sitesi-%C3%BCzerinden-geri-bildirim) dosyasıdır.
 
-**Doğrulama durumu:** Form ve sunucu kaynakları hazır; `node --test tests/feedback.test.mjs` ile **31/31 yerel test** geçti. Testler taklit SMTP/Turnstile/Queue kullanır. Worker dry-run ve mevcut site hazırlık kontrolleri geçti. Düzelt için yalnız `duzelt.yerli.dev` alanına bağlı Turnstile widget'ı oluşturuldu. Yerel SMTP ön kontrolünde TLS sertifikası ve kimlik doğrulaması başarılı; bu kontrolde e-posta gönderilmedi. Canlı form/kuyruk kabulü, Cloudflare Worker'ından SMTP teslimi ve alıcı gelen kutusu görünümü henüz doğrulanmadı. Tamamlanan kontroller ve kalanlar [TODO.md](TODO.md#4-site-uzerinden-e-posta-geri-bildirimi) içinde izlenir.
+**4 Ekim 2026 doğrulama durumu:**
 
-Yeni form için **37/37 Chromium kontrolü** geçti: dört genişlikte açık/koyu tema, klavye, ağ hatasında mesaj koruma ve tek gönderim. Mevcut site akışı da **58 kontrolle** doğrulandı; yeni rapor [feedback site kanıtında](evidence/feedback-site-ui-results.json), önceki yayın kanıtı kendi dosyasında korunur. İki örnek e-posta 390/768 px'de taşma olmadan render edildi. Bu kontroller gerçek CAPTCHA veya e-posta göndermez.
+- Sunucu birim testleri **33/33**; bağımsız tekrar başarılı. Bunlar SMTP, Turnstile ve Queue taklitleri kullanır.
+- Form arayüzü **37/37 Chromium kontrolü**, 8 tema/genişlik birleşimi ve 13 incelenmiş ekran görüntüsüyle doğrulandı. Klavye, alan etiketleri, mesajın hatada korunması ve tek gönderim kapsanır; gerçek ekran okuyucu oturumu değildir. [Form kanıtı](evidence/feedback-ui-results.json).
+- Genel site akışı **58 kontrol** ve 40 tema/genişlik ölçümüyle geçti. İki HTML e-posta örneği 390/768 px'de **4/4** render kontrolünden geçti; bu görünüm testi posta teslimi değildir. [Site kanıtı](evidence/feedback-site-ui-results.json), [e-posta görünümü](evidence/feedback-email-render-results.json).
+- Mevcut `main` → Workers Builds düzeniyle form ve SDK düzeltmesi yayımlandı. Canlı `/api/feedback/config` HTTP 200 ve `enabled: true`; `/.env` HTTP 404. Gerekli 11 alan Worker'ın şifreli secret mekanizmasına aktarıldı. Yerel `.env` Git dışında ve `0600` izinli tutuluyor; sızıntı kontrolünde bulgu yok.
+- Yerel SMTP ön kontrolünde TLS sertifikası ve kimlik doğrulaması başarılı; bu kontrolde e-posta gönderilmedi. Gerçek widget belirteci ayrı Siteverify kontrolünde doğru hostname/action ile kabul edildi.
+
+**Teslimat doğrulaması sürüyor:** İlk canlı POST, HTTP 503 döndü. Worker çalışma ortamındaki uyumsuz istek seçenekleri için düzeltme ve yerel workerd regresyonu hazır; yeniden yayın ve canlı kontrol sürüyor. Kuyruğa kabul edilen gerçek bildirim, Worker'dan SMTP sunucusunun kabulü ve alıcı gelen kutusu görünümü henüz doğrulanmadı. Tamamlanan işler ve kalanlar [TODO.md](TODO.md#4-site-%C3%BCzerinden-e-posta-geri-bildirimi) içinde ayrı izlenir.
 
 ## Video ve mağaza gönderimi
 

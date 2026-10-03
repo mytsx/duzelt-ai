@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { EventEmitter } from 'node:events';
+import { readFile } from 'node:fs/promises';
 import worker, { handleFeedback, deliverFeedback } from '../worker/index.mjs';
 import { FeedbackError, SITE_ORIGIN, FEEDBACK_ACTION, MAX_BODY_BYTES, JOB_MAX_AGE_MS,
     validateFeedback, readFeedback, verifyTurnstile, feedbackJob, validateJob, ipRateKey, emailMessage } from '../worker/feedback.mjs';
@@ -201,14 +202,57 @@ test('Turnstile uses server form secret and token without raw IP or URL credenti
     await verifyTurnstile(validateFeedback(VALID), env, async (url, options) => {
         assert.equal(url, 'https://challenges.cloudflare.com/turnstile/v0/siteverify');
         assert.equal(options.method, 'POST');
-        assert.equal(options.redirect, 'error');
-        assert.equal(options.credentials, 'omit');
-        assert.equal(options.referrerPolicy, 'no-referrer');
+        assert.equal(options.redirect, 'manual');
+        assert.equal(Object.hasOwn(options, 'credentials'), false);
+        assert.equal(Object.hasOwn(options, 'referrerPolicy'), false);
         assert.deepEqual([...options.body.keys()].sort(), ['response', 'secret']);
         assert.equal(options.body.get('secret'), env.TURNSTILE_SECRET_KEY);
         assert.equal(options.body.get('response'), VALID.turnstileToken);
         return verify();
     });
+});
+
+test('real workerd accepts Siteverify options and refuses redirects without any outbound fetch', async () => {
+    const { Miniflare, convertV4MiniflareOptions } = await import('miniflare');
+    const runtime = new Miniflare(convertV4MiniflareOptions({
+        compatibilityDate: '2026-10-03', compatibilityFlags: ['nodejs_compat'],
+        modules: [
+            { type: 'ESModule', path: 'runtime-test.mjs', contents: `
+                import { verifyTurnstile } from './worker/feedback.mjs';
+                export default { async fetch() {
+                    const results = [];
+                    for (const status of [200,301,302,307,308]) {
+                        let calls = 0;
+                        let mode;
+                        try {
+                            await verifyTurnstile({turnstileToken:'fixture-token'}, {TURNSTILE_SECRET_KEY:'fixture-secret'}, async (url,options) => {
+                                calls++;
+                                const request = new Request(url,options);
+                                mode = request.redirect;
+                                if (status !== 200) return new Response(null,{status,headers:{Location:'https://redirect-target.example.test/'}});
+                                return Response.json({success:true,hostname:'duzelt.yerli.dev',action:'feedback'});
+                            });
+                            results.push({status,accepted:true,calls,mode});
+                        } catch(error) {
+                            results.push({status,accepted:false,calls,mode,code:error.code,diagnosticClass:error.diagnosticClass});
+                        }
+                    }
+                    return Response.json(results);
+                } }
+            ` },
+            { type: 'ESModule', path: 'worker/feedback.mjs', contents: await readFile(new URL('../worker/feedback.mjs', import.meta.url), 'utf8') },
+            { type: 'ESModule', path: 'worker/email-template.mjs', contents: await readFile(new URL('../worker/email-template.mjs', import.meta.url), 'utf8') },
+        ],
+    }));
+    try {
+        const results = await (await runtime.dispatchFetch('https://fixture.example.test/')).json();
+        assert.deepEqual(results[0], { status: 200, accepted: true, calls: 1, mode: 'manual' });
+        for (const result of results.slice(1)) {
+            assert.deepEqual(result, { status: result.status, accepted: false, calls: 1, mode: 'manual', code: 'unavailable', diagnosticClass: 'turnstile_http_status' });
+        }
+    } finally {
+        await runtime.dispose();
+    }
 });
 
 test('Turnstile rejects failed/replayed tokens, non-boolean success, wrong hostname/action and malformed result', async () => {
@@ -232,6 +276,33 @@ test('Turnstile network/HTTP/JSON failures reveal no private server response', a
         assert.equal(response.status, 503);
         assert.deepEqual(await response.json(), { error: 'unavailable' });
         assert.equal(env.jobs.length, 0);
+    }
+});
+
+test('Turnstile unavailable diagnostics distinguish stages using only fixed safe classes', async () => {
+    for (const [fetcher, expected] of [
+        [async () => { throw new Error('private token and secret'); }, 'turnstile_transport'],
+        [async () => { throw Object.assign(new Error('private timeout'), { name: 'TimeoutError' }); }, 'turnstile_timeout'],
+        [async () => new Response('private provider HTML', { status: 502 }), 'turnstile_http_status'],
+        [async () => new Response('private malformed JSON', { status: 200 }), 'turnstile_json'],
+    ]) {
+        const logs = logger();
+        const response = await handleFeedback(request(), environment(), { ...dependencies(logs), fetcher });
+        assert.equal(response.status, 503);
+        assert.deepEqual(await response.json(), { error: 'unavailable' });
+        assert.deepEqual(logs.logs, [{ event: 'feedback_validation_failed', class: expected }]);
+        assert.doesNotMatch(JSON.stringify(logs.logs), /private|token|secret/);
+    }
+    const original = AbortSignal.timeout;
+    const logs = logger();
+    try {
+        AbortSignal.timeout = () => { throw new Error('private runtime detail'); };
+        const response = await handleFeedback(request(), environment(), dependencies(logs));
+        assert.equal(response.status, 503);
+        assert.deepEqual(await response.json(), { error: 'unavailable' });
+        assert.deepEqual(logs.logs, [{ event: 'feedback_validation_failed', class: 'turnstile_runtime' }]);
+    } finally {
+        AbortSignal.timeout = original;
     }
 });
 

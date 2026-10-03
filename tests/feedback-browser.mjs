@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,6 +13,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const site = path.join(root, 'site');
 const output = path.join(root, 'output/playwright/feedback');
+const cacheOnly = process.argv.includes('--cache-only');
 const sourceFiles = ['site/support/index.html', 'site/assets/css/feedback.css', 'site/assets/js/feedback.js', 'site/assets/js/site.js', 'site/assets/js/config.js', 'site/_headers'];
 const sourceHashes = {};
 for (const file of sourceFiles) sourceHashes[file] = createHash('sha256').update(await readFile(path.join(root, file))).digest('hex');
@@ -142,9 +144,111 @@ async function completeMessage(page) {
     await page.locator('#feedback-message').fill('Düzeltme önizlemesindeki düğme dar ekranda görünmüyor. Yeniden üretme adımlarını burada paylaşabilirim.');
 }
 
+async function verifyCacheVersion() {
+    const scriptSource = await readFile(path.join(site, 'assets/js/feedback.js'));
+    const version = createHash('sha256').update(scriptSource).digest('hex').slice(0, 12);
+    const support = await readFile(path.join(site, 'support/index.html'), 'utf8');
+    assert.ok(support.includes('src="../assets/js/feedback.js?v=' + version + '"'), 'HTML cache key matches current script bytes');
+    const generated = JSON.parse(execFileSync('python3', ['-c', `
+import importlib.util, pathlib, tempfile, json, hashlib, sys
+spec=importlib.util.spec_from_file_location('prepare_site', pathlib.Path(sys.argv[1])/'tools/prepare-site.py')
+module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+with tempfile.TemporaryDirectory() as directory:
+    root=pathlib.Path(directory);asset=root/'site/assets/js/feedback.js';asset.parent.mkdir(parents=True)
+    source='<script src="../assets/js/feedback.js?v=stale" defer></script>'
+    asset.write_bytes(b'first fixture revision')
+    first=module.version_feedback_script(source,root)
+    assert hashlib.sha256(asset.read_bytes()).hexdigest()[:12] in first
+    assert module.version_feedback_script(first,root)==first
+    asset.write_bytes(b'second fixture revision')
+    second=module.version_feedback_script(first,root)
+    assert first!=second and hashlib.sha256(asset.read_bytes()).hexdigest()[:12] in second
+    print(json.dumps({'idempotent':True,'updatedOnContentChange':True,'staleQueryRemoved':True}))
+`, root], { encoding: 'utf8' }));
+    checks.push('Preparation deterministically versions the feedback URL from current bytes, is idempotent and changes the cache key after a script edit.');
+
+    let serverRevision = 'old';
+    const networkScriptRequests = [];
+    const external = [];
+    const cacheServer = createServer(async (request, response) => {
+        try {
+            const url = new URL(request.url, 'http://localhost');
+            let body; let extension = '.html';
+            if (url.pathname === '/cache/one' || url.pathname === '/cache/two') {
+                body = '<!doctype html><html><meta charset="utf-8"><script src="/assets/js/feedback.js"></script><title>Local HTTP cache fixture</title></html>';
+            } else if (url.pathname === '/assets/js/feedback.js') {
+                networkScriptRequests.push(url.pathname + url.search);
+                extension = '.js';
+                body = serverRevision === 'old' ? 'window.feedbackCacheBuild="old";' : 'window.feedbackCacheBuild="new";\n' + scriptSource;
+            } else {
+                const file = path.resolve(site, '.' + url.pathname + (url.pathname.endsWith('/') ? 'index.html' : ''));
+                if (!file.startsWith(site + path.sep)) { response.writeHead(400).end(); return; }
+                body = await readFile(file); extension = path.extname(file);
+            }
+            response.writeHead(200, { ...headers, 'Content-Type': types[extension] || 'application/octet-stream', 'Cache-Control': extension === '.js' ? 'public, max-age=86400, must-revalidate' : 'no-cache' });
+            response.end(body);
+        } catch { response.writeHead(404).end(); }
+    });
+    await new Promise(resolve => cacheServer.listen(0, '127.0.0.1', resolve));
+    const cacheOrigin = 'http://127.0.0.1:' + cacheServer.address().port;
+    // No request routing: Playwright routing disables HTTP cache and would mask this regression.
+    const cacheContext = await browser.newContext();
+    try {
+        const page = await cacheContext.newPage();
+        page.on('pageerror', error => pageErrors.push(error.message));
+        page.on('request', request => { if (new URL(request.url()).origin !== cacheOrigin) external.push(request.url()); });
+        await page.goto(cacheOrigin + '/cache/one');
+        assert.equal(await page.evaluate(() => window.feedbackCacheBuild), 'old');
+        serverRevision = 'new';
+        await page.goto(cacheOrigin + '/cache/two');
+        assert.equal(await page.evaluate(() => window.feedbackCacheBuild), 'old', 'Old cache key really retains the earlier body');
+        assert.deepEqual(networkScriptRequests, ['/assets/js/feedback.js'], 'Old body was reused from native browser HTTP cache');
+        await page.goto(cacheOrigin + '/support/');
+        assert.equal(await page.evaluate(() => window.feedbackCacheBuild), 'new');
+        assert.deepEqual(networkScriptRequests, ['/assets/js/feedback.js', '/assets/js/feedback.js?v=' + version]);
+        assert.equal(await page.locator('#feedback-open-inline').isVisible(), true);
+        assert.deepEqual(external, []);
+    } finally {
+        await cacheContext.close();
+        await new Promise(resolve => cacheServer.close(resolve));
+    }
+    checks.push('Native Chromium HTTP cache retains the warmed old URL, while the deployed content fingerprint requests and executes the new script. No route interception disables this cache proof.');
+
+    const s = await scenario();
+    try {
+        assert.equal(await s.page.locator('script[src*="assets/js/feedback.js"]').getAttribute('src'), '../assets/js/feedback.js?v=' + version);
+        assert.equal(s.state.configRequests, 0);
+        await s.open(); await completeMessage(s.page);
+        assert.equal(await s.page.evaluate(() => window.feedbackFixture.readyCalls), 0);
+        await s.page.locator('#feedback-submit').click();
+        await s.page.waitForFunction(() => document.getElementById('feedback-status').dataset.state === 'success');
+        assert.equal(s.state.posts.length, 1);
+        assert.equal(await s.page.evaluate(() => window.feedbackFixture.resets), 1);
+    } finally { await s.finish(); }
+    checks.push('The new versioned support script opens the form and completes one intercepted 202 acceptance without SDK ready() usage.');
+    assert.deepEqual(pageErrors, []);
+    assert.deepEqual(unexpectedExternalRequests, []);
+    for (const [file, hash] of Object.entries(sourceHashes)) assert.equal(createHash('sha256').update(await readFile(path.join(root, file))).digest('hex'), hash, 'Targeted cache source remains stable: ' + file);
+    const preparationHash = createHash('sha256').update(await readFile(path.join(root, 'tools/prepare-site.py'))).digest('hex');
+    const results = {
+        checkedOn: new Date().toISOString(), browser: browser.version(), checkCount: checks.length, checks,
+        sourceHashes: { ...sourceHashes, 'tools/prepare-site.py': preparationHash }, feedbackScriptVersion: version,
+        preparation: generated, nativeHTTPCacheEnabled: true, nativeCacheProofUsedRouteInterception: false,
+        nativeScriptNetworkRequests: networkScriptRequests, fixtureQuerySubmissionAccepted: true,
+        pageErrors, realExternalCalls: 0,
+        scope: 'Three targeted preparation/cache/query-flow checks. The earlier 37-case UI suite is retained as its dated record and was not rerun for the script URL-only change.',
+        fixtures: 'Cache server serves labelled old/new script bodies locally. Query form flow uses intercepted config, Turnstile and POST; no real CAPTCHA or mail.'
+    };
+    await writeFile(path.join(output, 'cache-results.json'), JSON.stringify(results, null, 2) + '\n');
+    console.log(JSON.stringify({ checks: checks.length, feedbackScriptVersion: version, nativeScriptNetworkRequests: networkScriptRequests, pageErrors, realExternalCalls: 0, output: 'output/playwright/feedback/cache-results.json' }, null, 2));
+}
+
 try {
     await mkdir(output, { recursive: true });
     browser = await chromium.launch({ channel: 'chromium', headless: true });
+    if (cacheOnly) {
+        await verifyCacheVersion();
+    } else {
     for (const theme of ['light', 'dark']) {
         for (const width of [320, 390, 768, 1440]) {
             const s = await scenario({ width, theme, hash: true });
@@ -383,6 +487,7 @@ try {
     const results = { checkedOn: new Date().toISOString(), browser: browser.version(), checkCount: checks.length, responsiveCases: 8, checks, sourceHashes, screenshots, pageErrors, realExternalCalls: 0, turnstileAndMail: 'All config, widget script/iframe and POST responses are local intercepted fixtures. No real CAPTCHA, credentials, queue or email delivery was exercised.', accessibilityScope: 'Native Chromium accessibility names/tree, labels, keyboard and status attributes; not a standalone screen-reader session.', captureMethod: 'Native section clip at the tested width, temporarily increasing viewport height to include the loaded cross-origin fixture iframe. No DOM or product style changes/masks; original viewport restored after capture.', visualReviewPending: true };
     await writeFile(path.join(output, 'results.json'), JSON.stringify(results, null, 2) + '\n');
     console.log(JSON.stringify({ checks: checks.length, responsiveCases: 8, screenshots: screenshots.length, pageErrors, realExternalCalls: 0, output: 'output/playwright/feedback/results.json' }, null, 2));
+    }
 } finally {
     for (const context of activeContexts) await context.close().catch(() => {});
     if (browser) await browser.close();

@@ -69,7 +69,12 @@ export async function handleFeedback(request, env, dependencies = {}) {
         safeLog(logger, 'feedback_accepted', job.id);
         return json({ accepted: true, id: job.id.slice(0, 8), message: 'Geri bildiriminiz alındı.' }, 202);
     } catch (error) {
-        if (error instanceof FeedbackError) return json({ error: error.code }, error.status);
+        if (error instanceof FeedbackError) {
+            if (['turnstile_runtime', 'turnstile_transport', 'turnstile_timeout', 'turnstile_http_status', 'turnstile_json'].includes(error.diagnosticClass)) {
+                safeLog(logger, 'feedback_validation_failed', undefined, error.diagnosticClass);
+            }
+            return json({ error: error.code }, error.status);
+        }
         safeLog(logger, 'feedback_accept_failed', undefined, 'unavailable');
         return json({ error: 'unavailable' }, 503);
     }

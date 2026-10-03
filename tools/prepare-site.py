@@ -3,6 +3,7 @@
 
 import argparse
 import ast
+import hashlib
 import html
 import json
 from pathlib import Path
@@ -134,6 +135,23 @@ def attribute(tag, name):
     return html.unescape(match[2]) if match else None
 
 
+def version_feedback_script(source, root):
+    """Change the browser cache key whenever the support feedback script changes."""
+    asset = Path(root).resolve() / 'site/assets/js/feedback.js'
+
+    def script(match):
+        tag = match[0]
+        src = attribute(tag, 'src')
+        if not src or urlsplit(src).path != '../assets/js/feedback.js':
+            return tag
+        if not asset.is_file() or asset.is_symlink() or Path(root).resolve() not in asset.resolve().parents:
+            raise ValueError('Geri bildirim betiği yerel normal dosya olmalı.')
+        version = hashlib.sha256(asset.read_bytes()).hexdigest()[:12]
+        return set_attribute(tag, 'src', '../assets/js/feedback.js?v=' + version)
+
+    return re.sub(r'<script\b[^>]*>', script, source)
+
+
 def sync_html(source, relative, config):
     links = {key: config[key] for key in ('store', 'website', 'support', 'privacy', 'issues', 'repository')}
     links.update({'email': 'mailto:' + config['contactEmail'], 'developer': config['developerWebsite']})
@@ -218,6 +236,8 @@ def expected_files(root):
             if source.count('<!-- privacy:start -->') != 1 or source.count('<!-- privacy:end -->') != 1 or source.index('<!-- privacy:end -->') < source.index('<!-- privacy:start -->'):
                 raise ValueError('Gizlilik HTML işaretleri eksik veya tekrarlı.')
             source = re.sub(r'<!-- privacy:start -->.*?<!-- privacy:end -->', lambda _: '<!-- privacy:start -->\n' + render_privacy(privacy) + '\n<!-- privacy:end -->', source, flags=re.S)
+        if relative == 'support/index.html':
+            source = version_feedback_script(source, root)
         generated['site/' + relative] = sync_html(source, relative, config).encode()
     if any('site/' + page not in generated for page in (*PAGES, '404.html')):
         raise ValueError('Gerekli site sayfaları eksik.')

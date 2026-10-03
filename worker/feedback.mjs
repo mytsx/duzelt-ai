@@ -10,11 +10,12 @@ const EMAIL = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Z
 const BAD_CONTROL = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/;
 
 export class FeedbackError extends Error {
-    constructor(status, code) {
+    constructor(status, code, diagnosticClass) {
         super(code);
         this.name = 'FeedbackError';
         this.status = status;
         this.code = code;
+        if (diagnosticClass) this.diagnosticClass = diagnosticClass;
     }
 }
 
@@ -89,16 +90,32 @@ export async function readFeedback(request) {
 
 export async function verifyTurnstile(feedback, env, fetcher = fetch) {
     const body = new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: feedback.turnstileToken });
+    let signal;
+    try {
+        signal = AbortSignal.timeout(8000);
+    } catch {
+        throw new FeedbackError(503, 'unavailable', 'turnstile_runtime');
+    }
+    let response;
+    try {
+        response = await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST', body, signal,
+            // workerd implements manual/follow, not redirect:error. Manual
+            // never forwards the verification secret to a redirect target;
+            // the non-2xx check below rejects every redirect response.
+            redirect: 'manual',
+        });
+    } catch (error) {
+        const diagnosticClass = ['AbortError', 'TimeoutError'].includes(error?.name) ? 'turnstile_timeout' : 'turnstile_transport';
+        throw new FeedbackError(503, 'unavailable', diagnosticClass);
+    }
+    if (!response.ok) throw new FeedbackError(503, 'unavailable', 'turnstile_http_status');
     let result;
     try {
-        const response = await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-            method: 'POST', body, signal: AbortSignal.timeout(8000),
-            redirect: 'error', credentials: 'omit', referrerPolicy: 'no-referrer',
-        });
-        if (!response.ok) throw new Error('unavailable');
         result = await response.json();
-    } catch {
-        throw new FeedbackError(503, 'unavailable');
+    } catch (error) {
+        const diagnosticClass = ['AbortError', 'TimeoutError'].includes(error?.name) ? 'turnstile_timeout' : 'turnstile_json';
+        throw new FeedbackError(503, 'unavailable', diagnosticClass);
     }
     if (!result || result.success !== true || result.hostname !== new URL(SITE_ORIGIN).hostname ||
         result.action !== FEEDBACK_ACTION) throw new FeedbackError(400, 'turnstile');

@@ -39,8 +39,16 @@
 - [x] Ollama/llama.cpp kartlarını, açık adres alanını ve anahtarsız bağlantıyı göster.
 - [x] İzinli yerel sunucudan modelleri otomatik listele; taslak keşfi kayıtlı sağlayıcıyı değiştirmeden yap.
 - [x] Kapalı sunucu/erişim reddi/boş liste için kopyalanabilir komut ve sonraki adımı göster.
-- [x] Son UI 29/29 ve sağlayıcı 188/188; gerçek yerel model-listesi GET HTTP 200.
+- [x] Son UI 36/36 ve sağlayıcı 188/188; gerçek yerel model-listesi GET HTTP 200.
 - [ ] Kullanıcının kendi Chrome kurulumundan host/origin iznini ve yerel bağlantıyı doğrula.
+
+## 2d. Ayarlar arayüzü ve kurulum rehberi
+- [x] Ollama rehberini durdurma → eklenti izinli tek başlatma komutu → model seçimi ve kaydetme akışına göre düzenle.
+- [x] Kod/Kopyala satırlarını aynı grid içinde hizala; dar ekranda tek kolona geçir. Okları ortak SVG/CSS biçimiyle göster.
+- [x] Tek Modelleri getir düğmesi, kısa Kaydet ve kullan metni ve görünür taslak/kayıtlı durum alanlarını hazırla.
+- [x] Bağlantı ve prompt kaydının başlangıç değerlerini, kaydetme sonrası durumunu ve eşzamanlı form değişikliklerini regresyon testleriyle doğrula.
+- [x] Rehber açıkken farklı genişliklerde kod/Kopyala hizasını, panoya giden tam komutu, klavye odağını ve kaydetme durumlarını gerçek eklenti arayüzünde doğrula.
+- [x] Son UI 36/36 ve açık/koyu beş genişlik görsellerini doğrula; test/görsel kanıtlarını ve paket kaynaklarını yenile.
 
 ## 3. Tasarım tesliminden sonra
 - [ ] Gelen site tasarımını site/ altında entegre et; /privacy/ ve /support/ bağla.

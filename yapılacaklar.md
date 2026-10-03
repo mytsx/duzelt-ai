@@ -12,11 +12,18 @@ Güncel çalışma planı [TODO.md](TODO.md), test kanıtları [docs/testing.md]
 - [x] Ollama ve llama.cpp kartlarını görünür yap; yerel adresi göster, anahtar alanını gizle.
 - [x] Kullanıcı Ollama'yı seçince izin isteyip taslak adresten modelleri getir. İlk açılışta yalnız verilmiş izinle keşif yap; gerekirse Modelleri getir adımını göster. Keşif sırasında etkin sağlayıcı ve kayıtlı profilleri koru.
 - [x] Native `/api/tags` model etiketlerini koru; yetenek bilgisi varsa embedding-only kayıtları önerilerden çıkar. Model seçilip Kaydet denmeden düzeltme bağlantısını değiştirme.
-- [x] `ollama serve`, `ollama list` ve isteğe bağlı model yükleme komutunu göster; origin komutunu gerçek eklenti kimliğiyle hazırla.
+- [x] Ollama için gerçek eklenti kimliğini içeren tek izinli başlatma komutunu, model listesi ve isteğe bağlı yükleme komutunu göster.
 - [x] Merkezi ve bağımsız sağlayıcı testlerinde 188/188 kontrolü tamamla; 7.804 katalog modeli ve 2 yerel örnek için istek oluşturmayı doğrula.
-- [x] Gerçek eklenti arayüzünde 29/29 kontrolü tamamla: seçim içi arama/klavye, otomatik Ollama keşfi, izin/boş liste/hata, adres değişiminde eski sonuç ve komut kopyalama.
+- [x] Gerçek eklenti arayüzünde 36/36 kontrolü tamamla: seçim içi arama/klavye, otomatik Ollama keşfi, izin/boş liste/hata, adres değişiminde eski sonuç ve komut kopyalama.
 - [x] 30 katalog ve 7 paket regresyonunu doğrula; eklenti paketini yalnız 19 çalışma dosyasıyla hazırla.
 - [x] Gerçek uygulama ekranları ve ürün sınırlarıyla 22 dosyalık Claude Design referans kitini hazırla.
+
+## Ayarlar arayüzü bakımı
+
+- [x] Rehberde çalışan Ollama'yı durdurmayı başlatmadan önce anlat; aynı komutta eklenti origin izniyle başlat.
+- [x] Kod/Kopyala satırlarını ve okları hizala; tek Modelleri getir düğmesi, kısa Kaydet ve kullan metni ve görünür kayıt durumunu hazırla.
+- [x] Rehber açıkken dar/geniş ekran, doğru panoya kopyalama, bağlantı/prompt taslağı ve kaydetme sonrası durum testlerini tamamla.
+- [x] Son UI 36/36 ve rehber açıkken beş genişlik/açık-koyu görselleriyle test/görsel kanıtlarını ve paketleri yenile.
 
 ## Açık kontroller ve tasarım teslimi
 

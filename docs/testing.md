@@ -39,9 +39,9 @@ python3 tools/package-store.py
 
 API testleri sahte anahtar/metin ve taklit servis yanıtları kullanır; gerçek hesap, kişisel sır veya ücretli istek kullanılmaz. Paket testleri geçici örnek çalışma klasörlerini kullanır; gerçek kullanıcı ayarlarını okumaz.
 
-Paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik ve kaynak değişmeden tekrarlanan üretimin aynı ZIP'i vermesi doğrulandı. `dist/duzelt-ai-3.4.0.zip` güncel kaynakla iki kez üretildi; SHA-256: `6020d93155d44da9dd86585d8fad38c1190e71924090d4c6f694f5c87c18623d`. ZIP içeriği kaynak dosyalarla birebir karşılaştırıldı.
+Paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik ve kaynak değişmeden tekrarlanan üretimin aynı ZIP'i vermesi doğrulandı. `dist/duzelt-ai-3.4.0.zip` güncel kaynakla iki kez üretildi; SHA-256: `22727bbdcd4cbd3a162aa5a17806b6f73880dff02cbcad8056e1c5f6c63f16c4`. ZIP içeriği kaynak dosyalarla birebir karşılaştırıldı.
 
-Gerçek paketlenmemiş eklentinin yeni popup/ayarlar kontrolü Chromium **151.0.7922.34** ile **29/29 geçti**. Kanıt dosyası: [ui-results.json](../evidence/ui-results.json); ayrıntılı kaynak `output/playwright/ui-results.json`. Sağlayıcı seçimi/anahtar/prompt kaydı, eski OpenAI kaydının korunması, ayrı profiller, model araması, desteklenmeyen kayıtların durumu, kaydedilmiş bağlantıyla test, IBM/SAP dinamik alanları ve iki origin izni, sır alanlarının maskelenmesi, tokenın depoya yazılmaması, toggle ve sabit bağlantılar kapsanır. Sağlayıcı listesindeki arama ile Home/End/Escape klavye akışı; Ollama seçiminde otomatik keşif; taslak URL değişince eski sonuçların uygulanmaması; komut kopyalama; bağlantı hatası/403/boş liste davranışı doğrulandı. İlk açılışta izin yoksa GET yapılmaz; izin varsa kayıtlı model korunur ve liste kapalı kalır. Chrome'un yerel API izin penceresinin sonucu fixture ile taklit edildi; gerçek kullanıcının izin kabulü bu koşuda doğrulanmadı. Bu arayüz koşusunda gerçek sağlayıcı ağ isteği **0**.
+Gerçek paketlenmemiş eklentinin yeni popup/ayarlar kontrolü Chromium **151.0.7922.34** ile **36/36 geçti**. Kanıt dosyası: [ui-results.json](../evidence/ui-results.json); ayrıntılı kaynak `output/playwright/ui-results.json`. Sağlayıcı seçimi/anahtar/prompt kaydı, eski OpenAI kaydının korunması, ayrı profiller, model araması, desteklenmeyen kayıtların durumu, kaydedilmiş bağlantıyla test, IBM/SAP dinamik alanları ve iki origin izni, sır alanlarının maskelenmesi, tokenın depoya yazılmaması, toggle ve sabit bağlantılar kapsanır. Sağlayıcı listesindeki arama ile Home/End/Escape klavye akışı; Ollama seçiminde otomatik keşif; taslak URL değişince eski sonuçların uygulanmaması; komut kopyalama; bağlantı hatası/403/boş liste davranışı doğrulandı. İlk açılışta izin yoksa GET yapılmaz; izin varsa kayıtlı model korunur ve liste kapalı kalır. Chrome'un yerel API izin penceresinin sonucu fixture ile taklit edildi; gerçek kullanıcının izin kabulü bu koşuda doğrulanmadı. Bu arayüz koşusunda gerçek sağlayıcı ağ isteği **0**.
 
 Açık/koyu tema için **320/390/768/1024/1440 px** ayarlar görselleri ve iki popup görseli gerçek görüntü olarak incelendi. Başlık, alan, Türkçe açıklama, düğme, klavye odağı ve popup yüksekliği kontrol edildi; kırpılma/üst üste binme görülmedi. Bu sonuç son arayüz kaynaklarına ve kaydedilmiş ekran görüntülerine aittir.
 
@@ -63,25 +63,28 @@ Her HTTP isteğinin zaman aşımı **25 saniyedir**; gövde okuması bu süreye 
 
 ## Yerel model bağlantısı
 
-Sağlayıcı araması açılan seçim listesinde bulunur; Ollama ve llama.cpp ayrıca görünür kartlardan seçilir. Yerel adres açık, anahtar alanı gizlidir. Kullanıcı Ollama'yı seçtiğinde Chrome bağlantı izni istenir ve izin verilirse taslak adresten modeller otomatik alınır. Ayarlar ilk açıldığında yalnız önceden verilmiş izinle otomatik keşif yapılır; izin yoksa **Modelleri getir** düğmesiyle devam edilir. Model seçimi **Kaydet** ile etkinleşir; keşif sırasında kaydedilmiş sağlayıcı ve diğer profiller değişmez. Model bilinmiyorsa adresi boş modelle kaydetme → modelleri getirme → model seçip tekrar kaydetme de mümkündür.
+Sağlayıcı araması açılan seçim listesinde bulunur; Ollama ve llama.cpp ayrıca görünür kartlardan seçilir. Yerel adres açık, anahtar alanı gizlidir. Kullanıcı Ollama'yı seçtiğinde Chrome bağlantı izni istenir ve izin verilirse taslak adresten modeller otomatik alınır. Ayarlar ilk açıldığında yalnız önceden verilmiş izinle otomatik keşif yapılır; izin yoksa **Modelleri getir** düğmesiyle devam edilir. Model seçimi **Kaydet ve kullan** ile etkinleşir; keşif sırasında kaydedilmiş sağlayıcı ve diğer profiller değişmez. Model bilinmiyorsa adresi boş modelle kaydetme → modelleri getirme → model seçip tekrar kaydetme de mümkündür.
 
 Ollama native `/api/tags`, llama.cpp uyumlu `/v1/models` kullanır. Ollama listesinde isteğe bağlı `capabilities` varsa embedding-only kayıtlar elenir; yetenek alanı olmayan kayıtlar korunur. Yerel non-cloud Ollama düzeltmesi `temperature: 0.2` ve zorunlu `corrected_text` alanıyla JSON Schema kullanır; bulut/uzak dal JSON object biçimindedir. Bu taşıma ve doğrulayıcı davranışı taklit servis yanıtlarıyla test edilir.
 
-Arayüzdeki kurulum yardımında [resmî CLI komutları](https://docs.ollama.com/cli) bulunur:
+**Ollama’yı nasıl bağlarım?** rehberi önce çalışan sunucuyu durdurmayı anlatır: Terminalde Ctrl+C, uygulamada Çıkış; yalnız Homebrew servisiyle başladıysa `brew services stop ollama`. Kapalıysa başlatma adımına geçilir. Arayüz, gerçek `chrome.runtime.id` ile eklenti origin iznini de içeren tek komut hazırlar:
 
 ```sh
-ollama serve
-ollama list
-ollama pull <model-adı>
+OLLAMA_ORIGINS=chrome-extension://EKLENTI_KIMLIGI ollama serve
 ```
 
-Son komut isteğe bağlıdır; `<model-adı>` yerine seçtiğiniz model adı yazılır. Ollama zaten çalışıyorsa ikinci sunucuyu başlatmayın. Origin erişimi gerekiyorsa çalışan sunucuyu durdurup arayüzün gerçek `chrome.runtime.id` ile hazırladığı komutla yeniden başlatın:
+Ekrandaki tam komut kopyalanıp Terminalde çalıştırılır; o Terminal açık kalır. Ardından tek **Modelleri getir** düğmesiyle model seçilir ve **Kaydet ve kullan** ile etkinleştirilir. “Address already in use” eski sunucunun hâlâ açık olduğunu gösterir. Liste boşsa başka bir Terminalde `ollama list`, gerekirse model adı girilerek `ollama pull <model-adı>` kullanılır. [Resmî CLI komutları](https://docs.ollama.com/cli). Chrome bağlantı izni ve Ollama'nın origin izni ayrı koşullardır. [Ollama origin ayarı](https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama). Kullanıcının gerçek Chrome kurulum kimliği/izin penceresi doğrulanmadı.
 
-```sh
-OLLAMA_ORIGINS="chrome-extension://EKLENTI_KIMLIGI" ollama serve
-```
+## Ayarlar arayüzü bakım kontrolleri
 
-Buradaki yer tutucu o kurulumun gerçek kimliğiyle değiştirilir. Chrome bağlantı izni ve Ollama'nın origin izni ayrı koşullardır. [Ollama origin ayarı](https://docs.ollama.com/faq#how-can-i-allow-additional-web-origins-to-access-ollama). Kullanıcının gerçek Chrome kurulum kimliği/izin penceresi doğrulanmadı.
+Son 36/36 arayüz koşusu bu hizalama, rehber ve kayıt durumlarını da kapsar. Ağ, izin ve pano sonuçları test profiline ait fixture değerleridir; gerçek sağlayıcıya istek gönderilmez.
+
+- [x] Ollama rehberi açıkken 320, 390, 768, 1024 ve 1440 px genişliklerde açık/koyu tema, kod/Kopyala satırları, uzun origin komutu, düğme metni ve taşma kontrolü.
+- [x] Tek Modelleri getir düğmesi; ortak ok/kopyalama ikonlarının merkezlenmesi, klavye odağı, açık/kapalı ok durumu ve azaltılmış hareket.
+- [x] Panoya giden metnin ekrandaki tam komutla eşleşmesi; gerçek eklenti kimliği, satır kaydırmadan etkilenmeme, kopyalama başarı/ret mesajı ve düğmenin genişliğinin değişmemesi.
+- [x] Yeni profil, eksik model/bilgi, kaydedilmemiş değişiklik, kayıtlı fakat etkin olmayan bağlantı ve kayıtlı/etkin bağlantının doğru açıklanması. Form değişikliği etkin bağlantıyı kendiliğinden değiştirmesin.
+- [x] Kaydetme/izin sonucu beklenirken yeni form değişikliği veya sağlayıcı geçişinin yanlışlıkla kaydedildi/hazır gösterilmemesi; başarısız kayıt taslak olarak kalsın.
+- [x] Özel prompt yükleme/kaydetme başlangıç değerinin korunması; Varsayılanı yükle yalnız taslağı değiştirsin, Kuralları kaydet başarılı olunca kayıt durumu güncellensin. Test hangi kayıtlı model/promptu kullanacağını açıkça anlatsın.
 
 ## Yerel testlerde kapsanan kabul kontrolleri
 

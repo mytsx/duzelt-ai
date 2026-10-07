@@ -3,6 +3,9 @@
   "checked_on": "2026-10-07",
   "recorded_at_utc": "2026-10-07T11:15:24.621812+00:00",
   "method": "Public HTTPS GET without account cookies; static CRX inspection only",
+  "historical_snapshot": true,
+  "later_native_install_record": "evidence/store-install-2026-10-07.json",
+  "later_record_note": "The NOT RUN installation fields below describe the initial HTTP/CRX phase. User-approved native Store installation was completed later the same day; cloud/local correction and country/region remain unverified.",
   "store": {
     "requested_url": "https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl",
     "http_status": 200,

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'">
+    <title>Düzelt #7 — anahtarsız mağaza eklentisi testi</title>
+    <style>
+        body { margin: 32px auto; padding: 0 24px; max-width: 960px; font: 18px/1.6 system-ui; color: #202636; }
+        aside { padding: 16px; background: #fff4c4; border: 1px solid #bca247; }
+        .ql-toolbar, .ql-container { padding: 16px; border: 1px solid #aaa; }
+        .ql-editor { min-height: 160px; }
+        label { display: block; margin: 16px 0; }
+        output { display: block; padding: 12px; background: #eef2f6; font: 15px/1.6 monospace; }
+    </style>
+</head>
+<body>
+    <aside><strong>SENTETİK EDİTÖR API'Sİ</strong> · Gerçek mağaza eklentisinin anahtarsız hata yolunu kontrol eder. Gerçek Quill/CMS uyumluluğu veya başarılı düzeltme testi değildir.</aside>
+    <h1>Mağazadan kurulan eklenti: anahtarsız ilk kullanım</h1>
+    <p>Sayfa eklenti kaynakları, Chrome API taklidi veya sağlayıcı yanıtı içermez. Düzelt düğmesini kurulu eklenti ekler. Yalnız aşağıdaki örnek metin kullanılır.</p>
+    <div id="toolbar" class="ql-toolbar"></div>
+    <div id="container" class="ql-container">
+        <div id="editor" class="ql-editor" contenteditable="true" aria-label="Sentetik editör"><p>Merhaba <strong>Ali</strong>, bugun cok guzel.</p><p><em>Örnek metin</em> korunmalıdır.</p></div>
+    </div>
+    <h2>Desteklenmeyen normal alanlar</h2>
+    <label>Normal input <input aria-label="Normal input" value="Örnek normal alan"></label>
+    <label>Normal textarea <textarea aria-label="Normal textarea">Örnek normal alan</textarea></label>
+    <h2>Sayfanın kendi DOM gözlemi</h2>
+    <output id="state" aria-live="polite"></output>
+    <script>
+        const editable = document.getElementById('editor');
+        const toolbar = document.getElementById('toolbar');
+        const originalHTML = editable.innerHTML;
+        document.getElementById('container').__quill = {
+            root: editable,
+            getContents() { return { ops: [] }; },
+            isEnabled() { return true; },
+            getModule(name) { return name === 'toolbar' ? { container: toolbar } : null; },
+            getSemanticHTML() { return editable.innerHTML; }
+        };
+        function observeState() {
+            const buttons = toolbar.querySelectorAll('.ai-text-corrector-button');
+            const status = [
+                `Düzelt düğmesi: ${buttons.length}`,
+                `Düğme etkin: ${buttons.length === 1 && !buttons[0].disabled ? 'evet' : 'hayır'}`,
+                `Düğme metni: ${buttons[0]?.textContent || 'yok'}`,
+                `Önizleme modalı: ${document.getElementById('ai-text-corrector-modal') ? 'var' : 'yok'}`,
+                `Orijinal HTML: ${editable.innerHTML === originalHTML ? 'aynı' : 'değişti'}`
+            ].join(' · ');
+            const output = document.getElementById('state');
+            if (output.textContent !== status) output.textContent = status;
+        }
+        new MutationObserver(observeState).observe(document.body, {
+            childList: true, subtree: true, characterData: true, attributes: true,
+            attributeFilter: ['disabled', 'class', 'data-duzelt-editor', 'data-duzelt-toolbar']
+        });
+        observeState();
+    </script>
+</body>
+</html>

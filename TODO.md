@@ -3,7 +3,9 @@
 ## 1. Tasarım aracına devir (önce)
 - [x] Kullanıcı kapsamı, AGENTS.md, CLAUDE.md, manifest, README ve PRIVACY okundu.
 - [x] Yerel değişiklikler ve Git durumu kontrol edildi; başlangıç çalışma ağacı temiz, ana dal main.
-- [x] Kamu mağaza öğesi ve CRX manifesti: gnkhgnhdokinbamhokpljgafapfjhjhl, yayın 3.3.0; mevcut geliştirici paneli gerçek Chrome arayüzünde doğrulandı.
+- [x] 3 Ekim tarihsel mağaza/panel kontrolü: gnkhgnhdokinbamhokpljgafapfjhjhl, o gün yayın 3.3.0; mevcut geliştirici paneli gerçek Chrome arayüzünde doğrulandı.
+- [x] #7: 7 Ekim ayrı temiz, oturumsuz Chrome 154.0.8037.98 profilinde resmî mağaza 3.4.0 kurulumu ve anahtarsız ilk kullanım/hata/toggle kontrolü. [Kanıt](docs/first-correction.md).
+- [ ] #7: ülke/bölge teyidi ve mağazadan kurulan sürümle gerçek bulut/yerel ilk düzeltme/önizleme/kabul/iptal — **NOT RUN / ülke-bölge doğrulanmadı**.
 - [x] Editör desteğini gerçek editörlerle test et; platform iddialarını ayır.
 - [x] Gizlilik metnini gerçek veri akışına göre düzelt.
 - [x] Gerçek arayüz ekran görüntülerini ve mevcut ikonları tasarım paketi için hazırla.
@@ -110,7 +112,7 @@
 - [x] [Boş görüşme, toplu özet, ayrı pilot rızası, senaryo/kabul ve karar şablonlarını](docs/cms-pilot-templates.md) hazırla.
 - [ ] Operatör hedef görev, rıza/not kapsamı, dönem ve eşikleri ilk görüşmeden önce kaydetsin; dış iletişim için ayrıca açık yetki gereklidir.
 - [ ] 10–15 gönüllü görüşmeyi yap ve yalnız anonim/toplu sonuçları özetle — **NOT RUN**.
-- [ ] #7 gerçek kurulum veya eşdeğer onaylı kurulum kapısını tamamla; ayrı rıza ve tam editör/sürüm kapsamıyla sentetik teknik pilot yap — **NOT RUN**.
+- [ ] #7'nin kalan gerçek düzeltme/ülke-bölge kapısını veya seçilen pilotta eşdeğer onaylı kanıtı tamamla; ayrı rıza ve tam editör/sürüm kapsamıyla sentetik teknik pilot yap — **NOT RUN**.
 - [ ] Ön kayıt ölçütlerine göre devam/yeniden dene/durdur kararını gerekçelendir; ücretli teklif/pilot bu hazırlıkta yok — **NOT RUN**.
 
 ## Kanıt sınırları

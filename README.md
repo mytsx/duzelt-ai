@@ -4,7 +4,7 @@ Chrome'daki uyumlu zengin metin editörlerine Türkçe düzeltme düğmesi ekler
 
 Eklenti yazım, noktalama ve resmî yazışma üslubu için seçtiğiniz yapay zekâ sağlayıcısından öneri alır. Sonucu kullanmadan önce gözden geçirin; kusursuz doğruluk, resmî kurum onayı veya mevzuata uyum garantisi verilmez.
 
-**Yerel bakım sürümü: 3.4.0.** 7 Ekim 2026'da [mevcut Chrome Web Store öğesinin](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) kamu HTTP yanıtı ve Google'ın indirme paketinin manifesti **3.4.0** olarak doğrulandı. Mağazadan temiz Chrome profiline kurulum ve gerçek bulut/yerel ilk düzeltme henüz yapılmadı. [#7 doğrulama kaydı](docs/first-correction.md) yayımlanan paket, yerel değişiklikler ve tamamlanmamış kontrolleri ayrı açıklar.
+**Yerel bakım sürümü: 3.4.0.** 7 Ekim 2026'da [mevcut Chrome Web Store öğesinin](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) **3.4.0** sürümü kamu sayfası/paketi ve ayrı, temiz, oturumsuz Chrome **154.0.8037.98** profiline gerçek mağaza kurulumu ile doğrulandı. Anahtarsız popup/ayarlar ve sentetik editör API'sinde eksik anahtar/toggle kontrolü geçti. Ülke/bölge doğrulanmadı; gerçek bulut/yerel ilk düzeltme henüz yapılmadı. [#7 doğrulama kaydı](docs/first-correction.md) yayımlanan paket, yerel değişiklikler ve kalan kontrolleri ayrı açıklar.
 
 ## Gereksinimler ve ücret
 

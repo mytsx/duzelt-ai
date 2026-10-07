@@ -52,7 +52,7 @@ Bu deney için **toplam bir yeniden deneme** önerilir: ya tek ek görüşme dö
 
 ## 3. Dar teknik pilot
 
-Pilota geçmeden ayrı rıza, kapsam, kurulum/editor sürümü ve kabul ölçütleri kayıtlı olmalıdır. #7'nin temiz profilde gerçek mağaza kurulumu ve bulut/yerel ilk düzeltme kontrolleri hâlâ **NOT RUN**. Bu kapı tamamlanmadan veya seçilen pilot kurulumunda eşdeğer onaylı gerçek kurulum kanıtı alınmadan teknik pilot başlamaz. Sentetik kaynak testi bu kapıyı geçirmez.
+Pilota geçmeden ayrı rıza, kapsam, kurulum/editor sürümü ve kabul ölçütleri kayıtlı olmalıdır. [#7 kaydında](first-correction.md) 7 Ekim temiz profilde gerçek mağaza kurulumu **PASS**; ülke/bölge doğrulanmadı ve bulut/yerel ilk düzeltme hâlâ **NOT RUN**. Bu kapı tamamlanmadan veya seçilen pilot kurulumunda eşdeğer onaylı gerçek kurulum ve gerekli düzeltme kanıtı alınmadan teknik pilot başlamaz. Sentetik kaynak veya anahtarsız hata testi bu kapıyı geçirmez.
 
 Önerilen dar kapsam: **bir ekip, bir CMS kurulumu, tek zengin metin editörü ve tam sürümü, bir masaüstü Chrome profili, bir mevcut sağlayıcı/model bağlantısı**. Üretim içeriği yerine izole örnek sayfa/staging ve sentetik metin kullanılır. CMS/editör eşleşmesi bilinmiyorsa önce salt okunur tanımlama yapılır; destek sözü verilmez.
 

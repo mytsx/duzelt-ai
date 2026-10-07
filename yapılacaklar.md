@@ -1,6 +1,6 @@
 # Bakım notları — 3.4.0
 
-Güncel çalışma planı [TODO.md](TODO.md), test kanıtları [docs/testing.md](docs/testing.md) dosyasındadır. Kamu mağaza sürümü 3.3.0; 3.4.0 yerel bakım sürümüdür.
+Güncel çalışma planı [TODO.md](TODO.md), test kanıtları [docs/testing.md](docs/testing.md) dosyasındadır. 7 Ekim 2026'da kamu mağaza sürümü ve ayrı temiz Chrome profiline resmî kurulum **3.4.0** olarak doğrulandı; yerel bakım sürümü de 3.4.0. Gerçek bulut/yerel ilk düzeltme **NOT RUN**, ülke/bölge doğrulanmadı: [#7 kaydı](docs/first-correction.md).
 
 ## Tamamlanan bakım
 
@@ -25,7 +25,9 @@ Güncel çalışma planı [TODO.md](TODO.md), test kanıtları [docs/testing.md]
 - [x] Rehber açıkken dar/geniş ekran, doğru panoya kopyalama, bağlantı/prompt taslağı ve kaydetme sonrası durum testlerini tamamla.
 - [x] Son UI 36/36 ve rehber açıkken beş genişlik/açık-koyu görselleriyle test/görsel kanıtlarını ve paketleri yenile.
 
-## Açık kontroller ve tasarım teslimi
+## Tarihsel hazırlık listesi — 3 Ekim tesliminden önce
+
+Aşağıdaki kutular önceki hazırlık planını korur; güncel tamamlanma durumu [TODO.md](TODO.md) ve [docs/testing.md](docs/testing.md) içindedir. Paket, tasarım ve yayın teslimlerini hâlâ bekleyen işler olarak yorumlamayın.
 
 - [ ] Kullanıcının kendi Chrome kurulum kimliğini ve gerçek bağlantı izinlerini doğrula; Ollama origin ayarını o kimlikle eşleştir.
 - [ ] Son kaynaklardan eklenti paketini yeniden üretip güncel SHA-256 kaydını tamamla.

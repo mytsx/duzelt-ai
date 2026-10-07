@@ -90,6 +90,8 @@ Paketleme için `npm run package:store` da kullanılabilir. Tarayıcı testleri 
 
 Paketleyici manifestteki referansları ve yerel çalışma bağımlılıklarını takip ederek `dist/duzelt-ai-<sürüm>.zip` üretir. Manifest ZIP kökünde bulunur; referanslar, dosya içerikleri ve CRC doğrulanır. Sabit zaman damgası, dosya izinleri ve sıralama aynı kaynaklardan tekrarlanabilir çıktı sağlar; `.zip.sha256` dosyası sağlama toplamını içerir. Kullanılmayan kütüphaneler, site/test/video kaynakları, `.git`, `node_modules` ve ayar dosyaları pakete girmez.
 
+İçerik ekipleri için sınırlı kurulum/destek hizmeti hipotezinin [deney planı](docs/cms-pilot-plan.md) ve [boş görüşme/pilot şablonları](docs/cms-pilot-templates.md) hazırdır. Görüşme, gerçek pilot veya satış yapılmadı; ücretsiz eklenti işlevleri korunur.
+
 ## Dizinler
 
 | Dizin / dosya | Amaç |

@@ -104,6 +104,15 @@
 - [x] Son Durable Object/gizlilik kaynaklarını hazırla ve `f2e9604a985a751040a4c25d38107d87e97caca4` commit'ini main'e pushla; Workers Builds `03360d54-f5e7-4ce8-ad10-d72273fb8e93` başarılı, aktif Worker `1b751316-8fe9-480c-a9a9-f16ee707b27d` yüzde 100. Canlı token tekrar reddi ayrıca doğrulandı.
 - [ ] 24 saatlik hata kuyruğunu arıza halinde izle; kapanan talebin posta yazışmalarını en geç 30 gün içinde sil ve aylık kontrolü işlet.
 
+## 5. Sınırlı CMS kurulum/destek deneyi — #8
+
+- [x] [Deney planını](docs/cms-pilot-plan.md), önceden belirlenecek karar eşiklerini ve dar hizmet kapsamını hazırla; talep/fiyat varsayma.
+- [x] [Boş görüşme, toplu özet, ayrı pilot rızası, senaryo/kabul ve karar şablonlarını](docs/cms-pilot-templates.md) hazırla.
+- [ ] Operatör hedef görev, rıza/not kapsamı, dönem ve eşikleri ilk görüşmeden önce kaydetsin; dış iletişim için ayrıca açık yetki gereklidir.
+- [ ] 10–15 gönüllü görüşmeyi yap ve yalnız anonim/toplu sonuçları özetle — **NOT RUN**.
+- [ ] #7 gerçek kurulum veya eşdeğer onaylı kurulum kapısını tamamla; ayrı rıza ve tam editör/sürüm kapsamıyla sentetik teknik pilot yap — **NOT RUN**.
+- [ ] Ön kayıt ölçütlerine göre devam/yeniden dene/durdur kararını gerekçelendir; ücretli teklif/pilot bu hazırlıkta yok — **NOT RUN**.
+
 ## Kanıt sınırları
 - Anahtar gerektirmeyen deterministik API testleri gerçek sağlayıcı/model erişimi veya düzeltme kalitesini kanıtlamaz. Gerçek hesapla API çağrısı yapılmadı.
 - Seçici veya DOM maketi testi, belirli CMS/platform desteği ya da gerçek editör veri modeli kanıtı değildir.

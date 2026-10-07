@@ -99,4 +99,4 @@ Fiyat, sabit ücret/abonelik modeli ve ticari koşullar şimdi seçilmez. [Tekli
 | Gerekçeli devam/yeniden dene/durdur kararı | **NOT RUN**; ön kayıt eşikleri ve boş karar formu hazır. |
 | Ücretsiz çekirdek, izinsiz iletişim ve CMS iddiaları | Bu belge değişikliğinde korunur; ürün kodu, site, izinler ve hesaplar değiştirilmedi, dış mesaj gönderilmedi. |
 
-Plan ve boş formların hazır olması #8'i tamamlamaz. Bu değişiklik yalnız yerel commit olarak tutulur; push/PR/merge/yayın yapılmaz.
+Plan ve boş formların hazır olması #8'i tamamlamaz. İlk hazırlık yalnız yerel commit olarak kaydedildi; kullanıcı daha sonra mevcut #7/#8 dalının gönderilmesini ve taslak PR açılmasını onayladı. Merge, site/mağaza yayını, dış iletişim ve gerçek pilot bu onayın kapsamında değildir.

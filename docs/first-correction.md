@@ -1,6 +1,6 @@
 # #7: mağaza ve ilk düzeltme doğrulaması
 
-Kontrol tarihi: **7 Ekim 2026**. [Issue #7](https://github.com/mytsx/duzelt-ai/issues/7) açık; yorum yok, açık PR yok. Mevcut altı PR 2025 tarihli ve kapalı/birleştirilmiş; bu yeni doğrulama işini tamamlamıyor.
+İlk kontrol tarihi: **7 Ekim 2026**. Bu kontrolde [issue #7](https://github.com/mytsx/duzelt-ai/issues/7) açık; yorum ve açık PR yoktu. Mevcut altı PR 2025 tarihli ve kapalı/birleştirilmişti; bu yeni doğrulama işini tamamlamıyor.
 
 ## Kamu mağazası ve yayımlanan paket
 
@@ -69,4 +69,4 @@ Kurulum ve bulut anahtarı/model/ücretli yapay metin testi kullanıcı onayıyl
 
 Kalan yerel testte ayrıca onaylanan mevcut çalışan Ollama/llama.cpp servisini kullanın. Yeni servis/model kurulumu bu çalışmanın parçası değil. **Bağlantıyı test et → örnek metni Düzelt → önizle → İptal → yeniden Düzelt → Kabul Et** sırasını gerçek editörde uygulayın. Tarih, ülke/bölge, Chrome/eklenti/editör sürümü ve görünür sonucu kaydedin. Sır alanları görsel dışında kalsın.
 
-İlk kullanım çözüm bağlantıları: [izin ve kaydet/test](https://duzelt.yerli.dev/support/#kaydet-test), [yerel sunucu](https://duzelt.yerli.dev/support/#yerel-sunucu), [düğme görünmemesi](https://duzelt.yerli.dev/support/#dugme-gorunmuyor). Push, PR, merge, site/mağaza yayını ve #8 pilot/outreach bu yerel çalışmada yapılmadı.
+İlk kullanım çözüm bağlantıları: [izin ve kaydet/test](https://duzelt.yerli.dev/support/#kaydet-test), [yerel sunucu](https://duzelt.yerli.dev/support/#yerel-sunucu), [düğme görünmemesi](https://duzelt.yerli.dev/support/#dugme-gorunmuyor). Bu doğrulama koşusunda push, PR, merge, site/mağaza yayını ve #8 pilot/outreach yapılmadı. Kullanıcı daha sonra mevcut #7/#8 dalının gönderilmesini ve taslak PR açılmasını onayladı; merge ve yayın bu onayın kapsamında değildir.

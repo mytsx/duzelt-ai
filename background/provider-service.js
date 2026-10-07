@@ -201,7 +201,7 @@
         if (key) {
             if (resolved.entry.authHeader === 'cf-aig-authorization') headers.set('cf-aig-authorization', 'Bearer ' + key);
             else if (resolved.isAzure && resolved.authType === 'api-key') headers.set('api-key', key);
-            else if (resolved.protocol === 'gemini') headers.set('x-goog-api-key', key);
+            else if (resolved.protocol === 'gemini' && resolved.authType === 'api-key') headers.set('x-goog-api-key', key);
             else if (resolved.protocol === 'anthropic-messages' && resolved.authType === 'api-key') headers.set('x-api-key', key);
             else headers.set('Authorization', 'Bearer ' + key);
         }

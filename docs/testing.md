@@ -1,6 +1,6 @@
 # Doğrulama ve kanıt sınırları
 
-Son güncelleme: 3 Ekim 2026
+Son güncelleme: 7 Ekim 2026
 
 Bu kayıt, bakım testlerini, gerçek uygulama doğrulamasını ve yayın durumunu ayrı tutar. Tamamlanmamış bir kontrol, başarılı olarak sunulmaz.
 
@@ -18,7 +18,9 @@ Bu kayıt, bakım testlerini, gerçek uygulama doğrulamasını ve yayın durumu
 
 ## Mevcut durum
 
-3 Ekim 2026'da Google'ın mevcut mağaza sayfası HTTP 200 ile doğrulandı: öğe kimliği `gnkhgnhdokinbamhokpljgafapfjhjhl`, yayın sürümü `3.3.0`, son mağaza güncellemesi 27 Kasım 2025. Aynı öğeye bakım sürümü `3.4.0` yüklendi ve gerçek geliştirici panelinden incelemeye gönderildi. Sonuç **İncelenmeyi bekliyor**; onay sonrası otomatik yayın seçeneği açıktır. Bu, 3.4.0'ın kamuya yayımlandığı anlamına gelmez. GitHub varsayılan dalı `main`; release listesi boş. Kaynak kayıt: [current-state.json](current-state.json), [submission.json](../store/submission.json).
+3 Ekim 2026'da Google'ın mevcut mağaza sayfası `3.3.0` sunuyordu; aynı öğeye `3.4.0` incelemesi gönderilmişti. Bu tarihsel panel kaydı [submission.json](../store/submission.json) içinde korunur.
+
+7 Ekim 2026'daki salt okunur kamu HTTP kontrolü, `gnkhgnhdokinbamhokpljgafapfjhjhl` öğesinde **3.4.0**, güncelleme tarihi **4 Ekim 2026** ve **Add to Chrome** etiketini gösterdi. Google update servisinden indirilen CRX'in manifesti de 3.4.0'dır; 19 çalışma dosyası, Google'ın eklediği `update_url` dışında, bu çalışmanın başlangıç commit'i `db2bccfef35c7964be3bae406289001ec800b43a` ile eşleşir. Bu eşleme, bu dalda sonradan yapılan Gemini kimlik başlığı ve ürün metadata değişikliklerinin yayımlandığı anlamına gelmez. Kamu kontrolü bir Chrome kurulumu, izin penceresi, ülke/bölge veya gerçek ilk düzeltme kanıtı değildir. [#7 kaydı](first-correction.md), [kamu kanıtı](../evidence/store-public-check-2026-10-07.json), [current-state.json](current-state.json).
 
 Gerçek, yerel classic editör kurulumlarıyla test edilen sürümler: CKEditor 4 **4.22.1**, CKEditor 5 **48.5.2**, Summernote **0.9.1** (jQuery **3.7.1**), TinyMCE **8.9.2**, Quill **2.0.3** ve **1.3.7**. Editör desteği bu sürüm/kurulumlarla sınırlıdır. WordPress, Drupal, Joomla ve Notion için ayrıca platform testi yoktur; cross-origin iframe, CKEditor 5 çok köklü/işbirlikçi kurulumlar ve Markdown/XML veri işlemcileri doğrulanmadı.
 
@@ -28,6 +30,7 @@ Gerçek, yerel classic editör kurulumlarıyla test edilen sürümler: CKEditor 
 npm ci
 npx playwright install chromium
 npm run test:provider
+npm run test:first-correction
 node tests/provider-edge-evidence.cjs
 node tests/editor-bootstrap.mjs
 npm run test:editors
@@ -39,7 +42,11 @@ python3 tools/package-store.py
 
 API testleri sahte anahtar/metin ve taklit servis yanıtları kullanır; gerçek hesap, kişisel sır veya ücretli istek kullanılmaz. Paket testleri geçici örnek çalışma klasörlerini kullanır; gerçek kullanıcı ayarlarını okumaz.
 
-Paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik ve kaynak değişmeden tekrarlanan üretimin aynı ZIP'i vermesi doğrulandı. `dist/duzelt-ai-3.4.0.zip` güncel kaynakla iki kez üretildi; SHA-256: `974ae8d6008fc75289796521a2800936ff81d0004d19a360e3b852de9f01223b`. ZIP içeriği kaynak dosyalarla birebir karşılaştırıldı.
+7 Ekim #7 bakım kontrolünde sağlayıcı testleri **191/191**, bootstrap **7/7**, paket **7/7**, katalog **30/30** ve site hazırlık **14/14** geçti. Yeni Gemini testi, özel bağlantıda Bearer seçiminin API anahtarı başlığı yerine `Authorization` kullanmasını doğrular; standart Gemini API anahtarı davranışı korunur. Kurulumsuz ilk kullanım fixture'ı yerel kaynak ve indirilen 3.4.0 kaynakları için ayrı **24/24** geçti: Chrome API'leri, editör ve OpenAI/Ollama/llama.cpp yanıtları taklit; gerçek ağ **0**. [Yerel sonuç](../evidence/first-correction-fixture-local.json), [yayımlanan kaynak sonucu](../evidence/first-correction-fixture-published.json). Yerel site testi **58/58** geçti (40 genişlik/tema/sayfa durumu; gerçek dış istek 0): [7 Ekim site sonucu](../evidence/site-ui-results-2026-10-07.json). Aşağıdaki 3 Ekim paketlenmemiş eklenti/editör kayıtları bu turda yeniden koşulmadı; gerçek mağaza kurulumu ayrıca eksiktir.
+
+Bu dal için üretilen 19 dosyalı yerel ZIP'in SHA-256 değeri `a334c1448f8837a5bb1e6713891b6c84c7ecb6e5cb1c98dff8753c4ffdc87f18`; yayımlanan Google CRX'iyle aynı çıktı değildir ve yüklenmedi.
+
+3 Ekim tarihsel paket kaydı: paketleyici regresyonları **7/7 geçti**: yalnız kullanılan çalışma dosyaları, CSS/getURL/importScripts bağımlılıkları, eksik dosya, dar izin listesi/yol dışına çıkma, sembolik bağlantı, dinamik/uzak kod reddi ve dosya zamanları değişse de aynı ZIP çıktısı. Paket **19 çalışma dosyası** içerir; sağlayıcı kataloğu ve merkezi servis bu listeye dahildir. `lib/crypto-js.min.js`, kaynak metadata önbelleği ve test dosyaları alınmaz. Manifest/CRC/içerik ve kaynak değişmeden tekrarlanan üretimin aynı ZIP'i vermesi doğrulandı. `dist/duzelt-ai-3.4.0.zip` o günkü kaynakla iki kez üretildi; SHA-256: `974ae8d6008fc75289796521a2800936ff81d0004d19a360e3b852de9f01223b`. ZIP içeriği o günkü kaynak dosyalarla birebir karşılaştırıldı.
 
 Gerçek paketlenmemiş eklentinin yeni popup/ayarlar kontrolü Chromium **151.0.7922.34** ile **36/36 geçti**. Kanıt dosyası: [ui-results.json](../evidence/ui-results.json); ayrıntılı kaynak `output/playwright/ui-results.json`. Sağlayıcı seçimi/anahtar/prompt kaydı, eski OpenAI kaydının korunması, ayrı profiller, model araması, desteklenmeyen kayıtların durumu, kaydedilmiş bağlantıyla test, IBM/SAP dinamik alanları ve iki origin izni, sır alanlarının maskelenmesi, tokenın depoya yazılmaması, toggle ve sabit bağlantılar kapsanır. Sağlayıcı listesindeki arama ile Home/End/Escape klavye akışı; Ollama seçiminde otomatik keşif; taslak URL değişince eski sonuçların uygulanmaması; komut kopyalama; bağlantı hatası/403/boş liste davranışı doğrulandı. İlk açılışta izin yoksa GET yapılmaz; izin varsa kayıtlı model korunur ve liste kapalı kalır. Chrome'un yerel API izin penceresinin sonucu fixture ile taklit edildi; gerçek kullanıcının izin kabulü bu koşuda doğrulanmadı. Bu arayüz koşusunda gerçek sağlayıcı ağ isteği **0**.
 
@@ -102,13 +109,15 @@ Son 36/36 arayüz koşusu bu hizalama, rehber ve kayıt durumlarını da kapsar.
 ## Ayrıca gerekli gerçek ortam kontrolleri
 
 - [ ] Kullanıcının kendi Chrome profilinde seçilen API origin'i için gerçek izin penceresi, kabul/ret ve izin kaldırma.
+- [ ] Temiz ve oturumsuz Chrome profilinde mağaza görünürlüğü/kurulum sonucu; tarih, Chrome sürümü ve ülke/bölge kaydı. 7 Ekim HTTP/CRX sonucu bu kontrolün yerine geçmez.
+- [ ] Mağazadan kurulan sürümle bir bulut ve bir yerel bağlantıda test → düzelt → önizle → kabul/iptal. Yalnız sentetik metin kullanın; sırları kaydetmeyin.
 - [ ] Kullanıcının kendi Chrome kurulumundan yerel sunucuya bağlantı, origin izni ve model listesinin alınması.
 - [ ] Gerçek bulut hesabı/anahtarı/bölgesi ile model erişimi ve faturalandırma. Yerel fixture başarısı bu kontrolün yerine geçmez.
 - [ ] Belirli bir WordPress/Drupal/Joomla/Notion veya diğer üretim sitesinin kendi editör kurulumuyla uyumluluk.
 - [x] Son arayüzün bütün ekran görüntülerinde gerçek görsel inceleme sonucu.
 - [x] Canlı site: 3 Ekim 2026 ayrı duzelt-site Worker, ana/destek/gizlilik HTTPS200, 9 route/CSP kontrolü. `evidence/site-live-results.json` ilk manuel dağıtımı kaydeder.
 - [ ] Gerçek main push'una ait uzak Workers Builds sonucu.
-- [x] Chrome Web Store geliştirici paneli, paket ve incelemeye gönderme sonucu doğrulandı; 3.4.0 incelemesi bekleniyor, kamu yayını ayrı süreçtir.
+- [x] 3 Ekim Chrome Web Store geliştirici paneli ve inceleme gönderimi tarihsel olarak kayıtlı. 7 Ekim kamu sayfası/CRX 3.4.0 yayını ayrıca doğrulandı; panel tekrar açılmadı.
 
 ## Tasarım ve yayın aşaması
 

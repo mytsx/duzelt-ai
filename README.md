@@ -4,7 +4,7 @@ Chrome'daki uyumlu zengin metin editörlerine Türkçe düzeltme düğmesi ekler
 
 Eklenti yazım, noktalama ve resmî yazışma üslubu için seçtiğiniz yapay zekâ sağlayıcısından öneri alır. Sonucu kullanmadan önce gözden geçirin; kusursuz doğruluk, resmî kurum onayı veya mevzuata uyum garantisi verilmez.
 
-**Yerel bakım sürümü: 3.4.0.** 3 Ekim 2026'da doğrulanan [mevcut Chrome Web Store öğesi](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) **3.3.0** sunuyor. 3.4.0 incelemeye gönderildi; [durum kaydı](docs/current-state.json) kamu sürümü ile incelemedeki sürümü ayrı tutar.
+**Yerel bakım sürümü: 3.4.0.** 7 Ekim 2026'da [mevcut Chrome Web Store öğesinin](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) kamu HTTP yanıtı ve Google'ın indirme paketinin manifesti **3.4.0** olarak doğrulandı. Mağazadan temiz Chrome profiline kurulum ve gerçek bulut/yerel ilk düzeltme henüz yapılmadı. [#7 doğrulama kaydı](docs/first-correction.md) yayımlanan paket, yerel değişiklikler ve tamamlanmamış kontrolleri ayrı açıklar.
 
 ## Gereksinimler ve ücret
 
@@ -41,7 +41,7 @@ Chrome'un bağlantı izni ve Ollama'nın origin izni ayrı koşullardır. Rehber
 
 ## Editör desteği ve sınırlar
 
-Yerel tarayıcı doğrulaması CKEditor **4.22.1**, CKEditor **48.5.2** (CKEditor 5), Summernote **0.9.1**, TinyMCE **8.9.2** ve Quill **2.0.3 / 1.3.7** classic kurulumlarıyla yapılır. Entegrasyonun test durumu, kanıtı ve sınırları [test kayıtlarında](docs/testing.md) belirtilir. Bir editörün test edilmesi, onu kullanan bütün sitelerin desteklendiğini kanıtlamaz.
+3.4.0 kaynak sürümünün yerel tarayıcı doğrulaması CKEditor **4.22.1**, CKEditor **48.5.2** (CKEditor 5), Summernote **0.9.1**, TinyMCE **8.9.2** ve Quill **2.0.3 / 1.3.7** classic kurulumlarıyla yapılmıştır. 7 Ekim'de indirilen yayımlanmış 3.4.0 paketinin çalışma dosyaları bu çalışmanın başlangıç commit'iyle eşleşir; mağazadan kurulmuş eklentiyle matris henüz tekrarlanmadı. Entegrasyonun test durumu, kanıtı ve sınırları [test kayıtlarında](docs/testing.md) belirtilir. Bir editörün test edilmesi, onu kullanan bütün sitelerin desteklendiğini kanıtlamaz.
 
 WordPress, Drupal, Joomla, Notion veya başka bir platform için genel destek iddiası yoktur. Sayfanın editör kurulumu, sürümü, iframe yapısı ve özelleştirmeleri uyumluluğu etkileyebilir. Özellikle Notion'ın Quill kullandığı varsayılmaz.
 
@@ -60,6 +60,8 @@ Normal kurulum için [yayınlanmış mağaza öğesini](https://chromewebstore.g
 
 Açma/kapatma durumu popup'tan yönetilir. Eklenti güncellenirken mevcut ayar anahtarları korunur.
 
+İlk kullanımda takılırsanız: [bağlantı izni ve kaydet/test](https://duzelt.yerli.dev/support/#kaydet-test), [çalışmayan yerel servis](https://duzelt.yerli.dev/support/#yerel-sunucu), [düğme görünmemesi](https://duzelt.yerli.dev/support/#dugme-gorunmuyor). Mağaza erişim sorununda [kontrol edilecek bilgiler](docs/first-correction.md) tarih, ülke/bölge ve Chrome sürümüdür; tek erişim hatası genel kaldırılma kanıtı sayılmaz.
+
 ## Verileriniz
 
 - Sağlayıcı profilleri, anahtarlar/erişim belirteçleri, SAP Client ID/secret, seçilen model/API adresi ve özel sistem promptu `chrome.storage.local` içinde bu Chrome profiline kaydedilir. Eklenti bunları Chrome Sync'e yazmaz; ayrıca kendi şifreleme katmanını uygulamaz. IBM/SAP kimlik değişiminde alınan kısa ömürlü belirteç kalıcı depoya yazılmaz.
@@ -75,6 +77,7 @@ Eklenti çalışma dosyaları düz JavaScript ve CSS kullanır; derleme gerektir
 
 ```sh
 npm run test:provider
+npm run test:first-correction
 node tests/editor-bootstrap.mjs
 npm run test:editors
 npm run test:ui
@@ -83,7 +86,7 @@ python3 -m unittest discover -s tests -p 'test_provider_catalog.py'
 python3 tools/package-store.py
 ```
 
-Paketleme için `npm run package:store` da kullanılabilir. Tarayıcı testleri için proje geliştirme bağımlılıklarını `npm ci`, test tarayıcısını `npx playwright install chromium` ile hazırlayın. Arayüz testinde Chrome'un yerel izin penceresinin sonucu fixture ile taklit edilir; gerçek kullanıcı izni ayrıca denenmelidir. Yerel taklit API testi, gerçek sağlayıcı hesabı/kalite testi, gerçek editör testi, uzak build, canlı site ve mağaza incelemesi ayrı kanıt sınıflarıdır; ayrıntılar [docs/testing.md](docs/testing.md) dosyasındadır.
+Paketleme için `npm run package:store` da kullanılabilir. Tarayıcı testleri için proje geliştirme bağımlılıklarını `npm ci`, test tarayıcısını `npx playwright install chromium` ile hazırlayın. `test:first-correction` eklenti yüklemeden, bellek içi Chrome API'leri ve editör/servis maketleriyle kaynak akışını sınar. `test:ui` ve `test:editors` gerçek paketlenmemiş eklentiyi geçici profile yükler; izin penceresi ve sağlayıcı yanıtları yine taklittir. Gerçek kullanıcı izni ayrıca denenmelidir. Yerel taklit API testi, gerçek sağlayıcı hesabı/kalite testi, gerçek editör testi, uzak build, canlı site ve mağaza incelemesi ayrı kanıt sınıflarıdır; ayrıntılar [docs/testing.md](docs/testing.md) dosyasındadır.
 
 Paketleyici manifestteki referansları ve yerel çalışma bağımlılıklarını takip ederek `dist/duzelt-ai-<sürüm>.zip` üretir. Manifest ZIP kökünde bulunur; referanslar, dosya içerikleri ve CRC doğrulanır. Sabit zaman damgası, dosya izinleri ve sıralama aynı kaynaklardan tekrarlanabilir çıktı sağlar; `.zip.sha256` dosyası sağlama toplamını içerir. Kullanılmayan kütüphaneler, site/test/video kaynakları, `.git`, `node_modules` ve ayar dosyaları pakete girmez.
 
@@ -147,7 +150,7 @@ ElevenLabs Starter planından alınan lisanslı kayıt, gerçek sözcük/durak z
 
 [Tanıtım videosu](https://youtu.be/q4k1awKQu1w) mevcut Yerli Developer kanalında liste dışı yayımlandı. Kayıtlı özel kapak, ürüne ait oynatma listesi, tamamlanmış HD işlemi, manuel Türkçe altyazı ve sorunsuz telif kontrolü gerçek YouTube arayüzünde doğrulandı. Merkezi yapılandırmadaki bu adresi kullanan site oynatıcıyı yalnız kullanıcı tıklamasıyla yükler; ses kapalı ve Türkçe altyazı tercihli başlar.
 
-Mevcut mağaza öğesine 3.4.0 paketi, beş yeni ekran görüntüsü, iki promosyon görseli, video/site/destek bağlantıları ve güncel gizlilik/izin beyanları kaydedildi. 3 Ekim 2026'da **incelemeye gönderildi**; panel **İncelenmeyi bekliyor** gösterdi. İncelemeyi geçtikten sonra otomatik yayın seçeneği açıktır. Kamuya sunulan 3.3.0 ile incelemedeki 3.4.0 ayrı tutulur; gönderim kaydı [store/submission.json](store/submission.json) içindedir.
+Mevcut mağaza öğesine 3.4.0 paketi, beş yeni ekran görüntüsü, iki promosyon görseli, video/site/destek bağlantıları ve güncel gizlilik/izin beyanları kaydedildi. 3 Ekim 2026'da **incelemeye gönderildi**; panel o tarihte **İncelenmeyi bekliyor** gösterdi ve onay sonrası otomatik yayın seçiliydi. Tarihsel gönderim kaydı [store/submission.json](store/submission.json) içinde korunur. 7 Ekim'de kamu sayfası ve Google CRX paketi **3.4.0** yayınını doğruladı; geliştirici paneli yeniden açılmadı. Bu dalın sonraki yerel değişiklikleri yayımlanmadı.
 
 Özgün Claude Design teslimi yerel `output/site-design-original-2026-10-03/` klasöründe yedeklidir. Eski tasarım referans kiti `npm run design:kit` ile yeniden üretilebilir; site ve mağaza çalışma paketi birbirinden ayrıdır.
 

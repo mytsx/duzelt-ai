@@ -272,6 +272,26 @@ test('Her protokol ailesi gerçek katalogla doğru endpoint, kimlik başlığı 
     }
 });
 
+test('Özel Gemini bağlantısı kayıtlı Bearer veya API anahtarı seçimini kullanır', async t => {
+    for (const authType of ['bearer', 'api-key']) {
+        await t.test(authType, async () => {
+            const profile = { model: 'fixture-model', protocol: 'gemini', baseURL: 'https://fixture.example/v1beta', authType };
+            const expectedHeader = authType === 'bearer' ? 'authorization' : 'x-goog-api-key';
+            const expectedValue = authType === 'bearer' ? 'Bearer ' + KEY : KEY;
+            const otherHeader = authType === 'bearer' ? 'x-goog-api-key' : 'authorization';
+            const h = harness({ storage: saved('custom', profile), fetchMock: async (url, options) => {
+                if (options.headers.get(expectedHeader) !== expectedValue || options.headers.has(otherHeader)) return reply({}, 401);
+                return reply(output('gemini'));
+            } });
+            assert.equal(await h.service.correctText('Bu bir sentetik ilk düzeltme metnidir.'), 'Düzeltilmiş metin.\n\nİkinci paragraf.');
+            assert.equal(h.calls.length, 1);
+            assert.equal(h.calls[0].url, 'https://fixture.example/v1beta/models/fixture-model:generateContent');
+            assert.deepEqual(h.permissions, [{ origins: ['https://fixture.example/*'] }]);
+            assert.deepEqual(h.logs, []);
+        });
+    }
+});
+
 test('Gateway, Azure Claude ve Vertex partner modelleri katalog override kullanır', async () => {
     const cases = [
         ['cloudflare-ai-gateway', { model: 'anthropic/claude-sonnet-4.5', accountId: 'fixture-account', gatewayId: 'fixture-gateway' }, 'openai-chat', 'https://gateway.ai.cloudflare.com/v1/fixture-account/fixture-gateway/compat/chat/completions', 'cf-aig-authorization', 'Bearer ' + KEY],

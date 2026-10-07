@@ -1,0 +1,126 @@
+{
+  "issue": "https://github.com/mytsx/duzelt-ai/issues/7",
+  "verified_on": "2026-10-07",
+  "completed_at_utc": "2026-10-07T12:10:50Z",
+  "method": "Native Chrome UI through cua_repl; visible accessibility text and screenshots",
+  "profile": {
+    "name": "Duzelt Issue7 Test 2026-10-07",
+    "new_separate_profile": true,
+    "created_via": "Chrome profile creation UI; Oturumu kapalı tut",
+    "google_sign_in_performed": false,
+    "store_sign_in_link_visible": true,
+    "sync_or_import_performed": false,
+    "chrome_version": "154.0.8037.98",
+    "chrome_build": "Official arm64",
+    "os": "macOS 27.0.1 (26A434)",
+    "locale_observed": "Turkish",
+    "country_or_region": null,
+    "country_or_region_note": "No country/region was displayed or independently established; locale does not establish country"
+  },
+  "store": {
+    "url": "https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl",
+    "item_id": "gnkhgnhdokinbamhokpljgafapfjhjhl",
+    "title": "AI Türkçe Metin Düzeltici",
+    "listed_version": "3.4.0",
+    "updated_on": "2026-10-04",
+    "before_install_button": "Chrome'a ekle",
+    "after_install_button": "Chrome'dan kaldır",
+    "permission_prompt": "Web sitelerindeki tüm verilerinizi okuma ve değiştirme",
+    "expected_permission_approved_by_user": true,
+    "unexpected_permission_prompt_seen": false,
+    "installation": "PASS"
+  },
+  "installed_extension": {
+    "details_url": "chrome://extensions/?id=gnkhgnhdokinbamhokpljgafapfjhjhl",
+    "id": "gnkhgnhdokinbamhokpljgafapfjhjhl",
+    "version": "3.4.0",
+    "enabled": true,
+    "source": "Chrome Web Store",
+    "developer_mode": false,
+    "incognito_allowed": false,
+    "site_access_observed": "Tüm sitelerde",
+    "unpacked_extension_loaded": false,
+    "local_branch_fixes_in_installed_package": false
+  },
+  "checks": [
+    {
+      "name": "Initial popup",
+      "result": "PASS",
+      "observed": ["v3.4.0", "Etkin · düğme gösterilir", "OpenAI", "gpt-4o", "Ayar gerekli", "Düzeltmeye başlamak için sağlayıcı bağlantısını tamamlayın."]
+    },
+    {
+      "name": "Initial options",
+      "result": "PASS",
+      "observed": ["Sürüm 3.4.0", "228 sağlayıcı kaydı", "Empty masked API key field", "Bağlantı bilgileri eksik", "Default correction rules visible", "Normal metin kutuları desteklenmez."]
+    },
+    {
+      "name": "Connection test before saving, without credentials",
+      "result": "PASS",
+      "observed": "API anahtarı / erişim tokenı girilmemiş. Ayarlardan kaydedin."
+    },
+    {
+      "name": "Save default OpenAI/gpt-4o connection without credentials",
+      "result": "PASS",
+      "observed": ["Bağlantı kaydedildi. Düzeltme için eksik giriş bilgilerini tamamlayıp yeniden kaydedin.", "Ayar gerekli", "Bağlantı bilgileri eksik"],
+      "note": "An incomplete profile was saved; this is not a successful provider connection"
+    },
+    {
+      "name": "Connection test after saving, without credentials",
+      "result": "PASS",
+      "observed": "API anahtarı / erişim tokenı girilmemiş. Ayarlardan kaydedin."
+    },
+    {
+      "name": "Installed content script, synthetic editor API, trusted Düzelt click",
+      "result": "PASS",
+      "observed": ["One extension-injected Düzelt button", "Native alert: API anahtarı / erişim tokenı girilmemiş. Ayarlardan kaydedin.", "After dismissal: original HTML identical, no preview modal, button enabled and labelled Düzelt", "No Düzelt button on ordinary input/textarea"]
+    },
+    {
+      "name": "Actual popup toggle and storage notification to content script",
+      "result": "PASS",
+      "observed": ["Off: Devre dışı · düğme gizlenir; page button count 0", "On: Etkin · düğme gösterilir; page button count 1", "Original HTML identical and no preview modal"],
+      "final_enabled_state": true
+    }
+  ],
+  "editor_page": {
+    "file": "tests/fixtures/store-keyless-editor.html",
+    "sha256": "6927791e95837e3a68d14bc18155263b902b65f5fbebb67e71385f262782a400",
+    "served_url": "http://127.0.0.1:8768/store-keyless-editor.html",
+    "editor": "Synthetic Quill-shaped read-only API fixture; not upstream Quill",
+    "extension_source_scripts_in_page": false,
+    "chrome_api_stubs": false,
+    "provider_response_mocks": false,
+    "installed_background_or_fetch_modified": false,
+    "content": "Only synthetic sample text",
+    "dom_observation": "Page-local MutationObserver displays exact original HTML equality, injected button count/state and modal presence",
+    "server_stopped": true,
+    "temporary_page_tab_closed": true,
+    "scope": "Installed Store content/runtime/background missing-key error and toggle; no real editor compatibility or successful correction claim"
+  },
+  "privacy_and_gates": {
+    "credential_entered_or_read": false,
+    "credential_created": false,
+    "optional_provider_host_grant_requested_or_accepted": false,
+    "local_model_service_installed_or_configured": false,
+    "real_provider_network_request_count_measured": null,
+    "network_note": "Provider transport was not instrumented. The observed error is missing credentials; static source validation checks this before provider fetch. No measured zero-network claim is made.",
+    "focus_interruption": "Chrome focus changed to a personal window. No action was performed there. Automatic approval review rejected a further full accessibility read; the user then brought the named test profile forward, which was verified before continuing.",
+    "browser_control_released": true,
+    "handoff_screen": "Named test profile, installed extension options, saved incomplete OpenAI/gpt-4o profile, key still empty",
+    "real_cloud_first_correction": "NOT RUN",
+    "real_local_first_correction": "NOT RUN",
+    "successful_preview_accept_cancel_on_installed_version": "NOT RUN",
+    "country_or_region_confirmation": "NOT VERIFIED",
+    "minimum_next_steps": ["User enters and saves their own existing cloud credential in this test profile's options UI; never in chat/evidence", "Confirm chosen provider/model and paid synthetic test request scope", "For local test, identify an existing running service and separately approve its exact optional origin permission", "Confirm country/region without treating Turkish locale as country"]
+  },
+  "screenshots": {
+    "observed_in_tool_results": ["Chrome version", "Store before and after install", "Permission prompt", "First popup", "Options with empty key", "Missing-key native alert", "Synthetic page after error"],
+    "persisted_local_image_files": [],
+    "library_file_ids": [],
+    "note": "Screenshots were emitted and visually inspected in this task's tool results; no downloadable screenshot file or Library artifact was created"
+  },
+  "issue_complete": false,
+  "remote_write_or_publication_performed": false,
+  "historical_snapshot": true,
+  "followup_cloud_evidence": "evidence/store-first-correction-2026-10-07.json",
+  "historical_note": "This record preserves the earlier keyless-install stage. Subsequent user credential configuration and actual cloud correction are recorded separately; the key is no longer empty."
+}

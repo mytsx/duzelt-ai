@@ -11,6 +11,7 @@
     "test:editors": "node tests/editor-browser.mjs",
     "test:catalog": "python3 -m unittest discover -s tests -p 'test_provider_catalog.py'",
     "test:bootstrap": "node tests/editor-bootstrap.mjs",
+    "test:first-correction": "node tests/first-correction-fixture.mjs",
     "design:kit": "python3 tools/prepare-design-kit.py",
     "site:prepare": "python3 tools/prepare-site.py",
     "site:preview": "npm run site:prepare && wrangler dev --config wrangler.site.jsonc --local --ip 127.0.0.1 --port 8787",

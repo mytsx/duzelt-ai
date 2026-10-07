@@ -71,6 +71,9 @@ try {
     const readyForImage = async () => {
         await page.evaluate(async () => {
             document.activeElement?.blur();
+            // Offscreen lazy images can leave decode() pending after a viewport change.
+            // All assets are local fixtures; eagerly load them before capture.
+            Array.from(document.images).forEach(image => { image.loading = 'eager'; });
             for (let y = 0; y < document.documentElement.scrollHeight; y += innerHeight) {
                 scrollTo(0, y);
                 await new Promise(resolve => setTimeout(resolve, 20));

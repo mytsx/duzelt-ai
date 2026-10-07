@@ -1,0 +1,251 @@
+<!doctype html>
+<!--
+    Manual official Chrome Web Store extension QA page; preparation is not a test result.
+    Upstream Quill 2.0.3 assets come only from the verified public npm tarball.
+    No npm install/lifecycle, extension script injection, chrome API stubs or provider mocks.
+
+    Prepared HTTP root: output/manual-store-fixture/ (a copy of this file is index.html).
+    Launch only when UI ownership is available:
+      python3 output/store-first-correction-assets/serve-fixture.py
+    Open http://127.0.0.1:8767/ in the authorized clean Chrome profile.
+    The server exposes only this HTML, Quill JS/CSS and its public LICENSE.
+    Do not serve the repository root, user files, credentials or registry download metadata.
+
+    Real cloud QA remains pending provider/model authorization and safe credential handoff.
+    At most two correction requests: first Duzelt -> inspect -> Cancel; second Duzelt ->
+    try a repeat click only after the button is visibly disabled -> inspect -> Accept.
+    Then Quill undo needs no provider request. Connection Test is itself a paid correction
+    request; do not add it to this two-request scenario. Record provider responses and cost
+    independently: this page counts UI observations, not service worker/provider requests.
+    Optional literal HTML example must be selected before either request and kept unchanged.
+-->
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Düzelt #7 — gerçek Quill 2.0.3 test sayfası</title>
+    <link rel="stylesheet" href="./vendor/quill/dist/quill.snow.css">
+    <style>
+        body { margin: 0; padding: 24px; color: #202636; background: #f4f5f8; font: 16px/1.5 system-ui, sans-serif; }
+        main { max-width: 1040px; margin: auto; padding: 24px; border: 1px solid #d7dce5; background: white; border-radius: 12px; }
+        h1 { margin-top: 0; font-size: 25px; }
+        .notice { padding: 12px; border-left: 4px solid #b88a00; background: #fff4cb; }
+        .note { color: #4b5568; font-size: 14px; }
+        .ql-editor { min-height: 200px; }
+        .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 16px 0; }
+        .controls button { padding: 8px 12px; font: inherit; }
+        .observations { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr; gap: 8px 16px; margin: 20px 0; }
+        dt { font-weight: 600; } dd { margin: 0; overflow-wrap: anywhere; }
+        pre { padding: 12px; background: #f4f5f8; border: 1px solid #d7dce5; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
+        .error { color: #a12626; }
+        .plain-fields { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
+        .plain-fields label { display: grid; gap: 4px; }
+        @media (max-width: 600px) { body { padding: 10px; } main { padding: 16px; } .observations { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Düzelt #7 — gerçek Quill 2.0.3</h1>
+        <p class="notice"><strong>Hazırlandı; gerçek sağlayıcı testi henüz yapılmadı.</strong><br>
+            Bu sayfa gerçek Quill kitaplığını ve yalnız sentetik Türkçe metni kullanır.
+            Düzelt düğmesinin kurulu resmî mağaza eklentisinden gelmesi beklenir.
+            Eklenti veya sağlayıcı yanıtı taklit edilmez.</p>
+        <p class="note">Bu sayfa anahtar, kullanıcı dosyası veya kişisel metin almaz.
+            Sağlayıcı erişimini, ağ çağrısı sayısını ve maliyeti ölçmez.
+            Görünen sayaçlar yalnız sayfa içindeki tıklama ve editör değişiklikleridir.</p>
+
+        <div id="quill-editor" aria-label="Sentetik Türkçe metin editörü"></div>
+        <div class="controls">
+            <button id="reset-fixture" type="button">Sentetik metni yeniden yükle</button>
+            <button id="undo-fixture" type="button">Quill geçmişinden geri al</button>
+            <label><input id="literal-html" type="checkbox"> Metne güvenli, görünür HTML örneği ekle</label>
+        </div>
+        <p class="note">Geri al düğmesi gerçek Quill history.undo() API’sini çağırır; klavye Cmd+Z testi değildir.
+            Metni yeniden yüklemek başlangıç karşılaştırmasını ve Quill geçmişini sıfırlar; sağlayıcı isteği yapmaz.</p>
+
+        <section aria-labelledby="observation-title">
+            <h2 id="observation-title">Yerel gözlemler</h2>
+            <p id="fixture-error" class="error" role="alert" hidden></p>
+            <dl class="observations" aria-live="polite">
+                <dt>Quill sürümü</dt><dd id="quill-version">Yükleniyor</dd>
+                <dt>Başlangıç karşılaştırması</dt><dd id="baseline-time">Hazır değil</dd>
+                <dt>Eklenti düğmesi sayısı</dt><dd id="injected-button-count">0</dd>
+                <dt>Düğme durumu</dt><dd id="injected-button-state">Görülmedi</dd>
+                <dt>Şu anki önizleme sayısı</dt><dd id="modal-count">0</dd>
+                <dt>Gözlenen önizleme açılışı</dt><dd id="preview-openings">0</dd>
+                <dt>En fazla eşzamanlı önizleme</dt><dd id="maximum-modal-count">0</dd>
+                <dt>Düzelt kullanıcı tıklamaları</dt><dd id="correction-clicks">0 — sağlayıcı çağrı sayısı değildir</dd>
+                <dt>Devre dışı düğmeye pointer girişimi</dt><dd id="busy-pointer-attempts">0</dd>
+                <dt>Kabul / İptal kullanıcı tıklamaları</dt><dd id="decision-clicks">0 / 0</dd>
+                <dt>Semantic HTML başlangıçla aynı mı?</dt><dd id="semantic-equality">Hazır değil</dd>
+                <dt>Delta JSON başlangıçla aynı mı?</dt><dd id="delta-equality">Hazır değil</dd>
+                <dt>Editör DOM HTML başlangıçla aynı mı?</dt><dd id="dom-equality">Hazır değil</dd>
+                <dt>Son text-change kaynağı</dt><dd id="last-change-source">Henüz gözlenmedi</dd>
+                <dt>text-change olayları</dt><dd id="change-counts">user: 0 / api: 0 / diğer: 0</dd>
+                <dt>Quill undo geçmişi</dt><dd id="undo-stack-size">Ölçülmedi</dd>
+                <dt>Son Quill geri alma gözlemi</dt><dd id="undo-observation">Henüz istenmedi</dd>
+            </dl>
+            <details><summary>Güncel semantic HTML — yalnız fixture metni</summary><pre id="semantic-html"></pre></details>
+            <details><summary>Güncel Quill Delta JSON — yalnız fixture metni</summary><pre id="delta-json"></pre></details>
+        </section>
+
+        <div class="plain-fields">
+            <label>Normal input — düğme beklenmez<input aria-label="Normal input" value="Sentetik input metni"></label>
+            <label>Normal textarea — düğme beklenmez<textarea aria-label="Normal textarea">Sentetik textarea metni</textarea></label>
+        </div>
+        <p id="fixture-link" class="note">Editör bağlantısı yalnız bu yerel işarete gider.
+            Bu sayfa belirli bir CMS veya sitenin uyumluluğunu kanıtlamaz.</p>
+        <p class="note">Quill 2.0.3: resmî npm paketinin self-hosted dağıtımı, <a href="./vendor/quill/LICENSE">BSD-3-Clause lisansı</a>.</p>
+    </main>
+    <script src="./vendor/quill/dist/quill.js"></script>
+    <script>
+    (function() {
+        'use strict';
+        const INITIAL_HTML = '<p>Merhaba <strong>Ali</strong>, bugun cok guzel.</p><p><em>Yarin toplantida</em> bu <a href="#fixture-link">baglantiyi</a> kullanacagiz.</p><ul><li>birinci ornek madde</li><li>ikinci ornek madde</li></ul>';
+        const LITERAL_HTML = '<p>Görünür kod örneği: <code>&lt;b&gt;örnek&lt;/b&gt;</code>.</p>';
+        const element = id => document.getElementById(id);
+        const observations = {
+            previewOpenings: 0, maximumModalCount: 0, previousModalCount: 0,
+            correctionClicks: 0, busyPointerAttempts: 0, acceptClicks: 0, cancelClicks: 0,
+            changes: { user: 0, api: 0, other: 0 }, lastChangeSource: 'Henüz gözlenmedi',
+            undoObservation: 'Henüz istenmedi'
+        };
+        let editor;
+        let baseline;
+        let scheduled = false;
+
+        function text(id, value) {
+            const target = element(id);
+            if (target.textContent !== String(value)) target.textContent = value;
+        }
+        function snapshot() {
+            const buttons = document.querySelectorAll('.ai-text-corrector-button');
+            return {
+                semanticHTML: editor.getSemanticHTML(),
+                deltaJSON: JSON.stringify(editor.getContents()),
+                domHTML: editor.root.innerHTML,
+                buttonCount: buttons.length,
+                buttonBusy: Array.from(buttons).some(button => button.disabled),
+                buttonLabels: Array.from(buttons).map(button => button.textContent),
+                modalCount: document.querySelectorAll('#ai-text-corrector-modal').length
+            };
+        }
+        function render() {
+            if (!editor || !baseline) return;
+            const current = snapshot();
+            if (current.modalCount > observations.previousModalCount) {
+                observations.previewOpenings += current.modalCount - observations.previousModalCount;
+            }
+            observations.previousModalCount = current.modalCount;
+            observations.maximumModalCount = Math.max(observations.maximumModalCount, current.modalCount);
+            text('quill-version', Quill.version);
+            text('baseline-time', baseline.recordedAt);
+            text('injected-button-count', current.buttonCount);
+            text('injected-button-state', current.buttonCount ? current.buttonLabels.join(' / ') + (current.buttonBusy ? ' — devre dışı' : ' — etkin') : 'Görülmedi');
+            text('modal-count', current.modalCount);
+            text('preview-openings', observations.previewOpenings);
+            text('maximum-modal-count', observations.maximumModalCount);
+            text('correction-clicks', observations.correctionClicks + ' — sağlayıcı çağrı sayısı değildir');
+            text('busy-pointer-attempts', observations.busyPointerAttempts);
+            text('decision-clicks', observations.acceptClicks + ' / ' + observations.cancelClicks);
+            text('semantic-equality', current.semanticHTML === baseline.semanticHTML ? 'Aynı (gözlem)' : 'Farklı (gözlem)');
+            text('delta-equality', current.deltaJSON === baseline.deltaJSON ? 'Aynı (gözlem)' : 'Farklı (gözlem)');
+            text('dom-equality', current.domHTML === baseline.domHTML ? 'Aynı (gözlem)' : 'Farklı (gözlem)');
+            text('last-change-source', observations.lastChangeSource);
+            text('change-counts', 'user: ' + observations.changes.user + ' / api: ' + observations.changes.api + ' / diğer: ' + observations.changes.other);
+            const undoStack = editor.getModule('history').stack?.undo;
+            text('undo-stack-size', Array.isArray(undoStack) ? undoStack.length + ' kayıt (Quill iç durumu)' : 'Ölçülmedi');
+            text('undo-observation', observations.undoObservation);
+            text('semantic-html', current.semanticHTML);
+            text('delta-json', current.deltaJSON);
+            ['reset-fixture', 'undo-fixture', 'literal-html'].forEach(id => {
+                element(id).disabled = current.buttonBusy || current.modalCount > 0;
+            });
+        }
+        function scheduleRender() {
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(() => { scheduled = false; render(); });
+        }
+        function seed() {
+            const html = INITIAL_HTML + (element('literal-html').checked ? LITERAL_HTML : '');
+            editor.setContents(editor.clipboard.convert({ html }), 'api');
+            editor.history.clear();
+            editor.history.cutoff();
+            const normalized = snapshot();
+            baseline = Object.freeze({
+                recordedAt: new Date().toISOString(),
+                semanticHTML: normalized.semanticHTML,
+                deltaJSON: normalized.deltaJSON,
+                domHTML: normalized.domHTML
+            });
+            observations.undoObservation = 'Başlangıç yeniden kaydedildi; undo geçmişi temizlendi';
+            render();
+        }
+        try {
+            if (typeof Quill !== 'function' || Quill.version !== '2.0.3') throw new Error('Yerel Quill 2.0.3 dağıtımı yüklenemedi.');
+            editor = new Quill('#quill-editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [['bold', 'italic'], [{ list: 'bullet' }, { list: 'ordered' }], ['link']],
+                    history: { userOnly: false }
+                }
+            });
+            seed();
+            editor.on('text-change', (delta, previous, source) => {
+                observations.lastChangeSource = source;
+                observations.changes[source === 'user' || source === 'api' ? source : 'other']++;
+                scheduleRender();
+            });
+            element('reset-fixture').addEventListener('click', event => { if (event.isTrusted) seed(); });
+            element('literal-html').addEventListener('change', event => { if (event.isTrusted) seed(); });
+            element('undo-fixture').addEventListener('click', event => {
+                if (!event.isTrusted) return;
+                const before = snapshot().deltaJSON;
+                editor.history.undo();
+                const after = snapshot().deltaJSON;
+                observations.undoObservation = before === after
+                    ? 'Delta değişmedi; uygulanmış bir düzeltmenin geri alınması kanıtlanmadı'
+                    : after === baseline.deltaJSON
+                        ? 'Quill undo sonrası Delta başlangıçla aynı (gözlem); HTML karşılaştırmaları ayrı'
+                        : 'Quill undo Delta değiştirdi; başlangıç Delta değerine dönmedi';
+                render();
+            });
+            document.addEventListener('click', event => {
+                if (!event.isTrusted || !(event.target instanceof Element)) return;
+                const button = event.target.closest('button');
+                if (button?.classList.contains('ai-text-corrector-button')) observations.correctionClicks++;
+                if (button?.closest('#ai-text-corrector-modal')) {
+                    if (button.dataset.action === 'accept') observations.acceptClicks++;
+                    if (button.dataset.action === 'reject') observations.cancelClicks++;
+                }
+                scheduleRender();
+            }, true);
+            document.addEventListener('pointerdown', event => {
+                if (!event.isTrusted || !(event.target instanceof Element)) return;
+                const button = event.target.closest('.ai-text-corrector-button');
+                if (button?.disabled) { observations.busyPointerAttempts++; scheduleRender(); }
+            }, true);
+            new MutationObserver(records => {
+                const relevant = records.some(record => {
+                    if (record.type === 'attributes') return record.target.matches?.('.ai-text-corrector-button');
+                    return [...record.addedNodes, ...record.removedNodes].some(node =>
+                        node instanceof Element && (node.matches('.ai-text-corrector-button, #ai-text-corrector-modal') ||
+                            node.querySelector('.ai-text-corrector-button, #ai-text-corrector-modal')));
+                });
+                if (relevant) scheduleRender();
+            }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'aria-busy'] });
+            window.storeFixtureSnapshot = () => ({
+                editor: 'upstream Quill', version: Quill.version, current: snapshot(),
+                baseline: { ...baseline }, observations: JSON.parse(JSON.stringify(observations)),
+                providerRequestsMeasured: false, providerResultVerified: false
+            });
+        } catch (error) {
+            element('fixture-error').hidden = false;
+            element('fixture-error').textContent = 'Fixture başlatılamadı: ' + error.message;
+            ['reset-fixture', 'undo-fixture', 'literal-html'].forEach(id => { element(id).disabled = true; });
+        }
+    })();
+    </script>
+</body>
+</html>

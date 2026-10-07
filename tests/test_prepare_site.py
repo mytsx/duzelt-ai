@@ -36,7 +36,7 @@ class PrepareSiteTests(unittest.TestCase):
             'plannedWebsite': 'https://duzelt.yerli.dev/', 'plannedSupport': 'https://duzelt.yerli.dev/support/',
             'plannedPrivacy': 'https://duzelt.yerli.dev/privacy/', 'repository': 'https://github.com/mytsx/duzelt-ai',
             'issues': 'https://github.com/mytsx/duzelt-ai/issues', 'developerWebsite': 'https://yerli.dev/',
-            'contactEmail': 'iletisim@mehmetyerli.com', 'publishedVersion': '3.3.0',
+            'contactEmail': 'iletisim@mehmetyerli.com', 'publishedVersion': '3.3.0', 'publishedVersionVerifiedOn': '2026-10-03',
             'store': 'https://chromewebstore.google.com/detail/example', 'video': None, 'videoDurationSeconds': None,
         }
         self.manifest = {'name': self.product['name'], 'version': '3.4.0', 'minimum_chrome_version': '111', 'icons': {str(size): f'icons/icon{size}.png' for size in (16, 48, 128)}}

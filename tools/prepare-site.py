@@ -47,7 +47,7 @@ def site_config(product, manifest):
     if product.get('name') != manifest.get('name'):
         raise ValueError('Ürün adı manifest ile eşleşmiyor.')
     website = public_url(product.get('plannedWebsite') or product.get('website')).rstrip('/') + '/'
-    config = {key: product[key] for key in ('name', 'developer', 'store', 'developerWebsite', 'contactEmail', 'repository', 'issues', 'publishedVersion', 'video', 'videoDurationSeconds')}
+    config = {key: product[key] for key in ('name', 'developer', 'store', 'developerWebsite', 'contactEmail', 'repository', 'issues', 'publishedVersion', 'publishedVersionVerifiedOn', 'video', 'videoDurationSeconds')}
     config.update({
         'website': website,
         'support': product.get('plannedSupport') or product.get('support'),

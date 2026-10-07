@@ -1,0 +1,200 @@
+{
+  "issue": "https://github.com/mytsx/duzelt-ai/issues/7",
+  "checked_on": "2026-10-07",
+  "recorded_at_utc": "2026-10-07T11:15:24.621812+00:00",
+  "method": "Public HTTPS GET without account cookies; static CRX inspection only",
+  "historical_snapshot": true,
+  "later_native_install_record": "evidence/store-install-2026-10-07.json",
+  "later_record_note": "The NOT RUN installation fields below describe the initial HTTP/CRX phase. User-approved native Store installation was completed later the same day; cloud/local correction and country/region remain unverified.",
+  "store": {
+    "requested_url": "https://chromewebstore.google.com/detail/gnkhgnhdokinbamhokpljgafapfjhjhl",
+    "http_status": 200,
+    "title": "AI Türkçe Metin Düzeltici - Chrome Web Store",
+    "visible_html_button_label": "Add to Chrome",
+    "published_version": "3.4.0",
+    "updated_on": "2026-10-04",
+    "listing_embedded_manifest_version": "3.4.0",
+    "response_sha256": "78257c4777e7ee3bfab38cbd30bdcf2248998898c584d4a39112a325ea7c6d2a",
+    "country_or_region": null,
+    "chrome_version": null,
+    "limitations": "HTTP source observation, not a fresh signed-out Chrome profile or installation result; region not determined."
+  },
+  "published_package": {
+    "request_url": "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=141.0.0.0&acceptformat=crx3&x=id%3Dgnkhgnhdokinbamhokpljgafapfjhjhl%26installsource%3Dondemand%26uc",
+    "request_prodversion": "141.0.0.0 (update protocol parameter; not an observed Chrome installation)",
+    "http_status": 200,
+    "format": "CRX3",
+    "version": "3.4.0",
+    "minimum_chrome_version": "111",
+    "bytes": 189069,
+    "sha256": "65d5d58b070ddea6a6a046fc008f52a162ccfbc5a5318cd863718506b33a6f1e",
+    "zip_crc_valid": true,
+    "baseline_commit": "db2bccfef35c7964be3bae406289001ec800b43a",
+    "matching_runtime_file_count": 19,
+    "files": [
+      {
+        "path": "background/background.js",
+        "published_sha256": "040e08ec5ad5c9d98c3b198aae976c6e131958cb012069bd548bd4bca7b3a731",
+        "baseline_sha256": "040e08ec5ad5c9d98c3b198aae976c6e131958cb012069bd548bd4bca7b3a731",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "background/openai-provider.js",
+        "published_sha256": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
+        "baseline_sha256": "83044568cad4b666d33e3b208217d9faeaab957ee888876047db7e07244a6ed1",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "background/provider-service.js",
+        "published_sha256": "b08575a2b51c53cb13360029b1519bdc2b40db0690874f9a20874800c01a062a",
+        "baseline_sha256": "b08575a2b51c53cb13360029b1519bdc2b40db0690874f9a20874800c01a062a",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "content/content.css",
+        "published_sha256": "27428c534bf8817567c24364b2ccc90ed54b36ba5053e3cbc93344834986774b",
+        "baseline_sha256": "27428c534bf8817567c24364b2ccc90ed54b36ba5053e3cbc93344834986774b",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "content/content.js",
+        "published_sha256": "bf7c73f37f77b8cc4f2843e6b6c49b1e0507b11e060a0ee7b8950eb1db35d514",
+        "baseline_sha256": "bf7c73f37f77b8cc4f2843e6b6c49b1e0507b11e060a0ee7b8950eb1db35d514",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "content/editor-bridge.js",
+        "published_sha256": "a779d60bd329296cccb18df7b0b63d44f296b01253e9a2f137953e17b0bd38b1",
+        "baseline_sha256": "a779d60bd329296cccb18df7b0b63d44f296b01253e9a2f137953e17b0bd38b1",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "icons/icon128.png",
+        "published_sha256": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
+        "baseline_sha256": "a74e842033668880c4f56269c557ccc6b430ef1a9bb232fdc10834ba0a4d2207",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "icons/icon16.png",
+        "published_sha256": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
+        "baseline_sha256": "2057a87eec63d69097d403835042b2354c51e1f26486819c437bd8ac91286648",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "icons/icon48.png",
+        "published_sha256": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
+        "baseline_sha256": "d45720c4ff721067036148456faa2de1bad15878864d67a861ad0eaf5af706d8",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "lib/diff.min.js",
+        "published_sha256": "3a29bd9374b219bd6964550085cddf6b62fc4073893d3f251c1d61ef1ea56b7f",
+        "baseline_sha256": "3a29bd9374b219bd6964550085cddf6b62fc4073893d3f251c1d61ef1ea56b7f",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "lib/product-config.js",
+        "published_sha256": "3096f8141b1e5c499cf4ec80529ba49c93d6b80b130b5e172c13fe70c400d0d1",
+        "baseline_sha256": "3096f8141b1e5c499cf4ec80529ba49c93d6b80b130b5e172c13fe70c400d0d1",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "lib/provider-catalog.js",
+        "published_sha256": "42a8fb3c1b7b653a7be838957b2b24c16575876de4025d031751ca64a117ebfa",
+        "baseline_sha256": "42a8fb3c1b7b653a7be838957b2b24c16575876de4025d031751ca64a117ebfa",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "manifest.json",
+        "published_sha256": "e19ce82fea9e7b5985ddbcf144d48817d296a3899e3543188b4eef4ea7c1b807",
+        "baseline_sha256": "99095cdc1d0b47df68664b2a76236941351a4d76b5847852fa94444df727fcc0",
+        "matches_baseline": true,
+        "normalization": "remove Google update_url; compare JSON"
+      },
+      {
+        "path": "options/options.css",
+        "published_sha256": "d92dd952ec5343c8ff398c698ef84da3990d5db931ea74bbba04aef362204420",
+        "baseline_sha256": "d92dd952ec5343c8ff398c698ef84da3990d5db931ea74bbba04aef362204420",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "options/options.html",
+        "published_sha256": "553bf360caaf85666a9efc562829d3ebe48ba3e492a800c7ae1208189ceea0b3",
+        "baseline_sha256": "553bf360caaf85666a9efc562829d3ebe48ba3e492a800c7ae1208189ceea0b3",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "options/options.js",
+        "published_sha256": "366feaf40bebb62ca2f18284cd44ab90ce138eb362b6f519f8d0ff1c7c63a4c1",
+        "baseline_sha256": "366feaf40bebb62ca2f18284cd44ab90ce138eb362b6f519f8d0ff1c7c63a4c1",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "popup/popup.css",
+        "published_sha256": "317af9ae76b79e52573986abe87da826e953f0bc242195cab9883a969e4f67d1",
+        "baseline_sha256": "317af9ae76b79e52573986abe87da826e953f0bc242195cab9883a969e4f67d1",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "popup/popup.html",
+        "published_sha256": "0bdc9abffb19996d1462adb3ea2667ed2aba5dea32ac8d8eb1bba22806739c04",
+        "baseline_sha256": "0bdc9abffb19996d1462adb3ea2667ed2aba5dea32ac8d8eb1bba22806739c04",
+        "matches_baseline": true,
+        "normalization": null
+      },
+      {
+        "path": "popup/popup.js",
+        "published_sha256": "0b2787f5088ee9263d60f250249bf7d85470294129e15c5bad5f9128a5f4fb80",
+        "baseline_sha256": "0b2787f5088ee9263d60f250249bf7d85470294129e15c5bad5f9128a5f4fb80",
+        "matches_baseline": true,
+        "normalization": null
+      }
+    ],
+    "google_added_file": "_metadata/verified_contents.json",
+    "installed": false,
+    "signature_verified_by_chrome": false,
+    "comparison_scope": "Baseline only; subsequent local Gemini auth and product-config edits are unpublished."
+  },
+  "landing": {
+    "url": "https://duzelt.yerli.dev/",
+    "http_status": 200,
+    "response_sha256": "faa66f0127281e2f5f5ea6591da025fefcf823d8bf919990bc86dac93302733a",
+    "screen_version": "3.4.0",
+    "published_version_claim": "3.3.0",
+    "published_version_claim_stale": true,
+    "preserved_limits": [
+      "No ordinary input/textarea correction button",
+      "No separately tested WordPress/Drupal/Joomla/Notion platform guarantee",
+      "Plain-text fallback warning when safe formatting mapping fails"
+    ],
+    "remote_page_edited": false
+  },
+  "real_environment": {
+    "clean_chrome_profile_listing": "NOT RUN",
+    "store_install": "NOT RUN",
+    "cloud_first_correction": "NOT RUN",
+    "local_first_correction": "NOT RUN",
+    "native_chrome_permission_dialog": "NOT RUN",
+    "store_screenshots": [],
+    "blockers": [
+      "Cua public browser tab creation unavailable; web open tool could not access store/landing; HTTP GET succeeded separately",
+      "No approval for persistent extension installation, credential configuration or new provider grants"
+    ]
+  }
+}

@@ -4,7 +4,7 @@ Chrome'daki uyumlu zengin metin editörlerine Türkçe düzeltme düğmesi ekler
 
 Eklenti yazım, noktalama ve resmî yazışma üslubu için seçtiğiniz yapay zekâ sağlayıcısından öneri alır. Sonucu kullanmadan önce gözden geçirin; kusursuz doğruluk, resmî kurum onayı veya mevzuata uyum garantisi verilmez.
 
-**Yerel bakım sürümü: 3.4.0.** 7 Ekim 2026'da [mevcut Chrome Web Store öğesinin](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) **3.4.0** sürümü kamu sayfası/paketi ve ayrı, temiz, oturumsuz Chrome **154.0.8037.98** profiline gerçek mağaza kurulumu ile doğrulandı. Anahtarsız popup/ayarlar ve sentetik editör API'sinde eksik anahtar/toggle kontrolü geçti. Ülke/bölge doğrulanmadı; gerçek bulut/yerel ilk düzeltme henüz yapılmadı. [#7 doğrulama kaydı](docs/first-correction.md) yayımlanan paket, yerel değişiklikler ve kalan kontrolleri ayrı açıklar.
+**Yerel bakım sürümü: 3.4.0.** 7 Ekim 2026'da [mevcut Chrome Web Store öğesinin](https://chromewebstore.google.com/detail/ai-t%C3%BCrk%C3%A7e-metin-d%C3%BCzeltici/gnkhgnhdokinbamhokpljgafapfjhjhl) **3.4.0** sürümü kamu sayfası/paketi ve ayrı, temiz, oturumsuz Chrome **154.0.8037.98** profiline gerçek mağaza kurulumu ile doğrulandı. Anahtarsız ilk kullanımın ardından kullanıcı kendi anahtarını Ayarlar'da kaydetti; OpenRouter / `google/gemini-3.8-flash` ile gerçek Quill **2.0.3** üzerinde sentetik metnin bulut düzeltmesi, iptal, uyarılı düz metin kabulü ve Quill undo doğrulandı. İlk denemede 25 saniyelik zaman aşımı görüldü. Yerel Ollama/llama.cpp düzeltmesi **NOT RUN**; ülke/bölge ve faturalandırma doğrulanmadı. [Bulut kontrolü](evidence/store-first-correction-2026-10-07.json) ve [#7 kaydı](docs/first-correction.md) kanıt sınırlarını açıklar; #7 kısmen tamamlandı.
 
 ## Gereksinimler ve ücret
 
@@ -41,7 +41,7 @@ Chrome'un bağlantı izni ve Ollama'nın origin izni ayrı koşullardır. Rehber
 
 ## Editör desteği ve sınırlar
 
-3.4.0 kaynak sürümünün yerel tarayıcı doğrulaması CKEditor **4.22.1**, CKEditor **48.5.2** (CKEditor 5), Summernote **0.9.1**, TinyMCE **8.9.2** ve Quill **2.0.3 / 1.3.7** classic kurulumlarıyla yapılmıştır. 7 Ekim'de indirilen yayımlanmış 3.4.0 paketinin çalışma dosyaları bu çalışmanın başlangıç commit'iyle eşleşir; mağazadan kurulmuş eklentiyle matris henüz tekrarlanmadı. Entegrasyonun test durumu, kanıtı ve sınırları [test kayıtlarında](docs/testing.md) belirtilir. Bir editörün test edilmesi, onu kullanan bütün sitelerin desteklendiğini kanıtlamaz.
+3.4.0 kaynak sürümünün yerel tarayıcı doğrulaması CKEditor **4.22.1**, CKEditor **48.5.2** (CKEditor 5), Summernote **0.9.1**, TinyMCE **8.9.2** ve Quill **2.0.3 / 1.3.7** classic kurulumlarıyla yapılmıştır. 7 Ekim'de indirilen yayımlanmış 3.4.0 paketinin çalışma dosyaları bu çalışmanın başlangıç commit'iyle eşleşir; sonraki yerel yamalar kurulu mağaza sürümünde yoktur. Matris mağazadan kurulmuş eklentiyle topluca tekrarlanmadı; yalnız gerçek Quill **2.0.3** örnek sayfasındaki sınırlı bulut akışı ayrıca doğrulandı. Bu akışta biçim koruma uyarısı görüldü, kabul düz metin uyguladı ve Quill undo başlangıcı geri getirdi. Entegrasyonun test durumu, kanıtı ve sınırları [test kayıtlarında](docs/testing.md) belirtilir. Bir editörün test edilmesi, onu kullanan bütün sitelerin desteklendiğini kanıtlamaz.
 
 WordPress, Drupal, Joomla, Notion veya başka bir platform için genel destek iddiası yoktur. Sayfanın editör kurulumu, sürümü, iframe yapısı ve özelleştirmeleri uyumluluğu etkileyebilir. Özellikle Notion'ın Quill kullandığı varsayılmaz.
 

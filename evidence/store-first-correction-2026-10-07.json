@@ -1,0 +1,182 @@
+{
+  "issue": "https://github.com/mytsx/duzelt-ai/issues/7",
+  "verified_on": "2026-10-07",
+  "method": "Native Chrome UI through cua_repl; masked options screenshot and synthetic editor accessibility observations",
+  "installation_evidence": "evidence/store-install-2026-10-07.json",
+  "profile": {
+    "name": "Duzelt Issue7 Test 2026-10-07",
+    "chrome_version": "154.0.8037.98",
+    "os": "macOS 27.0.1 (26A434)",
+    "country_or_region": null,
+    "country_or_region_verified": false
+  },
+  "installed_extension": {
+    "id": "gnkhgnhdokinbamhokpljgafapfjhjhl",
+    "source": "Chrome Web Store",
+    "version": "3.4.0",
+    "unpacked_extension_loaded": false,
+    "installed_background_or_fetch_modified": false,
+    "local_branch_fixes_in_installed_package": false
+  },
+  "connection": {
+    "provider": "OpenRouter",
+    "model": "google/gemini-3.8-flash",
+    "api_address_visible": "https://openrouter.ai/api/v1",
+    "saved_and_active_visible": true,
+    "credential_entered_and_saved_by": "User, through extension options UI",
+    "credential_read_or_entered_by_agent": false,
+    "credential_field_masked": true,
+    "connection_test": "PASS: existing successful UI result observed, user-operated; not rerun by agent",
+    "connection_test_message": "Bağlantı başarılı. Kaydedilmiş sağlayıcı ve model ile test tamamlandı.",
+    "new_origin_grant_requested_or_accepted_by_agent": false
+  },
+  "editor_page": {
+    "file": "tests/fixtures/store-first-correction.html",
+    "tested_sha256": "1b39d3a0a3c75b047556db36ee8312c764e2ef4c5c3f63d0ce01b21bd9aece51",
+    "served_url": "http://127.0.0.1:8769/",
+    "editor": "Actual upstream Quill 2.0.3",
+    "asset_source": "https://registry.npmjs.org/quill/-/quill-2.0.3.tgz",
+    "npm_sha512_integrity_verified": true,
+    "tarball_sha256": "3a8a6cb4383b65e93552ea3da79a796eb0be5d2ca08390f1add0208fb23e6f42",
+    "quill_js_sha256": "f6157c72ac9b3f51cdead426335688a027b12405d9d6a4daadd38a676b2d7ff2",
+    "quill_css_sha256": "1c7948cd13aa92fac6390319bc1e5e461823da171519d3a768db56164f871636",
+    "content": "Only supplied synthetic Turkish text, bold/italic/local link/bullet list, and visible literal <b>örnek</b> code example",
+    "baseline_recorded_at_utc": "2026-10-07T12:33:06.711Z",
+    "extension_source_scripts_in_page": false,
+    "chrome_api_stubs": false,
+    "provider_response_mocks": false,
+    "package_install_or_lifecycle_performed": false,
+    "server": "Loopback-only; exact HTML/Quill JS/CSS/LICENSE allowlist; no repository/user files or directory listing",
+    "tested_server_sha256": "ad41c496aac6d38808862bd34ef02f2a1941a9a5779aa0ef1a3e3d2e4943356a",
+    "temporary_page_tab_closed": true,
+    "server_stopped": true,
+    "handoff_screen": "Named test profile on chrome://version; existing installed extension and user-saved cloud configuration retained"
+  },
+  "checks": [
+    {
+      "name": "First agent correction request",
+      "result": "FAIL: timeout",
+      "observed": "Sağlayıcı isteği zaman aşımına uğradı. Lütfen yeniden deneyin.",
+      "after_dismissal": "Semantic HTML, Delta JSON and editor DOM HTML equal baseline; no preview; Düzelt enabled",
+      "timeout_note": "Published source aborts each fetch after 25000ms. Exact network latency and upstream cause were not measured."
+    },
+    {
+      "name": "User manual retry and successful preview",
+      "result": "PASS after retry",
+      "observed_by_agent": "Real correction preview open on the same synthetic Quill page; original editor still unchanged",
+      "fallback_warning": "Bu değişiklikte biçimler güvenle eşleştirilemedi. Sonuç düz metin olarak uygulanacak; biçimler ve bağlantılar kaldırılacak. Kabul etmeden önce kontrol edin."
+    },
+    {
+      "name": "Cancel successful preview",
+      "result": "PASS",
+      "observed": "Trusted native İptal click; preview closed; semantic HTML, Delta JSON and DOM HTML equal baseline; undo stack 0"
+    },
+    {
+      "name": "Second and final agent correction request",
+      "result": "PASS",
+      "observed": "New real preview; same plain-text fallback warning; original editor unchanged until acceptance"
+    },
+    {
+      "name": "Accept successful preview",
+      "result": "PASS: warned plain-text fallback",
+      "observed": "Corrected Turkish text applied; semantic HTML, Delta JSON and DOM HTML changed; user-source text-change 1; Quill undo stack 1",
+      "formatting": "Bold, italic, link, semantic bullet list and code format removed, as the visible warning stated; format preservation was not achieved",
+      "literal_html": "<b>örnek</b> remained visible text; accepted semantic HTML contained &lt;b&gt;örnek&lt;/b&gt;",
+      "accepted_text": "Sayın Ali,\n\nBugün çok güzel bir gündür.\nYarın gerçekleştirilecek toplantıda bu bağlantı kullanılacaktır.\n1) Birinci örnek madde\n2) İkinci örnek madde\nGörünür kod örneği: <b>örnek</b>."
+    },
+    {
+      "name": "Quill history undo after acceptance",
+      "result": "PASS",
+      "observed": "Trusted fixture button called actual Quill history.undo(); semantic HTML, Delta JSON and DOM HTML all returned exactly to baseline; original formatting/link/list/code restored; undo stack 0",
+      "scope": "Quill history API, not a Cmd+Z keyboard shortcut test"
+    },
+    {
+      "name": "Repeat click while correction pending",
+      "result": "NOT VERIFIED",
+      "observed": "Düzelt was visibly disabled during the request. The later coordinate click coincided with the opened modal; busy-pointer counter stayed 0.",
+      "scope": "No claim that an in-flight repeat click was delivered or that provider request deduplication was measured"
+    },
+    {
+      "name": "Ordinary input/textarea",
+      "result": "PASS: no extension button",
+      "scope": "These ordinary controls remain unsupported"
+    }
+  ],
+  "final_page_observations": {
+    "injected_button_count": 1,
+    "button_enabled": true,
+    "preview_count": 0,
+    "preview_openings_observed": 2,
+    "maximum_simultaneous_previews_observed": 1,
+    "trusted_correction_clicks": 3,
+    "agent_correction_clicks": 2,
+    "user_manual_retry_clicks": 1,
+    "accept_clicks": 1,
+    "cancel_clicks": 1,
+    "busy_pointer_attempts_observed": 0,
+    "semantic_html_equal_baseline": true,
+    "delta_json_equal_baseline": true,
+    "dom_html_equal_baseline": true,
+    "text_changes": { "user": 2, "api": 1, "other": 0 },
+    "api_change_note": "One fixture seed when the visible literal HTML checkbox was enabled; not a provider result",
+    "counters_note": "Page-local UI/editor snapshots only; requestAnimationFrame observations can miss short transitions and do not measure provider calls"
+  },
+  "cost_and_privacy": {
+    "authorized_existing_balance_ceiling_usd": 5,
+    "top_up_performed": false,
+    "actual_provider_requests_measured": null,
+    "actual_tokens_or_billed_cost_measured": null,
+    "agent_connection_test_clicks": 0,
+    "agent_correction_clicks": 2,
+    "automatic_retry_added": false,
+    "public_pricing_checked_on": "2026-10-07",
+    "pricing_source": "https://openrouter.ai/api/v1/models/google/gemini-3.8-flash/endpoints",
+    "normal_input_output_usd_per_million_tokens": [0.75, 3.75],
+    "highest_listed_priority_input_output_usd_per_million_tokens": [1.35, 6.75],
+    "listed_context_length": 1048576,
+    "listed_max_completion_tokens": 65536,
+    "reasoning_billing_source": "https://openrouter.ai/docs/guides/best-practices/reasoning-tokens",
+    "pricing_note": "Published token rates and model caps are estimates only, not measured billing. Reasoning is charged as output. Installed OpenRouter requests do not send an output token cap; the 25s timeout is not a spend cap.",
+    "real_user_text_or_files_used": false,
+    "secret_logged_or_saved_in_evidence": false,
+    "options_full_accessibility_read": "Automatic approval rejected a full tree read due to possible API key disclosure. User masked the key and handed over a safe view; screenshot-only observation succeeded. No bypass or storage/profile-file read."
+  },
+  "screenshots": {
+    "observed_in_tool_results": ["Masked OpenRouter model and existing successful connection result", "Real Quill pending request", "Timeout alert", "Successful preview and fallback warning"],
+    "persisted_local_image_files": [],
+    "library_file_ids": [],
+    "note": "Tool-result screenshots only; no downloadable screenshot artifact"
+  },
+  "gates": {
+    "real_cloud_first_correction": "PASS after one timeout and user retry; cancellation, warned fallback acceptance and undo verified",
+    "real_local_first_correction": "NOT RUN",
+    "country_or_region": "NOT VERIFIED",
+    "all_supported_editors_or_cms_on_store_build": "NOT RUN",
+    "general_adversarial_html_safety": "NOT RUN; only the supplied literal example was observed",
+    "issue_complete": false,
+    "remote_write_or_publication_performed": false
+  },
+  "local_service_readiness": {
+    "read_only_endpoint": "http://127.0.0.1:11434/api/tags",
+    "result": "Connection refused, errno 61, after approved read-only sandbox-external check",
+    "inference_performed": false,
+    "service_started_or_configured": false,
+    "note": "No Ollama listener at this exact address was reachable during this check; other ports/services were not scanned. Local installed-extension correction remains NOT RUN."
+  },
+  "reproduction": {
+    "prepare_command": "python3 tools/prepare-store-fixture.py",
+    "serve_command": "python3 tools/serve-store-fixture.py --port 8769",
+    "note": "Committed reproduction helpers were added after manual QA and checked statically. The tested fixture/assets remain identical. Helpers do not install extensions, grant permissions or call providers."
+  },
+  "repository_checks": {
+    "json_and_python_syntax": "PASS",
+    "fixture_inline_javascript_and_upstream_quill_syntax": "PASS: node --check; parsing only",
+    "frozen_tested_html_and_served_copy_hash": "PASS",
+    "pinned_npm_archive_and_asset_hashes": "PASS",
+    "documentation_relative_links": "PASS",
+    "git_diff_check": "PASS",
+    "independent_fixture_source_review": "No blocking finding",
+    "extension_runtime_changed_in_this_followup": false,
+    "old_source_only_test_results": "Historical checks remain in separate evidence; not presented as this live provider test"
+  }
+}

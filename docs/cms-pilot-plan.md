@@ -52,7 +52,7 @@ Bu deney için **toplam bir yeniden deneme** önerilir: ya tek ek görüşme dö
 
 ## 3. Dar teknik pilot
 
-Pilota geçmeden ayrı rıza, kapsam, kurulum/editor sürümü ve kabul ölçütleri kayıtlı olmalıdır. [#7 kaydında](first-correction.md) 7 Ekim temiz profilde gerçek mağaza kurulumu **PASS**; ülke/bölge doğrulanmadı ve bulut/yerel ilk düzeltme hâlâ **NOT RUN**. Bu kapı tamamlanmadan veya seçilen pilot kurulumunda eşdeğer onaylı gerçek kurulum ve gerekli düzeltme kanıtı alınmadan teknik pilot başlamaz. Sentetik kaynak veya anahtarsız hata testi bu kapıyı geçirmez.
+Pilota geçmeden ayrı rıza, kapsam, kurulum/editor sürümü ve kabul ölçütleri kayıtlı olmalıdır. [#7 kaydında](first-correction.md) 7 Ekim temiz profilde gerçek mağaza kurulumu **PASS**; gerçek Quill **2.0.3** örnek sayfasında OpenRouter / `google/gemini-3.8-flash` bulut düzeltmesi, iptal, uyarılı düz metin kabulü ve Quill undo ayrıca gözlendi. [Bulut kanıtı](../evidence/store-first-correction-2026-10-07.json) bir CMS pilotu veya geniş uyumluluk kanıtı değildir; yerel Ollama/llama.cpp düzeltmesi **NOT RUN**, ülke/bölge doğrulanmadı ve #7 açık kalır. Seçilen pilotun kendi CMS/editör/sürüm ve bağlantısında onaylı gerçek kurulum ve gerekli düzeltme kanıtı alınmadan teknik pilot başlamaz. Sentetik kaynak veya anahtarsız hata testi bu kapıyı geçirmez.
 
 Önerilen dar kapsam: **bir ekip, bir CMS kurulumu, tek zengin metin editörü ve tam sürümü, bir masaüstü Chrome profili, bir mevcut sağlayıcı/model bağlantısı**. Üretim içeriği yerine izole örnek sayfa/staging ve sentetik metin kullanılır. CMS/editör eşleşmesi bilinmiyorsa önce salt okunur tanımlama yapılır; destek sözü verilmez.
 
@@ -95,7 +95,7 @@ Fiyat, sabit ücret/abonelik modeli ve ticari koşullar şimdi seçilmez. [Tekli
 | Issue ölçütü | Bu tur |
 | --- | --- |
 | 10–15 görüşmenin anonim/toplu özeti | **NOT RUN**; görüşme ve toplu özet şablonları hazır. |
-| Rıza, kapsam, editör/sürüm ve eşikle pilot | **NOT RUN**; rıza/senaryo/kabul şablonu hazır. #7 gerçek kurulum kapısı açık. |
+| Rıza, kapsam, editör/sürüm ve eşikle pilot | **NOT RUN**; rıza/senaryo/kabul şablonu hazır. Seçilen CMS/editör ve bağlantının ayrı rıza/doğrulama kapıları açık; #7 bulut Quill kontrolü pilot sayılmaz. |
 | Gerekçeli devam/yeniden dene/durdur kararı | **NOT RUN**; ön kayıt eşikleri ve boş karar formu hazır. |
 | Ücretsiz çekirdek, izinsiz iletişim ve CMS iddiaları | Bu belge değişikliğinde korunur; ürün kodu, site, izinler ve hesaplar değiştirilmedi, dış mesaj gönderilmedi. |
 

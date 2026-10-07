@@ -5,7 +5,8 @@
 - [x] Yerel değişiklikler ve Git durumu kontrol edildi; başlangıç çalışma ağacı temiz, ana dal main.
 - [x] 3 Ekim tarihsel mağaza/panel kontrolü: gnkhgnhdokinbamhokpljgafapfjhjhl, o gün yayın 3.3.0; mevcut geliştirici paneli gerçek Chrome arayüzünde doğrulandı.
 - [x] #7: 7 Ekim ayrı temiz, oturumsuz Chrome 154.0.8037.98 profilinde resmî mağaza 3.4.0 kurulumu ve anahtarsız ilk kullanım/hata/toggle kontrolü. [Kanıt](docs/first-correction.md).
-- [ ] #7: ülke/bölge teyidi ve mağazadan kurulan sürümle gerçek bulut/yerel ilk düzeltme/önizleme/kabul/iptal — **NOT RUN / ülke-bölge doğrulanmadı**.
+- [x] #7: mağaza 3.4.0 ve gerçek Quill 2.0.3 örnek sayfasında kullanıcı tarafından kaydedilmiş OpenRouter / `google/gemini-3.8-flash` bağlantısıyla bulut düzeltme, iptal, uyarılı düz metin kabulü ve Quill undo. İlk istekte 25 saniyelik zaman aşımı, kullanıcı tekrarında ve sonraki ajan isteğinde başarı gözlendi. [Kanıt](evidence/store-first-correction-2026-10-07.json).
+- [ ] #7: ülke/bölge teyidi ve gerçek Ollama/llama.cpp ilk düzeltme/önizleme/kabul/iptal — **NOT RUN / ülke-bölge doğrulanmadı**. Bulut ağ isteği sayısı ve faturalandırma ölçülmedi; #7 açık kalır.
 - [x] Editör desteğini gerçek editörlerle test et; platform iddialarını ayır.
 - [x] Gizlilik metnini gerçek veri akışına göre düzelt.
 - [x] Gerçek arayüz ekran görüntülerini ve mevcut ikonları tasarım paketi için hazırla.
@@ -112,11 +113,11 @@
 - [x] [Boş görüşme, toplu özet, ayrı pilot rızası, senaryo/kabul ve karar şablonlarını](docs/cms-pilot-templates.md) hazırla.
 - [ ] Operatör hedef görev, rıza/not kapsamı, dönem ve eşikleri ilk görüşmeden önce kaydetsin; dış iletişim için ayrıca açık yetki gereklidir.
 - [ ] 10–15 gönüllü görüşmeyi yap ve yalnız anonim/toplu sonuçları özetle — **NOT RUN**.
-- [ ] #7'nin kalan gerçek düzeltme/ülke-bölge kapısını veya seçilen pilotta eşdeğer onaylı kanıtı tamamla; ayrı rıza ve tam editör/sürüm kapsamıyla sentetik teknik pilot yap — **NOT RUN**.
+- [ ] Seçilen pilotun CMS/editör/sürüm ve bağlantısında onaylı gerçek kurulum/düzeltme kanıtını, ayrı rızayı ve kapsamı tamamla; sentetik teknik pilot yap — **NOT RUN**. #7'nin Quill bulut kontrolü CMS pilotu değildir; yerel düzeltme ve ülke/bölge kaydı ayrıca eksiktir.
 - [ ] Ön kayıt ölçütlerine göre devam/yeniden dene/durdur kararını gerekçelendir; ücretli teklif/pilot bu hazırlıkta yok — **NOT RUN**.
 
 ## Kanıt sınırları
-- Anahtar gerektirmeyen deterministik API testleri gerçek sağlayıcı/model erişimi veya düzeltme kalitesini kanıtlamaz. Gerçek hesapla API çağrısı yapılmadı.
+- Anahtar gerektirmeyen deterministik API testleri gerçek sağlayıcı/model erişimi veya düzeltme kalitesini kanıtlamaz. Mağazadan kurulu sürümün ayrı bulut kontrolünde gerçek düzeltme gözlendi; anahtarı kullanıcı girdi, ajan okumadı. Ağ isteği sayısı ve faturalandırma ölçülmedi.
 - Seçici veya DOM maketi testi, belirli CMS/platform desteği ya da gerçek editör veri modeli kanıtı değildir.
 - Yerel test, uzak build, canlı site ve mağaza incelemesi ayrı durumlarla raporlanır.
 - Cloudflare, mevcut Yerli Developer ve mağaza panelleri gerçek kullanıcı hesabında doğrulandı. Mağazanın DOM betik kısıtı nedeniyle native erişilebilirlik arayüzü kullanıldı.

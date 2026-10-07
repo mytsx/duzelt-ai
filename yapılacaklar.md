@@ -1,6 +1,6 @@
 # Bakım notları — 3.4.0
 
-Güncel çalışma planı [TODO.md](TODO.md), test kanıtları [docs/testing.md](docs/testing.md) dosyasındadır. 7 Ekim 2026'da kamu mağaza sürümü ve ayrı temiz Chrome profiline resmî kurulum **3.4.0** olarak doğrulandı; yerel bakım sürümü de 3.4.0. Gerçek bulut/yerel ilk düzeltme **NOT RUN**, ülke/bölge doğrulanmadı: [#7 kaydı](docs/first-correction.md).
+Güncel çalışma planı [TODO.md](TODO.md), test kanıtları [docs/testing.md](docs/testing.md) dosyasındadır. 7 Ekim 2026'da kamu mağaza sürümü ve ayrı temiz Chrome profiline resmî kurulum **3.4.0** olarak doğrulandı; yerel bakım sürümü de 3.4.0. Kullanıcının Ayarlar'da kaydettiği OpenRouter / `google/gemini-3.8-flash` bağlantısıyla gerçek Quill **2.0.3** üzerinde sentetik bulut düzeltmesi, iptal, uyarılı düz metin kabulü ve Quill undo gözlendi; ilk istekte 25 saniyelik zaman aşımı vardı. [Bulut kanıtı](evidence/store-first-correction-2026-10-07.json). Yerel Ollama/llama.cpp düzeltmesi **NOT RUN**, ülke/bölge ve faturalandırma doğrulanmadı; #7 açık: [doğrulama kaydı](docs/first-correction.md).
 
 ## Tamamlanan bakım
 

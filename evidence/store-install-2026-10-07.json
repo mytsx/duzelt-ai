@@ -119,5 +119,8 @@
     "note": "Screenshots were emitted and visually inspected in this task's tool results; no downloadable screenshot file or Library artifact was created"
   },
   "issue_complete": false,
-  "remote_write_or_publication_performed": false
+  "remote_write_or_publication_performed": false,
+  "historical_snapshot": true,
+  "followup_cloud_evidence": "evidence/store-first-correction-2026-10-07.json",
+  "historical_note": "This record preserves the earlier keyless-install stage. Subsequent user credential configuration and actual cloud correction are recorded separately; the key is no longer empty."
 }

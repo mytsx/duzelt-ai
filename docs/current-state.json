@@ -111,6 +111,13 @@
   "real_store_install_country_or_region": null,
   "real_store_install_country_or_region_verified": false,
   "real_store_keyless_first_use_verified": true,
-  "real_cloud_first_correction_verified": false,
-  "real_local_first_correction_verified": false
+  "real_cloud_first_correction_verified": true,
+  "real_local_first_correction_verified": false,
+  "real_cloud_first_correction_verified_on": "2026-10-07",
+  "real_cloud_first_correction_evidence": "evidence/store-first-correction-2026-10-07.json",
+  "real_cloud_first_correction_provider": "OpenRouter",
+  "real_cloud_first_correction_model": "google/gemini-3.8-flash",
+  "real_cloud_first_correction_editor": "Quill 2.0.3",
+  "real_cloud_first_correction_note": "First request timed out; user manual retry and final agent correction succeeded. Cancel, warned plain-text acceptance and Quill undo verified. Provider request count and billed cost not measured; country/region and actual local correction remain unverified.",
+  "issue_7_complete": false
 }
